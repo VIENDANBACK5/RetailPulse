@@ -1,0 +1,65 @@
+{
+  "nodes": {
+    "HN": {
+      "code": "HN",
+      "name": "Chi nhánh Hà Nội (Miền Bắc)",
+      "lat": 21.0285,
+      "lng": 105.8542,
+      "address": "Quận Hoàn Kiếm, TP. Hà Nội",
+      "region": "Bắc Bộ"
+    },
+    "DN": {
+      "code": "DN",
+      "name": "Chi nhánh Đà Nẵng (Miền Trung)",
+      "lat": 16.0544,
+      "lng": 108.2022,
+      "address": "Quận Hải Châu, TP. Đà Nẵng",
+      "region": "Trung Bộ"
+    },
+    "SG": {
+      "code": "SG",
+      "name": "Chi nhánh Sài Gòn (Miền Nam)",
+      "lat": 10.8231,
+      "lng": 106.6297,
+      "address": "Quận 1, TP. Hồ Chí Minh",
+      "region": "Nam Bộ"
+    }
+  },
+  "distance_matrix_km": {
+    "HN": {
+      "HN": 0.0,
+      "DN": 605.92,
+      "SG": 1137.8
+    },
+    "DN": {
+      "HN": 605.92,
+      "DN": 0.0,
+      "SG": 606.03
+    },
+    "SG": {
+      "HN": 1137.8,
+      "DN": 606.03,
+      "SG": 0.0
+    }
+  },
+  "sample_routes": [
+    {
+      "from": "HN",
+      "to": "DN",
+      "distance_km": 605.92,
+      "desc": "Tuyến Bắc - Trung qua Quốc lộ 1A"
+    },
+    {
+      "from": "DN",
+      "to": "SG",
+      "distance_km": 606.03,
+      "desc": "Tuyến Trung - Nam qua Cao tốc Bắc Nam"
+    },
+    {
+      "from": "HN",
+      "to": "SG",
+      "distance_km": 1137.8,
+      "desc": "Tuyến xuyên Việt Bắc - Nam"
+    }
+  ]
+}

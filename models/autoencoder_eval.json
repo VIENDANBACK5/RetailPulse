@@ -1,0 +1,36 @@
+{
+  "model_architecture": "MLP Autoencoder (8 -> 16 -> 3 -> 16 -> 8)",
+  "latent_dimension": 3,
+  "reconstruction_mse": 0.012,
+  "traditional_silhouette": 0.3088,
+  "autoencoder_silhouette": 0.3214,
+  "silhouette_gain": 0.0126,
+  "total_customers": 1072,
+  "cluster_distribution": {
+    "Deep At-Risk / Churn Warning": 499,
+    "Deep Loyal / High Engagement": 429,
+    "Deep VIP / High-Value Champions": 144
+  },
+  "latent_centroids": [
+    [
+      2.242456671905408,
+      2.928231535030494,
+      2.552820907917709
+    ],
+    [
+      2.6716489528937606,
+      5.397421025557298,
+      4.768528286569195
+    ],
+    [
+      5.047871560581323,
+      2.716126706827199,
+      1.6676677196040717
+    ],
+    [
+      1.636016335600094,
+      1.218075765584377,
+      1.2853055140489549
+    ]
+  ]
+}

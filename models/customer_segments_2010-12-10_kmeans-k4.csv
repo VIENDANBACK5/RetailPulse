@@ -1,0 +1,1073 @@
+customer_key,customer_code,recency,frequency,monetary,cluster_id,cluster_name
+12350,12350,30.0,5,1117.72,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12352,12352,173.0,3,140.67,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12353,12353,61.0,7,774.45,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12366,12366,226.0,1,233.37,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12368,12368,12.0,11,2318.92,1,VIP / Champions
+12370,12370,86.0,4,381.49,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12371,12371,70.0,4,454.51,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12375,12375,84.0,11,1750.64,1,VIP / Champions
+12382,12382,76.0,5,1750.05,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12385,12385,138.0,3,427.35,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12394,12394,113.0,3,813.98,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12397,12397,10.0,5,776.15,3,Khách hàng Trung thành (Loyal)
+12405,12405,45.0,8,519.65,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12406,12406,75.0,6,1627.63,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12412,12412,79.0,4,1272.92,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12417,12417,115.0,4,599.61,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12426,12426,82.0,4,713.06,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12431,12431,13.0,2,525.75,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12441,12441,41.0,5,588.89,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12448,12448,5.0,4,425.48,3,Khách hàng Trung thành (Loyal)
+12452,12452,53.0,6,1073.81,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12453,12453,10.0,9,900.56,3,Khách hàng Trung thành (Loyal)
+12455,12455,123.0,4,442.76,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12456,12456,223.0,2,363.72,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12457,12457,81.0,4,616.53,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12466,12466,106.0,5,804.19,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12470,12470,43.0,5,610.05,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12472,12472,37.0,11,1520.68,1,VIP / Champions
+12475,12475,123.0,8,1451.61,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12479,12479,164.0,2,581.89,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12482,12482,43.0,9,1156.24,1,VIP / Champions
+12485,12485,162.0,4,597.13,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12496,12496,135.0,3,302.1,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12499,12499,68.0,7,1519.89,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12501,12501,115.0,3,626.66,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12503,12503,144.0,1,58.65,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12513,12513,55.0,8,1083.15,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12516,12516,87.0,4,663.89,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12518,12518,168.0,6,1140.49,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12520,12520,36.0,7,1309.7,1,VIP / Champions
+12522,12522,13.0,6,944.98,3,Khách hàng Trung thành (Loyal)
+12523,12523,101.0,6,651.04,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12524,12524,66.0,4,473.9,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12532,12532,99.0,7,497.14,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12536,12536,176.0,6,707.13,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12541,12541,99.0,7,1124.72,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12553,12553,54.0,10,1660.23,1,VIP / Champions
+12559,12559,42.0,6,808.35,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12560,12560,40.0,8,1285.6,1,VIP / Champions
+12563,12563,25.0,6,612.82,3,Khách hàng Trung thành (Loyal)
+12564,12564,206.0,3,498.3,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12572,12572,41.0,3,263.86,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12575,12575,33.0,5,968.5,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12582,12582,14.0,4,408.98,3,Khách hàng Trung thành (Loyal)
+12592,12592,35.0,4,396.64,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12595,12595,234.0,3,274.36,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12602,12602,33.0,9,1216.42,1,VIP / Champions
+12612,12612,33.0,7,1453.73,1,VIP / Champions
+12618,12618,19.0,4,786.03,3,Khách hàng Trung thành (Loyal)
+12630,12630,71.0,3,268.23,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12638,12638,90.0,4,471.33,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12653,12653,2.0,5,468.76,3,Khách hàng Trung thành (Loyal)
+12654,12654,99.0,5,1394.6,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12655,12655,174.0,3,963.77,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12661,12661,166.0,7,1007.22,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12665,12665,150.0,4,495.84,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12670,12670,45.0,10,925.51,1,VIP / Champions
+12671,12671,55.0,2,436.29,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12673,12673,2.0,8,994.38,3,Khách hàng Trung thành (Loyal)
+12674,12674,47.0,6,1077.09,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12688,12688,23.0,4,851.81,3,Khách hàng Trung thành (Loyal)
+12690,12690,93.0,9,2303.99,1,VIP / Champions
+12693,12693,19.0,5,712.47,3,Khách hàng Trung thành (Loyal)
+12694,12694,145.0,1,216.5,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12695,12695,18.0,10,2839.96,1,VIP / Champions
+12703,12703,4.0,3,317.38,3,Khách hàng Trung thành (Loyal)
+12704,12704,6.0,7,1329.53,3,Khách hàng Trung thành (Loyal)
+12709,12709,20.0,10,1545.63,1,VIP / Champions
+12711,12711,86.0,3,616.88,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12715,12715,120.0,10,1655.29,1,VIP / Champions
+12722,12722,31.0,4,268.29,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12725,12725,22.0,5,383.85,3,Khách hàng Trung thành (Loyal)
+12731,12731,57.0,6,471.13,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12736,12736,6.0,15,2738.59,1,VIP / Champions
+12737,12737,7.0,10,1694.4,1,VIP / Champions
+12740,12740,140.0,2,582.06,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12741,12741,48.0,7,816.41,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12747,12747,16.0,8,1217.35,1,VIP / Champions
+12750,12750,25.0,1,121.95,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12751,12751,120.0,5,1017.31,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12754,12754,90.0,8,995.55,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12764,12764,30.0,6,768.78,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12767,12767,16.0,4,622.9,3,Khách hàng Trung thành (Loyal)
+12788,12788,270.0,1,67.4,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12796,12796,51.0,8,1166.89,1,VIP / Champions
+12797,12797,219.0,3,535.67,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12800,12800,80.0,6,851.06,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12807,12807,30.0,6,1625.21,1,VIP / Champions
+12812,12812,63.0,4,908.69,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12815,12815,39.0,6,938.56,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12819,12819,32.0,6,606.34,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12829,12829,93.0,3,764.45,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12835,12835,19.0,8,1066.35,1,VIP / Champions
+12841,12841,41.0,6,702.61,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12853,12853,57.0,9,2171.92,1,VIP / Champions
+12884,12884,57.0,9,918.17,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12885,12885,4.0,6,1002.18,3,Khách hàng Trung thành (Loyal)
+12897,12897,223.0,6,859.62,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12908,12908,70.0,7,697.74,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12910,12910,44.0,11,1764.2,1,VIP / Champions
+12912,12912,35.0,10,1865.03,1,VIP / Champions
+12914,12914,42.0,4,424.45,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12916,12916,16.0,8,1106.29,1,VIP / Champions
+12919,12919,45.0,3,698.55,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12922,12922,141.0,6,762.99,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12937,12937,34.0,11,1547.78,1,VIP / Champions
+12938,12938,4.0,3,600.32,3,Khách hàng Trung thành (Loyal)
+12949,12949,5.0,5,894.41,3,Khách hàng Trung thành (Loyal)
+12953,12953,24.0,4,707.18,3,Khách hàng Trung thành (Loyal)
+12955,12955,5.0,6,975.89,3,Khách hàng Trung thành (Loyal)
+12963,12963,21.0,6,1248.14,3,Khách hàng Trung thành (Loyal)
+12967,12967,139.0,4,1231.93,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12968,12968,23.0,7,792.86,3,Khách hàng Trung thành (Loyal)
+12976,12976,104.0,3,754.95,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+12978,12978,59.0,8,1304.56,1,VIP / Champions
+12982,12982,33.0,2,54.59,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13004,13004,54.0,4,784.98,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13009,13009,46.0,7,781.07,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13016,13016,90.0,4,561.49,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13017,13017,35.0,11,1406.19,1,VIP / Champions
+13021,13021,31.0,6,603.45,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13022,13022,43.0,9,1933.69,1,VIP / Champions
+13027,13027,132.0,7,1063.28,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13029,13029,20.0,6,1581.27,1,VIP / Champions
+13035,13035,23.0,10,1973.35,1,VIP / Champions
+13036,13036,148.0,3,1028.05,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13037,13037,28.0,6,645.76,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13041,13041,93.0,3,555.42,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13045,13045,70.0,11,2041.22,1,VIP / Champions
+13047,13047,119.0,4,757.06,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13054,13054,173.0,7,2707.23,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13060,13060,97.0,6,1604.34,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13075,13075,47.0,10,1440.66,1,VIP / Champions
+13086,13086,26.0,1,78.35,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13100,13100,157.0,2,297.06,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13102,13102,7.0,2,173.79,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13111,13111,99.0,3,324.59,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13114,13114,73.0,5,781.49,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13115,13115,16.0,8,1408.48,1,VIP / Champions
+13117,13117,11.0,4,511.26,3,Khách hàng Trung thành (Loyal)
+13123,13123,10.0,2,62.15,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13143,13143,31.0,4,221.05,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13148,13148,21.0,10,1738.53,1,VIP / Champions
+13151,13151,114.0,3,1121.53,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13168,13168,20.0,10,2127.04,1,VIP / Champions
+13170,13170,65.0,5,1582.67,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13175,13175,44.0,6,2284.63,1,VIP / Champions
+13176,13176,23.0,5,510.64,3,Khách hàng Trung thành (Loyal)
+13182,13182,101.0,2,280.86,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13184,13184,72.0,8,1773.21,1,VIP / Champions
+13187,13187,24.0,4,313.7,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13189,13189,52.0,5,1362.18,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13193,13193,2.0,18,3909.73,1,VIP / Champions
+13194,13194,1.0,7,1613.81,3,Khách hàng Trung thành (Loyal)
+13197,13197,91.0,4,1025.43,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13198,13198,67.0,6,1434.16,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13210,13210,105.0,6,1275.38,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13226,13226,40.0,12,1682.48,1,VIP / Champions
+13240,13240,17.0,12,2896.44,1,VIP / Champions
+13250,13250,205.0,3,170.12,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13256,13256,172.0,2,610.6,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13262,13262,3.0,8,1095.82,3,Khách hàng Trung thành (Loyal)
+13266,13266,143.0,4,663.08,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13267,13267,59.0,3,272.89,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13270,13270,128.0,6,263.31,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13272,13272,24.0,4,1287.97,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13274,13274,142.0,3,903.6,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13283,13283,73.0,8,1792.64,1,VIP / Champions
+13284,13284,92.0,7,1386.84,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13286,13286,41.0,8,2161.87,1,VIP / Champions
+13297,13297,41.0,4,677.95,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13298,13298,10.0,14,1543.38,1,VIP / Champions
+13300,13300,67.0,7,1620.25,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13313,13313,80.0,2,10.79,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13314,13314,101.0,2,786.5,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13327,13327,18.0,2,210.61,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13338,13338,6.0,12,1929.8,1,VIP / Champions
+13339,13339,87.0,4,1162.13,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13345,13345,123.0,12,1597.2,1,VIP / Champions
+13346,13346,17.0,6,1119.15,3,Khách hàng Trung thành (Loyal)
+13351,13351,91.0,4,753.58,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13352,13352,8.0,4,364.11,3,Khách hàng Trung thành (Loyal)
+13360,13360,4.0,6,395.86,3,Khách hàng Trung thành (Loyal)
+13365,13365,30.0,10,1219.96,1,VIP / Champions
+13368,13368,23.0,8,1021.29,1,VIP / Champions
+13370,13370,18.0,14,2842.14,1,VIP / Champions
+13371,13371,119.0,1,143.05,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13372,13372,50.0,9,572.57,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13375,13375,1.0,7,1462.39,3,Khách hàng Trung thành (Loyal)
+13387,13387,334.0,2,689.42,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13402,13402,24.0,11,1175.31,1,VIP / Champions
+13404,13404,28.0,6,1369.76,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13406,13406,39.0,8,1488.61,1,VIP / Champions
+13407,13407,18.0,6,1004.49,3,Khách hàng Trung thành (Loyal)
+13408,13408,100.0,6,1118.01,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13411,13411,116.0,7,1120.72,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13413,13413,143.0,2,105.6,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13423,13423,152.0,4,364.79,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13425,13425,65.0,3,51.4,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13427,13427,69.0,9,2130.03,1,VIP / Champions
+13435,13435,325.0,1,156.6,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13437,13437,331.0,2,287.79,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13446,13446,8.0,3,636.51,3,Khách hàng Trung thành (Loyal)
+13447,13447,32.0,10,1437.01,1,VIP / Champions
+13453,13453,75.0,10,1228.4,1,VIP / Champions
+13478,13478,94.0,5,616.5,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13493,13493,56.0,7,1107.15,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13497,13497,11.0,6,662.15,3,Khách hàng Trung thành (Loyal)
+13500,13500,9.0,3,413.23,3,Khách hàng Trung thành (Loyal)
+13501,13501,22.0,4,779.05,3,Khách hàng Trung thành (Loyal)
+13505,13505,5.0,6,1459.18,3,Khách hàng Trung thành (Loyal)
+13514,13514,19.0,5,1056.12,3,Khách hàng Trung thành (Loyal)
+13518,13518,17.0,5,1118.48,3,Khách hàng Trung thành (Loyal)
+13523,13523,33.0,6,524.4,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13527,13527,83.0,4,827.49,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13528,13528,51.0,3,289.6,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13534,13534,22.0,5,679.39,3,Khách hàng Trung thành (Loyal)
+13540,13540,15.0,2,153.3,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13543,13543,13.0,17,4814.11,1,VIP / Champions
+13549,13549,86.0,8,719.59,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13554,13554,40.0,3,1047.84,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13555,13555,23.0,6,847.05,3,Khách hàng Trung thành (Loyal)
+13556,13556,167.0,3,122.55,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13558,13558,120.0,9,1214.2,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13560,13560,4.0,7,724.53,3,Khách hàng Trung thành (Loyal)
+13565,13565,95.0,9,1896.58,1,VIP / Champions
+13601,13601,22.0,6,553.7,3,Khách hàng Trung thành (Loyal)
+13602,13602,65.0,7,922.02,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13603,13603,129.0,5,595.34,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13608,13608,8.0,5,585.67,3,Khách hàng Trung thành (Loyal)
+13614,13614,46.0,4,500.5,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13619,13619,97.0,6,1340.78,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13641,13641,91.0,7,884.21,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13645,13645,14.0,7,937.83,3,Khách hàng Trung thành (Loyal)
+13648,13648,43.0,12,2682.15,1,VIP / Champions
+13654,13654,2.0,6,833.11,3,Khách hàng Trung thành (Loyal)
+13657,13657,40.0,3,898.33,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13660,13660,26.0,5,682.96,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13661,13661,74.0,8,1199.89,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13672,13672,26.0,10,954.54,1,VIP / Champions
+13673,13673,36.0,11,2041.5,1,VIP / Champions
+13680,13680,32.0,3,531.92,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13681,13681,11.0,5,613.98,3,Khách hàng Trung thành (Loyal)
+13685,13685,20.0,6,1464.55,3,Khách hàng Trung thành (Loyal)
+13692,13692,163.0,13,2275.03,1,VIP / Champions
+13697,13697,129.0,5,793.31,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13710,13710,91.0,7,639.24,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13711,13711,104.0,4,332.6,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13718,13718,25.0,5,1555.28,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13736,13736,5.0,6,1051.33,3,Khách hàng Trung thành (Loyal)
+13743,13743,2.0,12,2388.99,1,VIP / Champions
+13747,13747,76.0,4,970.9,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13752,13752,7.0,16,2827.76,1,VIP / Champions
+13757,13757,5.0,4,589.06,3,Khách hàng Trung thành (Loyal)
+13760,13760,199.0,2,323.73,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13763,13763,40.0,10,1601.15,1,VIP / Champions
+13766,13766,153.0,5,1164.22,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13779,13779,15.0,6,830.25,3,Khách hàng Trung thành (Loyal)
+13782,13782,22.0,6,1008.59,3,Khách hàng Trung thành (Loyal)
+13787,13787,85.0,4,752.8,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13794,13794,10.0,13,2032.54,1,VIP / Champions
+13803,13803,62.0,6,1779.69,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13805,13805,144.0,6,1185.19,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13808,13808,26.0,8,1136.53,1,VIP / Champions
+13811,13811,32.0,9,1833.81,1,VIP / Champions
+13813,13813,49.0,7,1210.05,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13824,13824,68.0,8,1133.97,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13830,13830,65.0,2,239.1,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13847,13847,17.0,4,532.3,3,Khách hàng Trung thành (Loyal)
+13848,13848,5.0,2,639.49,3,Khách hàng Trung thành (Loyal)
+13852,13852,9.0,8,923.53,3,Khách hàng Trung thành (Loyal)
+13862,13862,37.0,6,1438.54,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13872,13872,2.0,12,1304.33,3,Khách hàng Trung thành (Loyal)
+13876,13876,133.0,2,233.02,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13881,13881,39.0,7,970.8,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13896,13896,134.0,6,628.78,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13917,13917,69.0,5,472.99,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13924,13924,28.0,9,1013.8,1,VIP / Champions
+13932,13932,2.0,3,334.84,3,Khách hàng Trung thành (Loyal)
+13934,13934,19.0,12,1970.1,1,VIP / Champions
+13939,13939,83.0,4,871.2,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13969,13969,23.0,3,537.24,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13976,13976,67.0,7,825.79,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13978,13978,55.0,4,368.53,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13980,13980,7.0,9,1373.26,3,Khách hàng Trung thành (Loyal)
+13983,13983,88.0,3,236.77,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13985,13985,89.0,4,848.5,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13988,13988,23.0,7,1862.39,1,VIP / Champions
+13992,13992,85.0,7,1986.0,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13994,13994,167.0,4,341.94,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+13998,13998,20.0,5,485.89,3,Khách hàng Trung thành (Loyal)
+14014,14014,154.0,5,1017.72,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14024,14024,78.0,3,214.47,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14028,14028,17.0,5,806.43,3,Khách hàng Trung thành (Loyal)
+14038,14038,10.0,5,401.03,3,Khách hàng Trung thành (Loyal)
+14042,14042,60.0,7,1209.93,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14043,14043,4.0,13,1902.28,1,VIP / Champions
+14049,14049,254.0,2,92.7,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14070,14070,88.0,8,1338.3,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14082,14082,70.0,6,900.81,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14084,14084,104.0,8,1950.7,1,VIP / Champions
+14087,14087,182.0,3,1001.92,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14088,14088,143.0,4,868.28,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14103,14103,128.0,7,1283.46,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14116,14116,27.0,8,1229.33,1,VIP / Champions
+14118,14118,55.0,4,580.45,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14120,14120,2.0,7,805.52,3,Khách hàng Trung thành (Loyal)
+14133,14133,41.0,5,963.06,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14145,14145,138.0,4,936.85,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14156,14156,11.0,7,712.87,3,Khách hàng Trung thành (Loyal)
+14158,14158,60.0,6,1045.57,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14170,14170,113.0,7,1042.01,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14171,14171,95.0,2,149.5,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14172,14172,108.0,6,1719.09,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14173,14173,51.0,3,914.12,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14176,14176,74.0,8,1328.29,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14181,14181,65.0,11,1585.96,1,VIP / Champions
+14212,14212,40.0,6,1000.03,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14223,14223,36.0,6,866.46,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14225,14225,9.0,7,1396.73,3,Khách hàng Trung thành (Loyal)
+14230,14230,48.0,4,800.61,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14231,14231,107.0,4,466.1,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14237,14237,45.0,7,1715.84,1,VIP / Champions
+14251,14251,14.0,9,2040.52,1,VIP / Champions
+14259,14259,8.0,2,269.22,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14261,14261,39.0,8,2084.91,1,VIP / Champions
+14265,14265,20.0,8,1094.67,1,VIP / Champions
+14268,14268,260.0,3,134.86,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14273,14273,88.0,5,820.62,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14285,14285,58.0,6,507.81,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14291,14291,88.0,7,1614.95,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14294,14294,28.0,6,680.16,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14300,14300,11.0,5,737.99,3,Khách hàng Trung thành (Loyal)
+14303,14303,32.0,6,1039.49,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14312,14312,70.0,4,296.89,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14317,14317,138.0,6,676.34,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14320,14320,11.0,14,1601.98,1,VIP / Champions
+14324,14324,59.0,4,739.64,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14326,14326,36.0,5,524.22,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14328,14328,45.0,9,1669.12,1,VIP / Champions
+14332,14332,12.0,7,881.25,3,Khách hàng Trung thành (Loyal)
+14337,14337,90.0,9,687.61,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14343,14343,12.0,7,719.38,3,Khách hàng Trung thành (Loyal)
+14374,14374,130.0,5,1064.13,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14379,14379,9.0,8,1458.26,3,Khách hàng Trung thành (Loyal)
+14385,14385,4.0,6,372.7,3,Khách hàng Trung thành (Loyal)
+14395,14395,83.0,4,557.36,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14399,14399,2.0,8,910.57,3,Khách hàng Trung thành (Loyal)
+14400,14400,89.0,7,1022.9,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14401,14401,48.0,2,191.53,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14403,14403,80.0,4,727.94,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14404,14404,3.0,9,1840.74,3,Khách hàng Trung thành (Loyal)
+14406,14406,42.0,11,2876.16,1,VIP / Champions
+14418,14418,21.0,7,434.24,3,Khách hàng Trung thành (Loyal)
+14421,14421,46.0,5,874.49,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14422,14422,2.0,7,1112.44,3,Khách hàng Trung thành (Loyal)
+14425,14425,95.0,6,624.95,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14427,14427,136.0,3,237.6,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14432,14432,112.0,5,823.46,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14434,14434,122.0,4,631.39,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14445,14445,107.0,6,1259.03,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14448,14448,44.0,7,749.57,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14449,14449,16.0,5,431.18,3,Khách hàng Trung thành (Loyal)
+14453,14453,6.0,3,824.42,3,Khách hàng Trung thành (Loyal)
+14454,14454,96.0,6,583.23,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14457,14457,15.0,10,1006.83,1,VIP / Champions
+14466,14466,54.0,6,1287.59,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14474,14474,100.0,7,1772.8,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14482,14482,57.0,6,507.25,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14488,14488,252.0,5,727.89,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14491,14491,76.0,3,318.15,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14496,14496,77.0,9,1027.13,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14511,14511,39.0,5,1163.35,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14512,14512,49.0,6,995.68,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14515,14515,90.0,7,954.27,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14516,14516,12.0,13,1840.05,1,VIP / Champions
+14517,14517,1.0,10,2082.47,3,Khách hàng Trung thành (Loyal)
+14519,14519,95.0,5,321.28,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14529,14529,52.0,5,319.18,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14539,14539,112.0,6,2110.51,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14540,14540,28.0,13,2918.23,1,VIP / Champions
+14553,14553,6.0,3,782.78,3,Khách hàng Trung thành (Loyal)
+14559,14559,14.0,12,1776.09,1,VIP / Champions
+14562,14562,102.0,4,367.29,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14566,14566,36.0,9,1821.51,1,VIP / Champions
+14569,14569,213.0,3,229.87,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14591,14591,124.0,7,1282.83,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14601,14601,26.0,3,170.37,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14604,14604,3.0,5,434.54,3,Khách hàng Trung thành (Loyal)
+14606,14606,45.0,7,1444.96,1,VIP / Champions
+14608,14608,88.0,5,469.04,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14619,14619,28.0,8,2030.5,1,VIP / Champions
+14629,14629,17.0,7,1196.44,3,Khách hàng Trung thành (Loyal)
+14634,14634,12.0,5,1063.18,3,Khách hàng Trung thành (Loyal)
+14643,14643,93.0,5,905.82,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14644,14644,56.0,5,844.17,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14667,14667,34.0,7,1441.06,1,VIP / Champions
+14670,14670,66.0,9,1290.69,1,VIP / Champions
+14681,14681,4.0,10,2932.74,1,VIP / Champions
+14684,14684,134.0,3,665.55,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14685,14685,76.0,9,853.23,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14691,14691,26.0,4,373.91,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14701,14701,195.0,6,997.29,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14704,14704,82.0,5,533.09,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14705,14705,3.0,6,1079.07,3,Khách hàng Trung thành (Loyal)
+14707,14707,29.0,5,644.71,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14708,14708,166.0,4,1193.66,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14719,14719,26.0,8,1934.49,1,VIP / Champions
+14723,14723,107.0,5,954.34,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14726,14726,54.0,6,409.81,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14729,14729,35.0,6,800.86,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14730,14730,14.0,7,1602.99,1,VIP / Champions
+14733,14733,28.0,5,867.42,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14737,14737,16.0,7,570.73,3,Khách hàng Trung thành (Loyal)
+14745,14745,1.0,21,4267.01,1,VIP / Champions
+14748,14748,28.0,10,931.1,1,VIP / Champions
+14749,14749,103.0,2,475.2,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14751,14751,16.0,6,1062.83,3,Khách hàng Trung thành (Loyal)
+14756,14756,52.0,5,642.59,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14757,14757,48.0,5,771.22,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14760,14760,18.0,4,1188.69,3,Khách hàng Trung thành (Loyal)
+14761,14761,105.0,6,817.89,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14771,14771,33.0,6,1032.17,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14772,14772,61.0,3,409.24,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14783,14783,26.0,17,3266.0,1,VIP / Champions
+14795,14795,83.0,6,546.09,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14808,14808,119.0,4,411.38,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14813,14813,137.0,4,587.69,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14816,14816,62.0,7,903.1,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14821,14821,58.0,7,732.49,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14823,14823,50.0,15,2865.36,1,VIP / Champions
+14826,14826,2.0,7,1397.42,3,Khách hàng Trung thành (Loyal)
+14829,14829,55.0,10,1067.98,1,VIP / Champions
+14835,14835,198.0,3,956.79,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14836,14836,18.0,7,892.68,3,Khách hàng Trung thành (Loyal)
+14853,14853,115.0,5,710.37,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14854,14854,11.0,3,600.31,3,Khách hàng Trung thành (Loyal)
+14858,14858,32.0,2,190.72,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14860,14860,34.0,8,621.03,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14863,14863,26.0,10,1429.55,1,VIP / Champions
+14869,14869,19.0,4,146.93,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14878,14878,15.0,1,354.45,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14884,14884,23.0,6,939.36,3,Khách hàng Trung thành (Loyal)
+14889,14889,26.0,2,87.94,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14908,14908,23.0,14,2252.84,1,VIP / Champions
+14909,14909,73.0,6,1746.71,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14910,14910,145.0,5,1121.95,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14913,14913,75.0,4,796.52,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14916,14916,6.0,11,2657.69,1,VIP / Champions
+14921,14921,38.0,5,1317.2,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14923,14923,7.0,6,1091.21,3,Khách hàng Trung thành (Loyal)
+14925,14925,2.0,6,1110.04,3,Khách hàng Trung thành (Loyal)
+14932,14932,94.0,4,1137.15,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14933,14933,11.0,4,351.17,3,Khách hàng Trung thành (Loyal)
+14935,14935,19.0,3,137.75,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14936,14936,70.0,10,1346.85,1,VIP / Champions
+14949,14949,15.0,5,786.96,3,Khách hàng Trung thành (Loyal)
+14958,14958,51.0,5,1034.84,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14960,14960,99.0,5,1181.6,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14962,14962,33.0,9,1061.71,1,VIP / Champions
+14971,14971,43.0,9,998.99,1,VIP / Champions
+14972,14972,65.0,4,310.16,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+14992,14992,52.0,6,550.92,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15006,15006,15.0,5,996.57,3,Khách hàng Trung thành (Loyal)
+15014,15014,123.0,4,191.7,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15019,15019,216.0,5,285.42,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15020,15020,58.0,8,985.4,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15027,15027,30.0,10,1484.1,1,VIP / Champions
+15028,15028,62.0,6,450.84,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15031,15031,7.0,7,1095.1,3,Khách hàng Trung thành (Loyal)
+15036,15036,139.0,4,1037.35,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15040,15040,12.0,6,989.66,3,Khách hàng Trung thành (Loyal)
+15043,15043,23.0,8,1536.18,1,VIP / Champions
+15044,15044,18.0,15,2658.41,1,VIP / Champions
+15045,15045,11.0,5,1075.01,3,Khách hàng Trung thành (Loyal)
+15051,15051,69.0,9,2179.77,1,VIP / Champions
+15055,15055,31.0,11,1979.75,1,VIP / Champions
+15074,15074,14.0,24,3664.7,1,VIP / Champions
+15076,15076,36.0,6,388.35,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15082,15082,64.0,5,773.9,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15084,15084,41.0,9,1488.75,1,VIP / Champions
+15086,15086,9.0,6,888.03,3,Khách hàng Trung thành (Loyal)
+15087,15087,15.0,6,976.27,3,Khách hàng Trung thành (Loyal)
+15105,15105,17.0,11,1569.11,1,VIP / Champions
+15114,15114,75.0,7,1735.76,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15117,15117,42.0,4,409.83,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15122,15122,19.0,3,321.89,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15125,15125,52.0,4,313.45,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15128,15128,68.0,4,128.25,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15130,15130,204.0,3,729.55,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15136,15136,17.0,7,1217.97,3,Khách hàng Trung thành (Loyal)
+15146,15146,201.0,4,901.85,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15162,15162,39.0,9,1748.78,1,VIP / Champions
+15165,15165,144.0,7,1038.83,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15167,15167,10.0,8,674.84,3,Khách hàng Trung thành (Loyal)
+15170,15170,3.0,3,617.28,3,Khách hàng Trung thành (Loyal)
+15174,15174,104.0,6,785.99,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15175,15175,60.0,6,504.6,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15179,15179,58.0,13,2729.5,1,VIP / Champions
+15192,15192,91.0,4,457.61,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15198,15198,61.0,14,2971.15,1,VIP / Champions
+15204,15204,105.0,4,1316.07,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15208,15208,68.0,9,1701.12,1,VIP / Champions
+15210,15210,13.0,7,1240.08,3,Khách hàng Trung thành (Loyal)
+15211,15211,240.0,2,114.45,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15212,15212,9.0,5,1085.06,3,Khách hàng Trung thành (Loyal)
+15213,15213,196.0,2,766.34,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15215,15215,175.0,1,77.25,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15222,15222,7.0,7,1836.71,3,Khách hàng Trung thành (Loyal)
+15223,15223,58.0,3,422.37,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15224,15224,16.0,6,737.56,3,Khách hàng Trung thành (Loyal)
+15227,15227,29.0,5,907.04,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15233,15233,5.0,2,153.21,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15234,15234,57.0,5,1126.75,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15243,15243,174.0,2,175.4,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15253,15253,10.0,5,1327.13,3,Khách hàng Trung thành (Loyal)
+15256,15256,34.0,8,1130.5,1,VIP / Champions
+15265,15265,282.0,2,397.8,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15267,15267,23.0,7,1244.22,1,VIP / Champions
+15269,15269,20.0,6,867.15,3,Khách hàng Trung thành (Loyal)
+15272,15272,64.0,7,1230.8,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15293,15293,39.0,11,2106.65,1,VIP / Champions
+15298,15298,19.0,4,732.3,3,Khách hàng Trung thành (Loyal)
+15308,15308,40.0,6,904.61,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15313,15313,286.0,1,399.0,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15326,15326,30.0,7,922.55,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15342,15342,6.0,15,1552.72,1,VIP / Champions
+15344,15344,56.0,4,314.26,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15345,15345,3.0,10,1418.84,3,Khách hàng Trung thành (Loyal)
+15347,15347,30.0,6,1265.7,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15359,15359,32.0,5,839.67,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15361,15361,9.0,7,978.59,3,Khách hàng Trung thành (Loyal)
+15362,15362,68.0,6,1748.54,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15364,15364,13.0,3,648.87,3,Khách hàng Trung thành (Loyal)
+15369,15369,16.0,5,1161.31,3,Khách hàng Trung thành (Loyal)
+15376,15376,20.0,7,1117.66,3,Khách hàng Trung thành (Loyal)
+15377,15377,48.0,4,918.85,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15378,15378,20.0,10,2903.28,1,VIP / Champions
+15381,15381,38.0,5,460.91,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15382,15382,98.0,6,2295.79,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15387,15387,7.0,8,1648.96,3,Khách hàng Trung thành (Loyal)
+15390,15390,7.0,8,1876.28,1,VIP / Champions
+15401,15401,25.0,6,527.03,3,Khách hàng Trung thành (Loyal)
+15409,15409,116.0,4,1033.68,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15411,15411,11.0,10,1349.62,1,VIP / Champions
+15414,15414,93.0,4,1754.9,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15418,15418,23.0,7,773.47,3,Khách hàng Trung thành (Loyal)
+15420,15420,36.0,8,2051.64,1,VIP / Champions
+15422,15422,4.0,7,1267.2,3,Khách hàng Trung thành (Loyal)
+15424,15424,18.0,8,978.36,3,Khách hàng Trung thành (Loyal)
+15434,15434,53.0,4,1030.07,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15440,15440,121.0,4,629.1,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15444,15444,11.0,14,1474.53,1,VIP / Champions
+15453,15453,19.0,4,523.74,3,Khách hàng Trung thành (Loyal)
+15457,15457,372.0,1,256.22,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15469,15469,30.0,7,1292.57,1,VIP / Champions
+15470,15470,86.0,5,1852.04,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15474,15474,44.0,8,805.38,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15483,15483,57.0,7,1148.18,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15485,15485,23.0,7,1168.88,1,VIP / Champions
+15490,15490,47.0,6,833.99,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15491,15491,35.0,6,1412.12,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15492,15492,19.0,3,401.45,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15493,15493,43.0,3,249.95,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15506,15506,37.0,6,1226.9,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15510,15510,171.0,2,298.19,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15528,15528,19.0,8,1546.65,1,VIP / Champions
+15536,15536,88.0,5,747.84,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15543,15543,91.0,10,1266.39,1,VIP / Champions
+15553,15553,53.0,6,237.65,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15564,15564,31.0,2,504.69,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15573,15573,6.0,10,2567.45,1,VIP / Champions
+15580,15580,42.0,4,707.91,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15586,15586,114.0,5,774.29,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15590,15590,263.0,3,713.29,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15594,15594,43.0,8,2616.76,1,VIP / Champions
+15604,15604,34.0,8,1451.97,1,VIP / Champions
+15605,15605,29.0,16,2650.6,1,VIP / Champions
+15606,15606,3.0,21,3382.24,1,VIP / Champions
+15609,15609,8.0,8,959.82,3,Khách hàng Trung thành (Loyal)
+15610,15610,44.0,4,600.94,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15612,15612,63.0,3,487.31,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15617,15617,9.0,4,379.23,3,Khách hàng Trung thành (Loyal)
+15618,15618,67.0,3,485.11,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15627,15627,30.0,5,568.84,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15648,15648,267.0,2,553.38,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15652,15652,11.0,6,589.19,3,Khách hàng Trung thành (Loyal)
+15670,15670,28.0,10,1998.06,1,VIP / Champions
+15681,15681,39.0,4,622.34,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15688,15688,30.0,10,1193.73,1,VIP / Champions
+15696,15696,40.0,10,1009.47,1,VIP / Champions
+15698,15698,87.0,4,1196.83,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15717,15717,121.0,8,1662.84,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15720,15720,3.0,7,840.89,3,Khách hàng Trung thành (Loyal)
+15729,15729,90.0,7,1176.2,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15742,15742,13.0,7,881.3,3,Khách hàng Trung thành (Loyal)
+15747,15747,13.0,8,2030.95,1,VIP / Champions
+15749,15749,44.0,8,1910.23,1,VIP / Champions
+15766,15766,30.0,2,52.35,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15769,15769,24.0,7,1291.14,1,VIP / Champions
+15781,15781,24.0,4,1288.03,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15804,15804,27.0,6,1020.28,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15817,15817,80.0,6,1281.62,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15826,15826,63.0,4,917.68,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15832,15832,91.0,6,981.8,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15837,15837,184.0,3,261.07,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15847,15847,111.0,4,420.98,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15857,15857,84.0,4,984.55,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15865,15865,37.0,9,1543.78,1,VIP / Champions
+15874,15874,29.0,6,798.39,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15876,15876,62.0,4,675.54,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15891,15891,57.0,5,897.95,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15894,15894,50.0,17,2623.79,1,VIP / Champions
+15895,15895,19.0,9,1986.47,1,VIP / Champions
+15903,15903,48.0,5,586.55,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15907,15907,166.0,9,2119.51,1,VIP / Champions
+15912,15912,161.0,6,586.66,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15935,15935,23.0,9,1546.5,1,VIP / Champions
+15939,15939,62.0,5,472.38,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15947,15947,93.0,3,282.91,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15953,15953,92.0,4,633.05,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15958,15958,18.0,9,2226.93,1,VIP / Champions
+15960,15960,48.0,6,734.67,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15969,15969,20.0,5,1761.18,3,Khách hàng Trung thành (Loyal)
+15971,15971,112.0,7,1309.54,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15974,15974,130.0,4,336.41,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15982,15982,23.0,5,820.07,3,Khách hàng Trung thành (Loyal)
+15989,15989,37.0,7,591.03,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+15992,15992,27.0,9,2100.05,1,VIP / Champions
+16005,16005,43.0,6,1118.44,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16012,16012,22.0,10,1727.37,1,VIP / Champions
+16043,16043,6.0,7,1053.63,3,Khách hàng Trung thành (Loyal)
+16064,16064,114.0,6,1133.78,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16065,16065,11.0,13,2712.81,1,VIP / Champions
+16070,16070,71.0,4,638.82,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16072,16072,77.0,1,161.86,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16076,16076,15.0,3,525.76,3,Khách hàng Trung thành (Loyal)
+16091,16091,101.0,9,1555.14,1,VIP / Champions
+16094,16094,148.0,3,322.42,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16097,16097,52.0,4,526.85,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16101,16101,45.0,4,368.04,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16106,16106,313.0,1,37.0,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16107,16107,3.0,3,335.41,3,Khách hàng Trung thành (Loyal)
+16116,16116,30.0,9,1699.84,1,VIP / Champions
+16122,16122,3.0,12,2023.51,1,VIP / Champions
+16130,16130,63.0,5,565.13,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16134,16134,63.0,4,386.65,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16142,16142,49.0,8,758.66,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16147,16147,113.0,4,1080.76,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16156,16156,50.0,7,1112.03,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16160,16160,54.0,7,698.42,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16161,16161,13.0,7,313.07,3,Khách hàng Trung thành (Loyal)
+16163,16163,66.0,6,747.91,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16170,16170,66.0,6,971.63,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16172,16172,39.0,6,1221.81,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16183,16183,56.0,6,1038.74,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16189,16189,50.0,9,1944.8,1,VIP / Champions
+16193,16193,47.0,7,1012.04,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16197,16197,66.0,5,844.94,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16204,16204,10.0,9,2805.13,1,VIP / Champions
+16222,16222,157.0,1,125.49,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16237,16237,114.0,4,565.55,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16250,16250,21.0,3,639.07,3,Khách hàng Trung thành (Loyal)
+16265,16265,79.0,2,173.1,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16270,16270,16.0,8,1513.72,1,VIP / Champions
+16274,16274,23.0,5,591.58,3,Khách hàng Trung thành (Loyal)
+16276,16276,12.0,7,1121.6,3,Khách hàng Trung thành (Loyal)
+16277,16277,9.0,4,914.5,3,Khách hàng Trung thành (Loyal)
+16284,16284,34.0,5,518.02,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16287,16287,99.0,2,159.53,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16293,16293,80.0,7,618.0,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16299,16299,36.0,8,1161.42,1,VIP / Champions
+16304,16304,77.0,8,1546.47,1,VIP / Champions
+16312,16312,179.0,4,455.72,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16317,16317,153.0,5,714.89,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16320,16320,126.0,6,790.04,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16329,16329,60.0,6,870.03,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16330,16330,62.0,7,1073.28,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16338,16338,82.0,5,773.05,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16339,16339,6.0,3,328.74,3,Khách hàng Trung thành (Loyal)
+16351,16351,58.0,6,538.59,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16355,16355,53.0,7,609.65,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16359,16359,23.0,10,2653.4,1,VIP / Champions
+16361,16361,12.0,8,1185.99,3,Khách hàng Trung thành (Loyal)
+16366,16366,80.0,4,802.69,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16377,16377,28.0,9,1198.0,1,VIP / Champions
+16381,16381,43.0,6,1102.63,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16389,16389,27.0,11,1044.7,1,VIP / Champions
+16393,16393,49.0,6,704.95,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16397,16397,67.0,4,484.84,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16405,16405,11.0,6,1433.46,3,Khách hàng Trung thành (Loyal)
+16406,16406,32.0,7,1749.25,1,VIP / Champions
+16407,16407,250.0,3,114.95,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16412,16412,79.0,5,1518.44,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16417,16417,129.0,6,619.99,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16421,16421,70.0,8,992.56,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16422,16422,13.0,8,2015.31,1,VIP / Champions
+16436,16436,66.0,6,1034.8,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16460,16460,140.0,6,2341.65,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16464,16464,68.0,3,913.35,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16471,16471,7.0,6,719.54,3,Khách hàng Trung thành (Loyal)
+16478,16478,4.0,13,1918.92,1,VIP / Champions
+16479,16479,128.0,5,689.09,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16485,16485,84.0,2,414.66,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16494,16494,27.0,4,492.49,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16497,16497,34.0,6,815.96,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16498,16498,70.0,8,1905.75,1,VIP / Champions
+16512,16512,114.0,8,1141.09,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16513,16513,113.0,6,832.86,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16526,16526,180.0,5,506.22,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16529,16529,45.0,4,170.45,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16532,16532,139.0,7,1088.85,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16534,16534,37.0,5,805.64,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16537,16537,9.0,11,1592.08,1,VIP / Champions
+16539,16539,3.0,9,1307.94,3,Khách hàng Trung thành (Loyal)
+16541,16541,102.0,13,2195.97,1,VIP / Champions
+16550,16550,59.0,9,1407.35,1,VIP / Champions
+16555,16555,199.0,2,92.25,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16558,16558,1.0,8,1890.0,3,Khách hàng Trung thành (Loyal)
+16562,16562,28.0,5,704.24,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16578,16578,13.0,13,2494.32,1,VIP / Champions
+16582,16582,72.0,4,766.85,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16590,16590,7.0,15,2319.61,1,VIP / Champions
+16591,16591,47.0,3,515.09,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16597,16597,169.0,5,1017.06,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16601,16601,246.0,2,189.28,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16604,16604,187.0,3,479.59,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16605,16605,43.0,6,1548.43,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16608,16608,170.0,3,394.87,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16614,16614,51.0,5,792.75,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16615,16615,124.0,4,682.45,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16627,16627,53.0,7,1497.76,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16630,16630,98.0,3,550.9,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16634,16634,221.0,4,421.76,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16635,16635,24.0,8,1353.38,1,VIP / Champions
+16640,16640,71.0,8,1592.89,1,VIP / Champions
+16648,16648,26.0,5,773.1,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16653,16653,3.0,4,969.96,3,Khách hàng Trung thành (Loyal)
+16661,16661,63.0,5,1051.72,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16664,16664,1.0,8,882.04,3,Khách hàng Trung thành (Loyal)
+16668,16668,38.0,5,612.0,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16676,16676,29.0,7,994.8,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16690,16690,4.0,6,880.06,3,Khách hàng Trung thành (Loyal)
+16691,16691,150.0,7,1440.32,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16693,16693,36.0,5,350.19,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16695,16695,136.0,5,792.12,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16696,16696,15.0,3,420.29,3,Khách hàng Trung thành (Loyal)
+16709,16709,14.0,7,1114.98,3,Khách hàng Trung thành (Loyal)
+16716,16716,13.0,9,730.08,3,Khách hàng Trung thành (Loyal)
+16719,16719,152.0,2,224.82,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16722,16722,9.0,3,143.46,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16728,16728,61.0,5,1062.64,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16731,16731,19.0,8,845.34,3,Khách hàng Trung thành (Loyal)
+16734,16734,28.0,3,149.06,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16740,16740,53.0,7,1114.23,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16747,16747,8.0,2,298.76,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16749,16749,86.0,4,287.52,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16750,16750,31.0,15,3499.74,1,VIP / Champions
+16752,16752,50.0,8,1181.74,1,VIP / Champions
+16753,16753,44.0,5,1393.0,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16754,16754,13.0,4,334.61,3,Khách hàng Trung thành (Loyal)
+16765,16765,349.0,1,67.8,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16766,16766,55.0,5,851.8,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16768,16768,1.0,6,1012.27,3,Khách hàng Trung thành (Loyal)
+16769,16769,14.0,4,712.3,3,Khách hàng Trung thành (Loyal)
+16772,16772,111.0,6,1337.45,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16786,16786,87.0,5,513.72,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16787,16787,50.0,5,1152.74,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16788,16788,4.0,12,2074.7,1,VIP / Champions
+16790,16790,24.0,6,894.91,3,Khách hàng Trung thành (Loyal)
+16798,16798,2.0,6,795.54,3,Khách hàng Trung thành (Loyal)
+16816,16816,9.0,7,1368.99,3,Khách hàng Trung thành (Loyal)
+16819,16819,47.0,6,1512.98,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16820,16820,193.0,2,436.72,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16822,16822,29.0,5,963.77,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16833,16833,9.0,8,1358.13,3,Khách hàng Trung thành (Loyal)
+16837,16837,51.0,4,303.51,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16842,16842,18.0,7,1455.48,1,VIP / Champions
+16846,16846,346.0,1,76.15,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16852,16852,92.0,3,463.96,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16858,16858,61.0,6,1298.83,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16867,16867,62.0,8,841.69,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16875,16875,55.0,5,741.6,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16879,16879,48.0,6,1595.37,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16884,16884,70.0,5,1288.08,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16888,16888,47.0,5,611.52,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16895,16895,25.0,15,1568.04,1,VIP / Champions
+16897,16897,4.0,7,1070.28,3,Khách hàng Trung thành (Loyal)
+16899,16899,92.0,10,1370.57,1,VIP / Champions
+16905,16905,40.0,4,954.71,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16925,16925,134.0,3,204.63,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16927,16927,229.0,3,724.59,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16928,16928,12.0,7,1230.98,3,Khách hàng Trung thành (Loyal)
+16949,16949,37.0,10,1390.65,1,VIP / Champions
+16967,16967,154.0,3,963.07,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16970,16970,2.0,6,1107.09,3,Khách hàng Trung thành (Loyal)
+16977,16977,73.0,5,465.62,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16978,16978,12.0,8,1162.5,3,Khách hàng Trung thành (Loyal)
+16980,16980,79.0,1,61.64,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+16988,16988,15.0,9,2318.86,1,VIP / Champions
+16997,16997,24.0,5,1066.5,3,Khách hàng Trung thành (Loyal)
+16998,16998,75.0,4,277.03,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17002,17002,11.0,7,1676.56,3,Khách hàng Trung thành (Loyal)
+17003,17003,42.0,7,1219.18,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17007,17007,1.0,16,3095.44,1,VIP / Champions
+17010,17010,66.0,5,874.81,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17012,17012,11.0,10,2141.51,1,VIP / Champions
+17016,17016,3.0,6,798.26,3,Khách hàng Trung thành (Loyal)
+17024,17024,21.0,9,2125.53,1,VIP / Champions
+17026,17026,20.0,7,1641.4,1,VIP / Champions
+17037,17037,123.0,6,541.39,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17045,17045,114.0,5,723.83,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17047,17047,150.0,4,591.87,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17048,17048,56.0,6,893.01,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17052,17052,17.0,8,1662.54,1,VIP / Champions
+17069,17069,12.0,4,169.12,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17085,17085,16.0,7,437.35,3,Khách hàng Trung thành (Loyal)
+17086,17086,114.0,7,2151.76,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17096,17096,162.0,6,1004.51,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17097,17097,56.0,2,781.3,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17101,17101,2.0,8,1370.28,3,Khách hàng Trung thành (Loyal)
+17108,17108,37.0,10,1492.3,1,VIP / Champions
+17110,17110,18.0,15,2810.36,1,VIP / Champions
+17112,17112,298.0,5,1443.02,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17117,17117,70.0,4,344.78,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17118,17118,30.0,10,2051.83,1,VIP / Champions
+17121,17121,73.0,5,737.32,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17123,17123,80.0,8,1805.32,1,VIP / Champions
+17138,17138,144.0,6,899.47,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17139,17139,38.0,10,1551.28,1,VIP / Champions
+17150,17150,131.0,3,445.14,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17155,17155,40.0,4,1187.53,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17157,17157,12.0,5,488.11,3,Khách hàng Trung thành (Loyal)
+17159,17159,70.0,5,492.75,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17181,17181,30.0,3,430.35,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17185,17185,129.0,2,816.5,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17189,17189,36.0,3,515.77,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17192,17192,30.0,4,684.04,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17201,17201,179.0,6,839.38,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17203,17203,79.0,6,1106.6,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17204,17204,25.0,10,1292.75,1,VIP / Champions
+17205,17205,1.0,6,1437.84,3,Khách hàng Trung thành (Loyal)
+17207,17207,51.0,4,513.39,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17209,17209,66.0,5,666.81,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17211,17211,10.0,9,1003.25,3,Khách hàng Trung thành (Loyal)
+17226,17226,3.0,6,620.16,3,Khách hàng Trung thành (Loyal)
+17231,17231,105.0,1,114.07,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17232,17232,30.0,3,206.92,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17233,17233,76.0,5,570.85,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17243,17243,92.0,4,416.17,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17244,17244,30.0,11,1543.56,1,VIP / Champions
+17245,17245,57.0,6,1110.46,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17248,17248,22.0,3,517.05,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17250,17250,108.0,6,733.92,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17252,17252,85.0,2,165.45,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17253,17253,148.0,4,461.39,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17260,17260,178.0,6,676.29,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17265,17265,16.0,8,762.71,3,Khách hàng Trung thành (Loyal)
+17267,17267,80.0,5,389.3,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17286,17286,93.0,3,328.55,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17290,17290,34.0,6,920.22,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17293,17293,58.0,5,821.36,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17296,17296,36.0,2,452.93,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17308,17308,34.0,11,2451.5,1,VIP / Champions
+17312,17312,80.0,3,457.25,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17313,17313,18.0,4,1008.41,3,Khách hàng Trung thành (Loyal)
+17323,17323,13.0,4,858.26,3,Khách hàng Trung thành (Loyal)
+17326,17326,182.0,4,292.05,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17330,17330,104.0,9,1904.34,1,VIP / Champions
+17331,17331,31.0,6,739.01,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17338,17338,51.0,5,281.96,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17350,17350,15.0,9,2008.26,1,VIP / Champions
+17360,17360,38.0,10,1559.14,1,VIP / Champions
+17365,17365,4.0,6,808.64,3,Khách hàng Trung thành (Loyal)
+17370,17370,4.0,8,1218.23,3,Khách hàng Trung thành (Loyal)
+17380,17380,33.0,12,2095.54,1,VIP / Champions
+17385,17385,122.0,4,1112.33,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17387,17387,79.0,4,1257.61,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17389,17389,10.0,7,623.18,3,Khách hàng Trung thành (Loyal)
+17390,17390,3.0,6,1675.81,3,Khách hàng Trung thành (Loyal)
+17391,17391,60.0,8,1211.97,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17394,17394,59.0,11,1807.89,1,VIP / Champions
+17397,17397,3.0,7,1085.12,3,Khách hàng Trung thành (Loyal)
+17406,17406,24.0,2,599.88,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17407,17407,26.0,6,1317.78,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17409,17409,113.0,9,1883.8,1,VIP / Champions
+17410,17410,10.0,14,2001.29,1,VIP / Champions
+17411,17411,102.0,7,458.58,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17412,17412,108.0,4,452.01,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17423,17423,16.0,7,1592.81,1,VIP / Champions
+17427,17427,87.0,7,782.04,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17431,17431,103.0,3,1019.12,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17436,17436,14.0,7,1248.85,3,Khách hàng Trung thành (Loyal)
+17437,17437,21.0,6,803.21,3,Khách hàng Trung thành (Loyal)
+17442,17442,93.0,3,326.54,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17445,17445,93.0,4,791.77,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17454,17454,33.0,14,2622.26,1,VIP / Champions
+17456,17456,48.0,9,2287.32,1,VIP / Champions
+17463,17463,59.0,4,436.25,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17465,17465,1.0,5,971.83,3,Khách hàng Trung thành (Loyal)
+17473,17473,16.0,6,1321.02,3,Khách hàng Trung thành (Loyal)
+17478,17478,39.0,6,840.2,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17482,17482,145.0,3,217.21,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17487,17487,6.0,5,971.62,3,Khách hàng Trung thành (Loyal)
+17492,17492,8.0,7,1095.23,3,Khách hàng Trung thành (Loyal)
+17494,17494,192.0,4,839.2,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17495,17495,30.0,3,311.95,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17496,17496,3.0,4,749.92,3,Khách hàng Trung thành (Loyal)
+17505,17505,23.0,6,1578.34,1,VIP / Champions
+17506,17506,2.0,6,628.77,3,Khách hàng Trung thành (Loyal)
+17510,17510,58.0,5,1207.1,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17513,17513,118.0,3,223.88,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17521,17521,34.0,2,330.42,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17525,17525,25.0,7,1219.11,1,VIP / Champions
+17531,17531,73.0,8,1785.43,1,VIP / Champions
+17546,17546,161.0,5,1504.66,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17556,17556,73.0,5,1330.4,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17561,17561,90.0,4,1404.22,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17572,17572,48.0,6,918.08,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17575,17575,11.0,8,1141.61,3,Khách hàng Trung thành (Loyal)
+17580,17580,25.0,5,647.71,3,Khách hàng Trung thành (Loyal)
+17581,17581,109.0,8,947.8,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17584,17584,13.0,9,1201.9,1,VIP / Champions
+17587,17587,70.0,7,1375.92,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17590,17590,13.0,12,2097.75,1,VIP / Champions
+17592,17592,48.0,6,1295.45,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17594,17594,22.0,14,2625.69,1,VIP / Champions
+17595,17595,108.0,7,1312.32,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17601,17601,73.0,4,873.4,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17602,17602,61.0,4,1637.54,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17607,17607,18.0,5,776.88,3,Khách hàng Trung thành (Loyal)
+17608,17608,28.0,7,1242.38,1,VIP / Champions
+17610,17610,71.0,5,1014.46,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17612,17612,26.0,10,1153.99,1,VIP / Champions
+17614,17614,25.0,6,808.81,3,Khách hàng Trung thành (Loyal)
+17620,17620,32.0,8,1478.15,1,VIP / Champions
+17621,17621,43.0,4,237.9,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17626,17626,35.0,12,2176.63,1,VIP / Champions
+17627,17627,16.0,9,2034.18,1,VIP / Champions
+17635,17635,6.0,6,714.35,3,Khách hàng Trung thành (Loyal)
+17639,17639,323.0,2,197.7,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17651,17651,50.0,12,2732.12,1,VIP / Champions
+17653,17653,66.0,2,471.36,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17654,17654,22.0,2,153.38,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17656,17656,20.0,10,1792.0,1,VIP / Champions
+17661,17661,17.0,8,659.71,3,Khách hàng Trung thành (Loyal)
+17664,17664,43.0,5,1044.34,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17676,17676,11.0,10,1401.79,1,VIP / Champions
+17678,17678,23.0,5,1016.64,3,Khách hàng Trung thành (Loyal)
+17681,17681,19.0,8,707.81,3,Khách hàng Trung thành (Loyal)
+17682,17682,49.0,2,442.05,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17683,17683,96.0,5,967.08,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17684,17684,19.0,7,1359.64,1,VIP / Champions
+17685,17685,26.0,4,459.54,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17691,17691,1.0,10,1777.9,3,Khách hàng Trung thành (Loyal)
+17695,17695,184.0,4,513.6,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17699,17699,39.0,4,736.54,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17703,17703,11.0,5,893.51,3,Khách hàng Trung thành (Loyal)
+17708,17708,10.0,4,285.9,3,Khách hàng Trung thành (Loyal)
+17718,17718,27.0,7,965.38,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17726,17726,3.0,6,1136.9,3,Khách hàng Trung thành (Loyal)
+17731,17731,178.0,4,722.28,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17733,17733,28.0,8,1437.21,1,VIP / Champions
+17734,17734,59.0,5,705.99,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17744,17744,18.0,10,2398.6,1,VIP / Champions
+17745,17745,57.0,3,285.02,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17746,17746,2.0,7,990.17,3,Khách hàng Trung thành (Loyal)
+17751,17751,23.0,11,2113.17,1,VIP / Champions
+17754,17754,7.0,3,545.79,3,Khách hàng Trung thành (Loyal)
+17757,17757,112.0,5,859.41,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17758,17758,27.0,3,547.4,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17784,17784,31.0,5,1166.51,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17789,17789,36.0,6,737.8,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17794,17794,28.0,8,916.04,1,VIP / Champions
+17795,17795,41.0,7,1381.78,1,VIP / Champions
+17798,17798,31.0,5,699.04,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17799,17799,4.0,6,702.88,3,Khách hàng Trung thành (Loyal)
+17801,17801,98.0,7,688.6,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17805,17805,217.0,6,744.79,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17807,17807,26.0,6,381.03,3,Khách hàng Trung thành (Loyal)
+17813,17813,21.0,9,988.64,1,VIP / Champions
+17816,17816,43.0,6,998.45,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17818,17818,30.0,4,498.77,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17820,17820,206.0,4,715.35,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17823,17823,47.0,5,1362.54,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17825,17825,130.0,7,1411.42,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17826,17826,42.0,3,516.78,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17850,17850,192.0,3,226.39,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17851,17851,103.0,4,719.09,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17852,17852,75.0,2,268.37,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17855,17855,59.0,7,525.32,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17859,17859,10.0,5,923.4,3,Khách hàng Trung thành (Loyal)
+17882,17882,5.0,15,2426.06,1,VIP / Champions
+17888,17888,232.0,1,121.97,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17892,17892,52.0,5,586.24,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17906,17906,60.0,5,1017.24,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17916,17916,64.0,7,1350.46,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17917,17917,79.0,3,348.63,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17920,17920,27.0,8,1434.88,1,VIP / Champions
+17924,17924,70.0,10,1648.53,1,VIP / Champions
+17929,17929,97.0,4,586.22,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17937,17937,83.0,6,1317.38,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17944,17944,35.0,5,1242.22,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17946,17946,238.0,3,171.64,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17952,17952,10.0,4,1045.0,3,Khách hàng Trung thành (Loyal)
+17971,17971,25.0,5,301.61,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17977,17977,39.0,6,864.42,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17981,17981,9.0,6,836.41,3,Khách hàng Trung thành (Loyal)
+17988,17988,154.0,3,666.65,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17992,17992,39.0,8,1288.41,1,VIP / Champions
+17995,17995,64.0,12,1230.98,1,VIP / Champions
+17996,17996,102.0,4,757.25,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+17999,17999,46.0,3,540.37,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18001,18001,66.0,9,1794.19,1,VIP / Champions
+18014,18014,47.0,3,479.96,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18016,18016,134.0,9,2092.14,1,VIP / Champions
+18018,18018,10.0,8,1256.35,3,Khách hàng Trung thành (Loyal)
+18033,18033,63.0,6,1500.22,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18034,18034,136.0,3,390.61,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18043,18043,122.0,5,820.0,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18044,18044,268.0,3,211.87,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18046,18046,73.0,6,1158.11,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18050,18050,33.0,7,1104.59,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18060,18060,21.0,11,2182.96,1,VIP / Champions
+18061,18061,44.0,3,182.07,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18068,18068,2.0,6,905.7,3,Khách hàng Trung thành (Loyal)
+18069,18069,92.0,11,1519.93,1,VIP / Champions
+18073,18073,8.0,4,229.65,3,Khách hàng Trung thành (Loyal)
+18086,18086,4.0,10,1323.06,3,Khách hàng Trung thành (Loyal)
+18087,18087,286.0,6,1266.55,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18093,18093,117.0,3,435.99,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18096,18096,9.0,14,2447.27,1,VIP / Champions
+18109,18109,81.0,5,1101.76,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18127,18127,30.0,8,722.78,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18154,18154,62.0,5,915.8,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18164,18164,172.0,3,381.46,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18166,18166,3.0,5,1116.54,3,Khách hàng Trung thành (Loyal)
+18185,18185,53.0,9,1452.93,1,VIP / Champions
+18195,18195,99.0,3,330.29,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18197,18197,63.0,6,590.45,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18202,18202,3.0,20,3011.22,1,VIP / Champions
+18205,18205,4.0,9,1694.47,3,Khách hàng Trung thành (Loyal)
+18212,18212,17.0,17,3408.02,1,VIP / Champions
+18215,18215,225.0,3,208.86,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18220,18220,28.0,6,932.93,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18222,18222,3.0,7,875.49,3,Khách hàng Trung thành (Loyal)
+18230,18230,158.0,2,86.42,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18231,18231,17.0,9,1217.08,1,VIP / Champions
+18236,18236,42.0,15,3697.75,1,VIP / Champions
+18238,18238,8.0,9,1628.59,1,VIP / Champions
+18242,18242,25.0,5,999.58,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18244,18244,315.0,1,401.25,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18246,18246,92.0,6,410.76,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18258,18258,11.0,6,1387.5,3,Khách hàng Trung thành (Loyal)
+18260,18260,68.0,6,685.53,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18263,18263,65.0,6,676.6,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18268,18268,86.0,6,1356.0,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18271,18271,24.0,3,515.64,0,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18274,18274,70.0,5,629.75,2,Khách hàng Có nguy cơ rời bỏ (At Risk)
+18275,18275,10.0,7,1423.65,3,Khách hàng Trung thành (Loyal)
+18277,18277,12.0,10,1476.19,1,VIP / Champions
+18282,18282,29.0,4,311.15,0,Khách hàng Có nguy cơ rời bỏ (At Risk)

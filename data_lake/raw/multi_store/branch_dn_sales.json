@@ -1,0 +1,57 @@
+[
+  {
+    "TX_ID": "DN-SQL-5001",
+    "CUST_ID": "CUST-DN-1082",
+    "TX_TIMESTAMP": "2026-09-18T08:30:00Z",
+    "SKU_CODE": "DN-FLASK-L",
+    "QTY": 1,
+    "UNIT_PRICE_USD": 50.0,
+    "AMOUNT_USD": 50.0,
+    "PAYMENT_METHOD": "Credit Card",
+    "ON_PROMO": true
+  },
+  {
+    "TX_ID": "DN-SQL-5002",
+    "CUST_ID": "CUST-DN-4320",
+    "TX_TIMESTAMP": "2026-09-18T10:15:20Z",
+    "SKU_CODE": "DN-SONIC-X",
+    "QTY": 2,
+    "UNIT_PRICE_USD": 33.15,
+    "AMOUNT_USD": 66.3,
+    "PAYMENT_METHOD": "Debit Card",
+    "ON_PROMO": false
+  },
+  {
+    "TX_ID": "DN-SQL-5003",
+    "CUST_ID": "CUST-DN-8841",
+    "TX_TIMESTAMP": "2026-09-19T11:45:00Z",
+    "SKU_CODE": "DN-LIGHT-LED",
+    "QTY": 1,
+    "UNIT_PRICE_USD": 25.99,
+    "AMOUNT_USD": 25.99,
+    "PAYMENT_METHOD": "Cash",
+    "ON_PROMO": false
+  },
+  {
+    "TX_ID": "DN-SQL-5004",
+    "CUST_ID": "CUST-DN-1082",
+    "TX_TIMESTAMP": "2026-09-20T14:22:10Z",
+    "SKU_CODE": "DN-POINTER-BT",
+    "QTY": 1,
+    "UNIT_PRICE_USD": 38.87,
+    "AMOUNT_USD": 38.87,
+    "PAYMENT_METHOD": "Credit Card",
+    "ON_PROMO": true
+  },
+  {
+    "TX_ID": "DN-SQL-5005",
+    "CUST_ID": "CUST-DN-7215",
+    "TX_TIMESTAMP": "2026-09-21T09:05:40Z",
+    "SKU_CODE": "DN-PAD-YOGA",
+    "QTY": 2,
+    "UNIT_PRICE_USD": 19.76,
+    "AMOUNT_USD": 39.52,
+    "PAYMENT_METHOD": "E-Wallet",
+    "ON_PROMO": false
+  }
+]

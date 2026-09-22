@@ -1,0 +1,58 @@
+# ====================================================================
+# FILE CẤU HÌNH HỆ THỐNG DATA WAREHOUSE & DATA MINING
+# ====================================================================
+
+app:
+  project_name: "BTL_DATA_MINING_PTIT"
+  version: "1.0.0"
+  env: "development"
+
+database:
+  # CSDL Tác nghiệp (OLTP - App DB)
+  oltp:
+    host: "localhost"
+    port: 5432
+    user: "postgres"
+    password: "postgres"
+    database: "retail_app_db"
+  
+  # Kho dữ liệu (OLAP - Data Warehouse)
+  dwh:
+    host: "localhost"
+    port: 5433
+    user: "postgres"
+    password: "postgres"
+    database: "retail_dwh_db"
+
+data_lake:
+  base_dir: "data_lake"
+  raw_uci_dir: "data_lake/raw/uci"
+  raw_app_dir: "data_lake/raw/app_db"
+  raw_api_dir: "data_lake/raw/api_inventory"
+  curated_dir: "data_lake/curated"
+
+api_nodes:
+  timeout_seconds: 3
+  branches:
+    - code: "HN"
+      name: "Chi nhánh Hà Nội"
+      url: "http://localhost:8000/api/v1/inventory/HN"
+    - code: "DN"
+      name: "Chi nhánh Đà Nẵng"
+      url: "http://localhost:8000/api/v1/inventory/DN"
+    - code: "SG"
+      name: "Chi nhánh TP. Hồ Chí Minh"
+      url: "http://localhost:8000/api/v1/inventory/SG"
+
+etl:
+  uci_window_months: 12
+  uci_file_path: "data_lake/raw/uci/online_retail_II.csv"
+  reconcile_tolerance: 0.01
+
+mining:
+  k_min: 2
+  k_max: 6
+  n_init: 20
+  random_state: 42
+  model_save_path: "models/kmeans_rfm_model.pkl"
+  scaler_save_path: "models/scaler_rfm.pkl"

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DataOps Pipeline &amp; Kafka Control — RetailPulse</title>
+  <meta name="description" content="Điều phối Microservices bất đồng bộ qua Apache Kafka, giám sát luồng trích xuất đa nguồn, chữ ký mật mã HMAC-SHA256 và nhật ký đối soát toàn vẹn dữ liệu." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <style>
+    .async-stepper-wrap {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+      gap: 0.75rem;
+      margin-block: 1rem;
+    }
+    .async-step-pill {
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-card-sm);
+      border: 1px solid var(--line);
+      background: var(--surface);
+      font-size: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      transition: all 0.3s ease;
+    }
+    .async-step-pill.active {
+      border-color: var(--accent);
+      background: rgba(177, 95, 44, 0.08);
+      box-shadow: 0 0 12px rgba(177, 95, 44, 0.2);
+    }
+    .async-step-pill.completed {
+      border-color: var(--success);
+      background: rgba(34, 197, 94, 0.08);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="portal-header">
+    <div class="shell portal-header-shell">
+      <a href="index.html" class="brand-wrap">
+        <svg viewBox="0 0 48 48" fill="currentColor">
+          <path d="M24 2c2.2 13.8 7.9 19.6 22 22-14.1 2.4-19.8 8.2-22 22-2.2-13.8-7.9-19.6-22-22 14.1-2.4 19.8-8.2 22-22Z"/>
+        </svg>
+        <span>RetailPulse <span style="font-weight:400; font-size:0.875rem; color:var(--muted);">/ DataOps Pipeline</span></span>
+      </a>
+
+      <nav class="portal-nav-links" aria-label="Điều hướng">
+        <div class="portal-nav-item"><a href="index.html">Trang chủ</a></div>
+        <div class="portal-nav-item"><a href="dashboard.html">📊 DataOps Overview</a></div>
+        <div class="portal-nav-item"><a href="operations.html">📥 Ingestion &amp; Nodes</a></div>
+        <div class="portal-nav-item"><a href="etl-monitor.html" class="active">⚡ Pipeline &amp; Kafka</a></div>
+        <div class="portal-nav-item"><a href="customer-segments.html">🧠 MLOps &amp; Registry</a></div>
+      </nav>
+
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <span class="status-pill success" id="broker-status-pill">Kafka Broker: Online (42.8 msg/s)</span>
+        <div class="clock-chip" style="display: flex;">
+          <span id="live-time-str">9:41pm</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Banner -->
+  <section class="page-banner">
+    <div class="shell">
+      <div class="page-title-wrap">
+        <div>
+          <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
+            <span class="eyebrow-dot" style="background:var(--accent);"></span>
+            <span>DataOps Microservices Orchestration • Event-Driven Control Panel</span>
+          </div>
+          <h1 class="page-title">Điều Phối Microservices &amp; Luồng Kafka</h1>
+          <p class="page-subtitle">Bảng điều khiển DataOps Control Panel: phát lệnh bất đồng bộ qua Kafka Message Broker, giám sát tiến trình microservices thời gian thực và kiểm toán HMAC-SHA256.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+          <button id="btn-simulate-hetero" class="pill-btn btn-sm variant-dark">🔥 Bắn Luồng Dị Đồng 3 Chi Nhánh (HN/DN/SG &rarr; Canonical)</button>
+          <button id="btn-trigger-etl" class="pill-btn btn-sm variant-outline">⚡ Kích Hoạt Luồng ETL Toàn Trình (Kafka Async)</button>
+          <button id="btn-trigger-mlops" class="pill-btn btn-sm variant-outline">🧠 Kích Hoạt Pipeline MLOps</button>
+          <button id="btn-simulate-kafka" class="pill-btn btn-sm variant-outline">Bắn Event Đơn Lẻ</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="shell" style="padding-bottom: 5rem;">
+
+    <!-- ASYNC MICROSERVICES PIPELINE STEPPER -->
+    <div class="card-box" style="margin-bottom: 2rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <h2 style="font-size:1.125rem; font-weight:700;">Tiến Trình Microservices Bất Đồng Bộ (Event-Driven Pipeline)</h2>
+          <div style="font-size:0.75rem; color:var(--muted);" id="pipeline-status-text">Trạng thái: Sẵn sàng nhận lệnh từ Control Panel (Idle)</div>
+        </div>
+        <span class="status-pill info" id="active-step-badge">Idle</span>
+      </div>
+
+      <div class="async-stepper-wrap" id="stepper-wrap">
+        <div class="async-step-pill" id="step-1">
+          <span style="font-weight:700; font-size:0.6875rem; color:var(--muted);">BƯỚC 01</span>
+          <span style="font-weight:600;">1. Queued (Kafka)</span>
+          <span style="font-size:0.6875rem; color:var(--muted);">Nhận message trigger</span>
+        </div>
+        <div class="async-step-pill" id="step-2">
+          <span style="font-weight:700; font-size:0.6875rem; color:var(--muted);">BƯỚC 02</span>
+          <span style="font-weight:600;">2. Ingestion &amp; HMAC</span>
+          <span style="font-size:0.6875rem; color:var(--muted);">Xác minh chữ ký số</span>
+        </div>
+        <div class="async-step-pill" id="step-3">
+          <span style="font-weight:700; font-size:0.6875rem; color:var(--muted);">BƯỚC 03</span>
+          <span style="font-weight:600;">3. Data Profiling</span>
+          <span style="font-size:0.6875rem; color:var(--muted);">Lọc lỗi &amp; missing</span>
+        </div>
+        <div class="async-step-pill" id="step-4">
+          <span style="font-weight:700; font-size:0.6875rem; color:var(--muted);">BƯỚC 04</span>
+          <span style="font-weight:600;">4. DWH Star Schema</span>
+          <span style="font-size:0.6875rem; color:var(--muted);">Nạp FactSales / Dim</span>
+        </div>
+        <div class="async-step-pill" id="step-5">
+          <span style="font-weight:700; font-size:0.6875rem; color:var(--muted);">BƯỚC 05</span>
+          <span style="font-weight:600;">5. Feature &amp; Cluster</span>
+          <span style="font-size:0.6875rem; color:var(--muted);">RFM &amp; Autoencoder Z</span>
+        </div>
+        <div class="async-step-pill" id="step-6">
+          <span style="font-weight:700; font-size:0.6875rem; color:var(--muted);">BƯỚC 06</span>
+          <span style="font-weight:600;">6. Completed</span>
+          <span style="font-size:0.6875rem; color:var(--muted);">Đối soát 100% khớp</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security & Kafka Streaming Stats Top Row -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Kafka Event Stream</span>
+          <span class="status-pill success">LIVE</span>
+        </div>
+        <div class="kpi-val" id="stream-events-count">1,248</div>
+        <div class="kpi-sub">Topic: <code>retail.orders.event</code> (Lag: 0ms)</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Độ Trễ Xử Lý (Latency)</span>
+          <span class="status-pill success">&lt; 15ms</span>
+        </div>
+        <div class="kpi-val">12 ms</div>
+        <div class="kpi-sub">Sub-second Stream Processing</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Xác Thực HMAC-SHA256</span>
+          <span class="status-pill success">100% VERIFIED</span>
+        </div>
+        <div class="kpi-val">100%</div>
+        <div class="kpi-sub">Chống giả mạo bản ghi chi nhánh</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Đối Soát FactSales</span>
+          <span class="status-pill success">0.00% SAI LỆCH</span>
+        </div>
+        <div class="kpi-val">30,000 / 30,000</div>
+        <div class="kpi-sub">Khớp hoàn toàn với UCI Lake</div>
+      </div>
+    </div>
+
+    <!-- HETEROGENEOUS KAFKA PRODUCER ADAPTERS & CANONICAL TOPIC -->
+    <div class="card-box" style="margin-bottom: 2rem;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
+            <span class="eyebrow-dot" style="background:var(--accent);"></span>
+            <span>Heterogeneous Ingestion Architecture • Microservices Adapters</span>
+          </div>
+          <h2 style="font-size:1.25rem; font-weight:700;">Kiến Trúc Kafka Producer Adapters Độc Lập Cho Dữ Liệu Dị Đồng</h2>
+          <p style="font-size:0.8125rem; color:var(--muted);">
+            Mỗi chi nhánh triển khai một Kafka Producer độc lập để phân giải định dạng thô đặc thù, nạp qua MDM Engine và xuất bản cấu trúc <strong>Canonical JSON</strong> vào topic chung <code>retail.canonical.transactions</code>.
+          </p>
+        </div>
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+          <span class="status-pill success">Topic: retail.canonical.transactions</span>
+          <span class="status-pill info">Partitions: 3</span>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(18rem, 1fr)); gap:1rem;">
+        <!-- HN Producer -->
+        <div style="padding:1.25rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--accent);">
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+            <strong style="font-size:0.875rem;">CsvBranchAdapterProducer</strong>
+            <span class="status-pill success" style="font-size:0.625rem; padding:0.15rem 0.4rem;">ONLINE</span>
+          </div>
+          <div style="font-size:0.75rem; color:var(--muted); line-height:1.6;">
+            <div>• Chi nhánh: <strong>Hà Nội Flagship (Store #1)</strong></div>
+            <div>• Nguồn thô: <strong>CSV Tiếng Việt</strong> (<code>Ma_Don</code>, <code>Ma_KH</code>, <code>Tien_VND</code>)</div>
+            <div>• Chuẩn hóa: VND &rarr; GBP (1 GBP = 32,500 VND)</div>
+            <div>• Bảo mật: <strong>SSH Port 2222 (WireGuard Subnet 10.8.1.0/24)</strong></div>
+            <div style="margin-top:0.5rem; padding:0.5rem; border-radius:4px; background:#ffffff; font-family:monospace; font-size:0.6875rem;">
+              Canonical ID: CAN-HN-xxxx | PRD-001
+            </div>
+          </div>
+        </div>
+
+        <!-- DN Producer -->
+        <div style="padding:1.25rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--info, #2d55ff);">
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+            <strong style="font-size:0.875rem;">SqlBranchAdapterProducer</strong>
+            <span class="status-pill success" style="font-size:0.625rem; padding:0.15rem 0.4rem;">ONLINE</span>
+          </div>
+          <div style="font-size:0.75rem; color:var(--muted); line-height:1.6;">
+            <div>• Chi nhánh: <strong>Đà Nẵng Hub (Store #2)</strong></div>
+            <div>• Nguồn thô: <strong>PostgreSQL CDC / Query</strong> (<code>TX_ID</code>, <code>CUST_ID</code>, <code>USD</code>)</div>
+            <div>• Chuẩn hóa: USD &rarr; GBP (1 GBP = 1.30 USD)</div>
+            <div>• Bảo mật: <strong>SSH Port 2223 (IPSec Subnet 10.8.2.0/24)</strong></div>
+            <div style="margin-top:0.5rem; padding:0.5rem; border-radius:4px; background:#ffffff; font-family:monospace; font-size:0.6875rem;">
+              Canonical ID: CAN-DN-xxxx | PRD-001
+            </div>
+          </div>
+        </div>
+
+        <!-- SG Producer -->
+        <div style="padding:1.25rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--success);">
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+            <strong style="font-size:0.875rem;">RestApiBranchAdapterProducer</strong>
+            <span class="status-pill success" style="font-size:0.625rem; padding:0.15rem 0.4rem;">ONLINE</span>
+          </div>
+          <div style="font-size:0.75rem; color:var(--muted); line-height:1.6;">
+            <div>• Chi nhánh: <strong>Sài Gòn Metro (Store #3)</strong></div>
+            <div>• Nguồn thô: <strong>REST JSON Payload</strong> (<code>orderRef</code>, <code>customerGlobalId</code>, <code>EUR</code>)</div>
+            <div>• Chuẩn hóa: EUR &rarr; GBP (1 GBP = 1.18 EUR)</div>
+            <div>• Bảo mật: <strong>SSH Port 2224 (mTLS Subnet 10.8.3.0/24)</strong></div>
+            <div style="margin-top:0.5rem; padding:0.5rem; border-radius:4px; background:#ffffff; font-family:monospace; font-size:0.6875rem;">
+              Canonical ID: CAN-SG-xxxx | PRD-001
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Kafka Stream Terminal & Security Posture -->
+    <div class="dashboard-row-2">
+      <!-- Live Kafka Terminal -->
+      <div class="card-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div>
+            <h2 style="font-size: 1.125rem; font-weight: 700;">Luồng Sự Kiện Thời Gian Thực (Kafka Event Stream Console)</h2>
+            <div style="font-size: 0.75rem; color: var(--muted);">Bắt gói tin JSON từ các node chi nhánh ngay khi khách mua hàng</div>
+          </div>
+          <span class="status-pill info">Consumer Partition 0-2</span>
+        </div>
+
+        <div style="background: #0a0e17; color: #38bdf8; font-family: monospace; font-size: 0.75rem; padding: 1rem; border-radius: var(--radius-control); max-height: 15rem; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1);" id="kafka-stream-console">
+          <div>[INFO] Kafka Broker initialized with 2 topics: [retail.orders.event, retail.inventory.event]</div>
+          <div>[INFO] Consumer group 'dwh-stream-consumer' subscribed to offset 0. Partition Lag: 0ms.</div>
+          <div>[STREAM] Offset #1245 | Key: HN | Event: ORDER_CREATED | Amount: 74.00 £ | HMAC: 9a4f8b... (VERIFIED)</div>
+          <div>[STREAM] Offset #1246 | Key: SG | Event: INVENTORY_CHANGED | SKU: PRD-001 | Delta: -2 (VERIFIED)</div>
+          <div>[STREAM] Offset #1247 | Key: DN | Event: ORDER_CREATED | Amount: 142.50 £ | HMAC: ec383f... (VERIFIED)</div>
+          <div>[STREAM] Offset #1248 | Key: HN | Event: ORDER_CREATED | Amount: 29.90 £ | HMAC: 7b1c4e... (VERIFIED)</div>
+        </div>
+      </div>
+
+      <!-- Security & Staging Architecture -->
+      <div class="card-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h2 style="font-size: 1.125rem; font-weight: 700;">Bảo Mật Luồng Tích Hợp (Security Posture)</h2>
+          <span class="status-pill success">Shield Active</span>
+        </div>
+
+        <div class="health-list">
+          <div class="health-item">
+            <div>
+              <div style="font-weight: 600;">HMAC-SHA256 Payload Sign</div>
+              <div style="font-size: 0.6875rem; color: var(--muted);">Khóa chia sẻ bảo mật 256-bit</div>
+            </div>
+            <span class="status-pill success">ENABLED</span>
+          </div>
+
+          <div class="health-item">
+            <div>
+              <div style="font-weight: 600;">Secure Staging Isolation</div>
+              <div style="font-size: 0.6875rem; color: var(--muted);">data_lake/raw/secure_staging/</div>
+            </div>
+            <span class="status-pill success">ISOLATED</span>
+          </div>
+
+          <div class="health-item">
+            <div>
+              <div style="font-weight: 600;">Idempotency Verification</div>
+              <div style="font-size: 0.6875rem; color: var(--muted);">Băm SHA256 record_hash</div>
+            </div>
+            <span class="status-pill success">100% IDEMPOTENT</span>
+          </div>
+
+          <div class="health-item">
+            <div>
+              <div style="font-weight: 600;">Security Audit Logging</div>
+              <div style="font-size: 0.6875rem; color: var(--muted);">Ghi nhận cảnh báo xâm nhập</div>
+            </div>
+            <span class="status-pill info">AUDITING</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reconciliation Log Table -->
+    <div class="card-box" style="margin-bottom: 2rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+        <div>
+          <h2 style="font-size:1.25rem; font-weight:700;">Nhật Ký Đối Soát Dữ Liệu (etl_reconciliation_log)</h2>
+          <div style="font-size:0.8125rem; color:var(--muted);">Kiểm toán số lượng dòng và tổng doanh thu giữa nguồn trích xuất và bảng đích FactSales</div>
+        </div>
+        <span class="status-pill success">100% Đối Soát Khớp Tuyệt Đối</span>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Thời Gian Chạy</th>
+              <th>Nguồn Dữ Liệu</th>
+              <th>Số Dòng Nguồn</th>
+              <th>Số Dòng DWH</th>
+              <th>Doanh Số Nguồn (£)</th>
+              <th>Doanh Số DWH (£)</th>
+              <th>Sai Lệch (%)</th>
+              <th>Kết Luận</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>#101</td>
+              <td>2026-09-22 13:40:15</td>
+              <td>UCI Online Retail II</td>
+              <td>30,000</td>
+              <td>30,000</td>
+              <td>1,842,500.00</td>
+              <td>1,842,500.00</td>
+              <td><strong>0.00%</strong></td>
+              <td><span class="status-pill success">MATCHED</span></td>
+            </tr>
+            <tr>
+              <td>#102</td>
+              <td>2026-09-22 13:40:22</td>
+              <td>PostgreSQL OLTP (Orders)</td>
+              <td>15</td>
+              <td>15</td>
+              <td>1,420.50</td>
+              <td>1,420.50</td>
+              <td><strong>0.00%</strong></td>
+              <td><span class="status-pill success">MATCHED</span></td>
+            </tr>
+            <tr>
+              <td>#103</td>
+              <td>2026-09-22 13:40:25</td>
+              <td>FastAPI Mock HN Inventory</td>
+              <td>20</td>
+              <td>20</td>
+              <td>—</td>
+              <td>—</td>
+              <td><strong>0.00%</strong></td>
+              <td><span class="status-pill success">MATCHED</span></td>
+            </tr>
+            <tr>
+              <td>#104</td>
+              <td>2026-09-22 13:40:28</td>
+              <td>FastAPI Mock DN Inventory</td>
+              <td>20</td>
+              <td>20</td>
+              <td>—</td>
+              <td>—</td>
+              <td><strong>0.00%</strong></td>
+              <td><span class="status-pill success">MATCHED</span></td>
+            </tr>
+            <tr>
+              <td>#105</td>
+              <td>2026-09-22 13:40:31</td>
+              <td>FastAPI Mock SG Inventory</td>
+              <td>20</td>
+              <td>20</td>
+              <td>—</td>
+              <td>—</td>
+              <td><strong>0.00%</strong></td>
+              <td><span class="status-pill success">MATCHED</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initClock } from './js/clock.js';
+    import { showToast } from './js/app.js';
+    import { simulateMultiBranchIngest } from './js/dataops-engine.js';
+
+    initClock();
+
+    const consoleEl = document.getElementById('kafka-stream-console');
+    const streamCountEl = document.getElementById('stream-events-count');
+    const statusTextEl = document.getElementById('pipeline-status-text');
+    const activeStepBadge = document.getElementById('active-step-badge');
+    let currentCount = 1248;
+
+    // Simulate Heterogeneous Multi-Branch Ingest (HN, DN, SG -> Canonical Topic)
+    document.getElementById('btn-simulate-hetero')?.addEventListener('click', () => {
+      showToast('Đang phát đồng thời 3 luồng dị đồng từ Hà Nội, Đà Nẵng, Sài Gòn qua SSH/VPN...', 'info');
+      const canonicalBatch = simulateMultiBranchIngest();
+
+      canonicalBatch.forEach((e, idx) => {
+        setTimeout(() => {
+          currentCount++;
+          streamCountEl.textContent = currentCount.toLocaleString();
+
+          const logLine = document.createElement('div');
+          logLine.style.color = idx === 0 ? '#f59e0b' : (idx === 1 ? '#38bdf8' : '#4ade80');
+          logLine.innerHTML = `[HETERO_INGEST] Offset #${currentCount} | Source: <strong>${e.source_system}</strong> | Canonical: <strong>${e.canonical_order_id}</strong> | MDM: <code>${e.items[0].raw_sku} &rarr; ${e.items[0].canonical_sku}</code> | Raw: ${e.raw_total_amount.toLocaleString()} ${e.raw_currency} &rarr; Base: <strong>£${e.normalized_total_gbp}</strong> | Tunnel: ${e.tunnel} <span style="color:#22c55e;">[VERIFIED]</span>`;
+          consoleEl.appendChild(logLine);
+          consoleEl.scrollTop = consoleEl.scrollHeight;
+        }, idx * 250);
+      });
+
+      setTimeout(() => {
+        showToast('✓ Cả 3 giao dịch dị đồng đã được nạp qua MDM Engine & xuất bản vào topic retail.canonical.transactions!', 'success');
+      }, 850);
+    });
+
+    // Simulate Kafka live event arrival (single)
+    document.getElementById('btn-simulate-kafka')?.addEventListener('click', () => {
+      currentCount++;
+      streamCountEl.textContent = currentCount.toLocaleString();
+
+      const branches = ['HN', 'DN', 'SG'];
+      const branch = branches[Math.floor(Math.random() * branches.length)];
+      const amount = (Math.random() * 150 + 10).toFixed(2);
+      const fakeHmac = Math.random().toString(36).substring(2, 10) + '... (VERIFIED)';
+
+      const line = document.createElement('div');
+      line.style.color = '#4ade80';
+      line.textContent = `[STREAM] Offset #${currentCount} | Key: ${branch} | Event: ORDER_CREATED | Amount: ${amount} £ | HMAC: ${fakeHmac}`;
+      consoleEl.appendChild(line);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+
+      showToast(`Kafka Topic: Sự kiện đơn hàng mới tại Node ${branch} (+${amount} £)`, 'info');
+    });
+
+    // Run Animated Async Pipeline
+    function runAsyncPipeline(pipelineName, isML = false) {
+      showToast(`[Kafka Broker] Đã gửi message: trigger.${isML ? 'ml_training' : 'etl_pipeline'}!`, 'info');
+      
+      const steps = [
+        { id: 'step-1', text: '1/6: Queued - Nhận message trigger từ Kafka', dur: 400 },
+        { id: 'step-2', text: '2/6: Ingestion & HMAC - Xác minh chữ ký số', dur: 450 },
+        { id: 'step-3', text: '3/6: Data Profiling - Kiểm toán lỗi & missing values', dur: 450 },
+        { id: 'step-4', text: '4/6: DWH Star Schema - Nạp FactSales an toàn', dur: 500 },
+        { id: 'step-5', text: '5/6: MLOps Feature Eng - Chuẩn hóa log1p & Autoencoder', dur: 500 },
+        { id: 'step-6', text: '6/6: Completed - Toàn vẹn 100% SLA!', dur: 300 }
+      ];
+
+      // Reset steps
+      for (let i = 1; i <= 6; i++) {
+        const el = document.getElementById(`step-${i}`);
+        el.className = 'async-step-pill';
+      }
+
+      let currentStepIdx = 0;
+
+      function executeNext() {
+        if (currentStepIdx > 0) {
+          document.getElementById(steps[currentStepIdx - 1].id).className = 'async-step-pill completed';
+        }
+        if (currentStepIdx < steps.length) {
+          const step = steps[currentStepIdx];
+          const el = document.getElementById(step.id);
+          el.className = 'async-step-pill active';
+          statusTextEl.textContent = `Tiến trình: ${step.text}`;
+          activeStepBadge.textContent = `Running: Step ${currentStepIdx + 1}/6`;
+          activeStepBadge.className = 'status-pill warning';
+
+          // Log to console
+          const logLine = document.createElement('div');
+          logLine.style.color = '#e2e8f0';
+          logLine.textContent = `[MICROSERVICE] ${new Date().toLocaleTimeString()} -> ${step.text}`;
+          consoleEl.appendChild(logLine);
+          consoleEl.scrollTop = consoleEl.scrollHeight;
+
+          currentStepIdx++;
+          setTimeout(executeNext, step.dur);
+        } else {
+          statusTextEl.textContent = `Trạng thái: Hoàn tất thành công luồng ${pipelineName} (SLA: 2.6s)`;
+          activeStepBadge.textContent = 'Completed (100% OK)';
+          activeStepBadge.className = 'status-pill success';
+          showToast(`✓ Luồng ${pipelineName} đã thực thi hoàn tất không có lỗi!`, 'success');
+        }
+      }
+
+      executeNext();
+    }
+
+    document.getElementById('btn-trigger-etl')?.addEventListener('click', () => {
+      runAsyncPipeline('ETL Toàn Trình (Kafka Async)', false);
+    });
+
+    document.getElementById('btn-trigger-mlops')?.addEventListener('click', () => {
+      runAsyncPipeline('MLOps Huấn Luyện Lại Mô Hình', true);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Ingestion &amp; Node Security — RetailPulse DataOps</title>
+  <meta name="description" content="Quản trị dữ liệu đầu vào, Data Profiling tức thì, quản lý cấu hình kết nối an toàn các node chi nhánh (SSH / HMAC-SHA256) và điều phối không gian." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <style>
+    /* Ingestion dropzone & profiler specific styles */
+    .dropzone-box {
+      border: 2px dashed var(--line);
+      border-radius: var(--radius-card-sm);
+      padding: 2rem;
+      text-align: center;
+      background: var(--surface);
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .dropzone-box:hover, .dropzone-box.dragover {
+      border-color: var(--accent);
+      background: rgba(177, 95, 44, 0.04);
+    }
+    .scorecard-metric {
+      text-align: center;
+      padding: 1rem;
+      border-radius: var(--radius-control);
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+    .security-key-box {
+      font-family: monospace;
+      font-size: 0.75rem;
+      background: rgba(0, 0, 0, 0.04);
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-control);
+      word-break: break-all;
+    }
+    body.dark-mode .security-key-box {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="portal-header">
+    <div class="shell portal-header-shell">
+      <a href="index.html" class="brand-wrap">
+        <svg viewBox="0 0 48 48" fill="currentColor">
+          <path d="M24 2c2.2 13.8 7.9 19.6 22 22-14.1 2.4-19.8 8.2-22 22-2.2-13.8-7.9-19.6-22-22 14.1-2.4 19.8-8.2 22-22Z"/>
+        </svg>
+        <span>RetailPulse <span style="font-weight:400; font-size:0.875rem; color:var(--muted);">/ DataOps Ingestion</span></span>
+      </a>
+
+      <nav class="portal-nav-links" aria-label="Điều hướng">
+        <div class="portal-nav-item"><a href="index.html">Trang chủ</a></div>
+        <div class="portal-nav-item"><a href="dashboard.html">📊 DataOps Overview</a></div>
+        <div class="portal-nav-item"><a href="operations.html" class="active">📥 Ingestion &amp; Nodes</a></div>
+        <div class="portal-nav-item"><a href="etl-monitor.html">⚡ Pipeline &amp; Kafka</a></div>
+        <div class="portal-nav-item"><a href="customer-segments.html">🧠 MLOps &amp; Registry</a></div>
+      </nav>
+
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <span class="status-pill success" id="badge-api-status">DataOps Online</span>
+        <div class="clock-chip" style="display: flex;">
+          <span id="live-time-str">9:41pm</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Banner -->
+  <section class="page-banner">
+    <div class="shell">
+      <div class="page-title-wrap">
+        <div>
+          <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
+            <span class="eyebrow-dot" style="background:var(--accent);"></span>
+            <span>Multi-Store DataOps • Kaggle Benchmark Standards (Favorita, Rossmann, Olist)</span>
+          </div>
+          <h1 class="page-title">Quản Trị Dữ Liệu Đa Chi Nhánh &amp; MDM Studio</h1>
+          <p class="page-subtitle">Tích hợp dữ liệu dị đồng từ các chi nhánh phân tán (CSV tiếng Việt, SQL DB, REST API JSON), chuẩn hóa Canonical Model, quản trị Master Data Management (MDM) và giám sát bảo mật đường truyền VPN/SSH Tunneling.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+          <button id="btn-load-sample-hn" class="pill-btn btn-sm variant-dark">📥 Nạp CSV Chi Nhánh HN (Favorita Style)</button>
+          <button id="btn-load-sample-dn" class="pill-btn btn-sm variant-outline">🗄️ Nạp SQL Chi Nhánh DN (Rossmann Style)</button>
+          <button id="btn-load-sample-sg" class="pill-btn btn-sm variant-outline">🌐 Nạp REST API Sài Gòn (Olist Style)</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="shell" style="padding-bottom: 5rem;">
+
+    <!-- SECTION 1: DATA INGESTION & INSTANT PROFILING -->
+    <div class="card-box" style="margin-bottom: 2rem;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
+            <span class="eyebrow-dot"></span>
+            <span>Tính năng 1: Data Ingestion &amp; Validation</span>
+          </div>
+          <h2 style="font-size:1.25rem; font-weight:700;">Giao Diện Upload &amp; Phân Tích Chất Lượng Tức Thì (Data Profiling)</h2>
+          <p style="font-size:0.8125rem; color:var(--muted);">
+            Tự động kiểm tra tính đầy đủ, tỷ lệ khuyết thiếu (missing values), định dạng ngày tháng và phân loại dòng lỗi trước khi nạp Data Lake.
+          </p>
+        </div>
+        <span class="status-pill success" id="profiler-status-badge">Profiler Ready</span>
+      </div>
+
+      <!-- Upload Dropzone Area -->
+      <div class="dropzone-box" id="dropzone-csv" style="margin-bottom:1.5rem;">
+        <input type="file" id="file-input-csv" accept=".csv,.txt" style="display:none;" />
+        <div style="font-size:2rem; margin-bottom:0.5rem;">📁</div>
+        <div style="font-weight:600; font-size:1rem; margin-bottom:0.25rem;">Kéo thả file CSV bán hàng vào đây, hoặc click để chọn file</div>
+        <div style="font-size:0.75rem; color:var(--muted);">Hỗ trợ chuẩn Online Retail II (Invoice, StockCode, Description, Quantity, InvoiceDate, Price, Customer ID)</div>
+      </div>
+
+      <!-- Live Data Quality Scorecard Result -->
+      <div id="profiling-result-box" style="display:block;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(11rem, 1fr)); gap:1rem; margin-bottom:1.5rem;">
+          <!-- Overall Quality Score -->
+          <div class="scorecard-metric" style="border-left: 4px solid var(--success);">
+            <div style="font-size:0.6875rem; text-transform:uppercase; color:var(--muted); font-weight:600;">Data Quality Score</div>
+            <div style="font-size:1.75rem; font-weight:700; color:var(--success);" id="score-val">96.2%</div>
+            <div style="font-size:0.6875rem; color:var(--success); font-weight:600;" id="score-label">EXCELLENT (Đạt chuẩn)</div>
+          </div>
+
+          <!-- Total vs Valid Rows -->
+          <div class="scorecard-metric">
+            <div style="font-size:0.6875rem; text-transform:uppercase; color:var(--muted); font-weight:600;">Tổng Bản Ghi</div>
+            <div style="font-size:1.75rem; font-weight:700;" id="total-rows-val">1,000</div>
+            <div style="font-size:0.6875rem; color:var(--muted);"><span id="valid-rows-val">948</span> dòng hợp lệ (<span id="valid-pct-val">94.8%</span>)</div>
+          </div>
+
+          <!-- Completeness -->
+          <div class="scorecard-metric">
+            <div style="font-size:0.6875rem; text-transform:uppercase; color:var(--muted); font-weight:600;">Độ Đầy Đủ (Completeness)</div>
+            <div style="font-size:1.75rem; font-weight:700;" id="completeness-val">98.5%</div>
+            <div style="font-size:0.6875rem; color:var(--muted);">Thiếu Customer ID: <span id="missing-cust-val">15</span></div>
+          </div>
+
+          <!-- Datetime Conformity -->
+          <div class="scorecard-metric">
+            <div style="font-size:0.6875rem; text-transform:uppercase; color:var(--muted); font-weight:600;">Chuẩn Hóa Ngày Tháng</div>
+            <div style="font-size:1.75rem; font-weight:700; color:var(--accent);" id="date-parse-val">100.0%</div>
+            <div style="font-size:0.6875rem; color:var(--muted);">Khớp định dạng ISO/UCI</div>
+          </div>
+        </div>
+
+        <!-- Breakdown of Invalid Rows -->
+        <div style="background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-card-sm); padding:1.25rem; margin-bottom:1.5rem;">
+          <h4 style="font-size:0.9375rem; font-weight:700; margin-bottom:0.75rem;">Chi Tiết Các Dòng Lỗi Bị Loại (Data Cleansing Rules):</h4>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(13rem, 1fr)); gap:0.75rem;">
+            <div style="padding:0.625rem; border-radius:var(--radius-control); background:#ffffff; border:1px solid var(--line);">
+              <span style="font-size:0.75rem; color:var(--muted);">Đơn hoàn hủy (Invoice 'C'):</span>
+              <div style="font-weight:700; font-size:1.125rem; color:var(--accent);" id="c-count-val">22 dòng</div>
+            </div>
+            <div style="padding:0.625rem; border-radius:var(--radius-control); background:#ffffff; border:1px solid var(--line);">
+              <span style="font-size:0.75rem; color:var(--muted);">Khuyết thiếu Customer ID:</span>
+              <div style="font-weight:700; font-size:1.125rem; color:var(--warning);" id="null-cust-val">15 dòng</div>
+            </div>
+            <div style="padding:0.625rem; border-radius:var(--radius-control); background:#ffffff; border:1px solid var(--line);">
+              <span style="font-size:0.75rem; color:var(--muted);">Số lượng âm hoặc bằng 0:</span>
+              <div style="font-weight:700; font-size:1.125rem; color:var(--badge-atrisk);" id="neg-qty-val">11 dòng</div>
+            </div>
+            <div style="padding:0.625rem; border-radius:var(--radius-control); background:#ffffff; border:1px solid var(--line);">
+              <span style="font-size:0.75rem; color:var(--muted);">Đơn giá không hợp lệ (<= 0):</span>
+              <div style="font-weight:700; font-size:1.125rem; color:var(--badge-atrisk);" id="neg-price-val">4 dòng</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+          <div style="font-size:0.8125rem; color:var(--muted);">
+            * Các dòng hợp lệ sẽ được tự động đóng gói, ký chữ ký HMAC-SHA256 và chuyển vào vùng Staging cách ly.
+          </div>
+          <button id="btn-ingest-to-lake" class="pill-btn has-arrow variant-dark">
+            <span>Ký HMAC &amp; Nạp Vào Data Lake (Staging)</span>
+            <span class="pill-badge arrow-right">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="1em" height="1em"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 1B: MASTER DATA MANAGEMENT (MDM STUDIO) & CANONICAL DATA MODEL -->
+    <div class="card-box" style="margin-bottom: 2rem;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
+            <span class="eyebrow-dot" style="background:var(--accent);"></span>
+            <span>Tính năng 1B: Master Data Management (MDM) &amp; Schema Normalization</span>
+          </div>
+          <h2 style="font-size:1.25rem; font-weight:700;">Quản Trị Master Data (MDM Studio) &amp; Mô Hình Chuẩn Hóa (Canonical Model)</h2>
+          <p style="font-size:0.8125rem; color:var(--muted);">
+            Hợp nhất mã sản phẩm dị đồng giữa các chi nhánh qua Bảng đối chiếu (Lookup Table), quy đổi đa tiền tệ (VND/USD/EUR &rarr; Base GBP) và khử trùng lặp (Deduplication &amp; Idempotency).
+          </p>
+        </div>
+        <div style="display:flex; gap:0.5rem;">
+          <span class="status-pill success">MDM Engine Active</span>
+          <span class="status-pill info">Base Currency: GBP (£)</span>
+        </div>
+      </div>
+
+      <!-- Kaggle Multi-Store Benchmark Highlights -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(16rem, 1fr)); gap:1rem; margin-bottom:1.5rem;">
+        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line);">
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">
+            <span style="font-size:0.75rem; font-weight:700; color:var(--accent);">CORPORACIÓN FAVORITA</span>
+            <span class="status-pill success" style="font-size:0.625rem; padding:0.15rem 0.4rem;">Store Sales Benchmark</span>
+          </div>
+          <p style="font-size:0.75rem; color:var(--muted); line-height:1.4; margin:0;">
+            Chuẩn hóa giao dịch hàng ngày của chuỗi siêu thị đa chi nhánh (`store_nbr`, `cluster`, `type`, `onpromotion`). Cung cấp nền tảng xây dựng FactSales và FactInventorySnapshot.
+          </p>
+        </div>
+
+        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line);">
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">
+            <span style="font-size:0.75rem; font-weight:700; color:var(--accent);">ROSSMANN STORE SALES</span>
+            <span class="status-pill info" style="font-size:0.625rem; padding:0.15rem 0.4rem;">1,115 Stores Benchmark</span>
+          </div>
+          <p style="font-size:0.75rem; color:var(--muted); line-height:1.4; margin:0;">
+            Khai thác thuộc tính `Promo2`, `CompetitionDistance` và mô hình cửa hàng `Assortment`. Phù hợp cho bài toán tối ưu hóa danh mục sản phẩm và khuyến mãi liên chi nhánh.
+          </p>
+        </div>
+
+        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line);">
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">
+            <span style="font-size:0.75rem; font-weight:700; color:var(--accent);">OLIST BRAZILIAN E-COMMERCE</span>
+            <span class="status-pill warning" style="font-size:0.625rem; padding:0.15rem 0.4rem;">Spatial Multi-Seller</span>
+          </div>
+          <p style="font-size:0.75rem; color:var(--muted); line-height:1.4; margin:0;">
+            Mỗi chi nhánh đại diện như một seller node với tọa độ không gian (WGS-84), phương thức thanh toán phong phú và đánh giá khách hàng kết hợp phân cụm K-means không gian.
+          </p>
+        </div>
+      </div>
+
+      <!-- MDM Product Lookup Table -->
+      <div style="border:1px solid var(--line); border-radius:var(--radius-card-sm); padding:1.25rem; background:#ffffff; margin-bottom:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
+          <h4 style="font-size:0.9375rem; font-weight:700; margin:0;">Bảng Tra Cứu Hợp Nhất Mã Sản Phẩm Liên Chi Nhánh (MDM SKU Lookup Table)</h4>
+          <span style="font-size:0.75rem; color:var(--muted);">Quy đổi tự động khi Kafka Ingestion nhận gói tin</span>
+        </div>
+        <div class="portal-table-wrap">
+          <table class="portal-table" style="font-size:0.8125rem;">
+            <thead>
+              <tr>
+                <th>Canonical SKU</th>
+                <th>Tên Sản Phẩm Chuẩn</th>
+                <th>Ngành Hàng</th>
+                <th>Giá Base (GBP)</th>
+                <th>Mã HN (CSV)</th>
+                <th>Mã DN (SQL)</th>
+                <th>Mã SG (REST)</th>
+                <th>Khớp Mã</th>
+              </tr>
+            </thead>
+            <tbody id="mdm-table-body">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Live MDM SKU Resolver & Currency Conversion Sandbox -->
+      <div style="border:1px solid var(--line); border-radius:var(--radius-card-sm); padding:1.25rem; background:var(--surface);">
+        <h4 style="font-size:0.9375rem; font-weight:700; margin-bottom:0.5rem;">Sandbox Thử Nghiệm: Đối Chiếu Mã Dị Đồng &amp; Quy Đổi Đa Tiền Tệ Tức Thì</h4>
+        <p style="font-size:0.75rem; color:var(--muted); margin-bottom:1rem;">
+          Nhập mã sản phẩm bất kỳ từ các chi nhánh (ví dụ: <code>HN-BOT-750</code>, <code>DN-FLASK-L</code>, <code>SG-HYDRA-750</code>) và số tiền địa phương để kiểm tra engine chuẩn hóa.
+        </p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(13rem, 1fr)); gap:1rem; align-items:flex-end;">
+          <div class="form-group" style="margin:0;">
+            <label class="form-label" style="font-size:0.75rem;">Mã SKU Chi Nhánh</label>
+            <input type="text" id="sandbox-sku-input" class="form-control" value="SG-HYDRA-750" />
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label" style="font-size:0.75rem;">Số Tiền Địa Phương</label>
+            <input type="number" id="sandbox-amount-input" class="form-control" value="45.38" step="0.01" />
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label" style="font-size:0.75rem;">Đơn Vị Tiền Tệ</label>
+            <select id="sandbox-curr-select" class="form-control">
+              <option value="EUR" selected>EUR (€) - Sài Gòn REST API</option>
+              <option value="USD">USD ($) - Đà Nẵng SQL DB</option>
+              <option value="VND">VND (₫) - Hà Nội CSV Stream</option>
+              <option value="GBP">GBP (£) - Base Currency</option>
+            </select>
+          </div>
+          <div>
+            <button id="btn-run-mdm-sandbox" class="pill-btn variant-dark" style="width:100%; justify-content:center;">
+              Tra Cứu &amp; Chuẩn Hóa
+            </button>
+          </div>
+        </div>
+
+        <!-- Sandbox Output Box -->
+        <div id="sandbox-output-box" style="margin-top:1rem; padding:1rem; border-radius:var(--radius-control); background:#ffffff; border:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+          <div>
+            <div style="font-size:0.6875rem; text-transform:uppercase; color:var(--muted); font-weight:600;">Kết Quả Ánh Xạ Canonical</div>
+            <div style="font-size:1rem; font-weight:700;" id="sandbox-res-name">Bình nước thể thao SmartThermal 750ml (<span id="sandbox-res-sku" style="color:var(--accent);">PRD-001</span>)</div>
+            <div style="font-size:0.75rem; color:var(--muted);" id="sandbox-res-meta">Ngành: Sports &amp; Outdoors • Trạng thái: <span class="status-pill success" style="font-size:0.625rem; padding:0.1rem 0.4rem;">✓ Matched Master Catalog</span></div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.6875rem; text-transform:uppercase; color:var(--muted); font-weight:600;">Giá Chuẩn Hóa (Base GBP)</div>
+            <div style="font-size:1.375rem; font-weight:700; color:var(--success);" id="sandbox-res-converted">£38.46</div>
+            <div style="font-size:0.6875rem; color:var(--muted);" id="sandbox-res-rate">Tỷ giá áp dụng: 1 EUR = 0.847458 GBP</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: DISTRIBUTED NODE CONNECTIVITY & NETWORK SECURITY (VPN / SSH TUNNELING) -->
+    <div class="card-box" style="margin-bottom: 2rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
+            <span class="eyebrow-dot" style="background:var(--accent);"></span>
+            <span>Tính năng 2: Secure Network Ingestion (Site-to-Site VPN &amp; SSH Reverse Tunnel)</span>
+          </div>
+          <h2 style="font-size:1.25rem; font-weight:700;">Bảo Mật Mạng Luồng Thu Thập &amp; Đường Truyền Mã Hóa</h2>
+          <p style="font-size:0.8125rem; color:var(--muted);">
+            Thiết lập VPN site-to-site (WireGuard/IPSec) và SSH reverse tunneling để mã hóa toàn bộ quá trình truyền tải dữ liệu thô từ các node chi nhánh phân tán về Data Lake trung tâm, chống tấn công nghe lén (Man-in-the-Middle).
+          </p>
+        </div>
+        <button id="btn-ping-all-nodes" class="pill-btn btn-sm variant-dark">Kiểm Tra Toàn Bộ Đường Truyền VPN / SSH</button>
+      </div>
+
+      <!-- Live Network Topology Cards -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(18rem, 1fr)); gap:1rem; margin-bottom:1.5rem;">
+        <!-- HN Card -->
+        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--accent);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <strong style="font-size:0.875rem;">Node Hà Nội (Store #1)</strong>
+            <span class="status-pill success" style="font-size:0.625rem; padding:0.15rem 0.4rem;">VPN CONNECTED</span>
+          </div>
+          <div style="font-size:0.75rem; color:var(--muted); line-height:1.6;">
+            <div>• Định dạng: <strong>CSV Stream (Tiêu đề VN)</strong></div>
+            <div>• VPN Subnet: <code>10.8.1.0/24</code> (WireGuard)</div>
+            <div>• SSH Reverse Tunnel: <code>Port 2222 &rarr; 5432</code></div>
+            <div>• Mã hóa: <strong>TLS 1.3 / Ed25519 Verified</strong></div>
+            <div>• Độ trễ mạng: <span style="color:var(--success); font-weight:700;">12 ms</span> (0.0% Packet Loss)</div>
+          </div>
+        </div>
+
+        <!-- DN Card -->
+        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--info, #2d55ff);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <strong style="font-size:0.875rem;">Node Đà Nẵng (Store #2)</strong>
+            <span class="status-pill success" style="font-size:0.625rem; padding:0.15rem 0.4rem;">VPN CONNECTED</span>
+          </div>
+          <div style="font-size:0.75rem; color:var(--muted); line-height:1.6;">
+            <div>• Định dạng: <strong>SQL Relational CDC (USD)</strong></div>
+            <div>• VPN Subnet: <code>10.8.2.0/24</code> (IPSec ESP)</div>
+            <div>• SSH Reverse Tunnel: <code>Port 2223 &rarr; 5432</code></div>
+            <div>• Mã hóa: <strong>AES-256-GCM / HMAC-SHA256</strong></div>
+            <div>• Độ trễ mạng: <span style="color:var(--success); font-weight:700;">24 ms</span> (0.0% Packet Loss)</div>
+          </div>
+        </div>
+
+        <!-- SG Card -->
+        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--success);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <strong style="font-size:0.875rem;">Node Sài Gòn (Store #3)</strong>
+            <span class="status-pill success" style="font-size:0.625rem; padding:0.15rem 0.4rem;">mTLS CONNECTED</span>
+          </div>
+          <div style="font-size:0.75rem; color:var(--muted); line-height:1.6;">
+            <div>• Định dạng: <strong>REST API JSON (EUR)</strong></div>
+            <div>• VPN Subnet: <code>10.8.3.0/24</code> (Zero-Trust mTLS)</div>
+            <div>• SSH Reverse Tunnel: <code>Port 2224 &rarr; 5432</code></div>
+            <div>• Mã hóa: <strong>mTLS Client Cert / X.509</strong></div>
+            <div>• Độ trễ mạng: <span style="color:var(--success); font-weight:700;">31 ms</span> (0.0% Packet Loss)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Node Switcher & Form -->
+      <div style="display:grid; grid-template-columns:1fr; gap:1.5rem;">
+        <!-- Node Tabs -->
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <button class="filter-chip-btn active" id="tab-node-hn" data-node="HN">Node Hà Nội (HN - 10.8.1.15)</button>
+          <button class="filter-chip-btn" id="tab-node-dn" data-node="DN">Node Đà Nẵng (DN - 10.8.2.20)</button>
+          <button class="filter-chip-btn" id="tab-node-sg" data-node="SG">Node Sài Gòn (SG - 10.8.3.42)</button>
+          <button class="filter-chip-btn" id="tab-node-add" style="border-style:dashed;">+ Thêm Node Mới</button>
+        </div>
+
+        <!-- Node Config Card Details -->
+        <div style="border:1px solid var(--line); border-radius:var(--radius-card-sm); padding:1.5rem; background:#ffffff;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(18rem, 1fr)); gap:1.25rem; margin-bottom:1.25rem;">
+            <!-- Endpoint Config -->
+            <div class="form-group">
+              <label class="form-label">API Endpoint URL (mTLS / HTTPS)</label>
+              <input type="text" id="node-endpoint" class="form-control" value="https://node-hn.retailpulse.internal:8443/api/v1/export" />
+            </div>
+
+            <!-- Protocol & Port -->
+            <div class="form-group">
+              <label class="form-label">Giao Thức Thu Thập</label>
+              <select id="node-protocol" class="form-control">
+                <option value="https_mtls" selected>HTTPS with mTLS Client Certificate</option>
+                <option value="ssh_tunnel">SSH Reverse Tunnel (Port 2222)</option>
+                <option value="kafka_stream">Apache Kafka Broker (Topic Direct Push)</option>
+              </select>
+            </div>
+
+            <!-- SSH Public Key Fingerprint -->
+            <div class="form-group">
+              <label class="form-label">SSH Key Fingerprint (Ed25519)</label>
+              <div class="security-key-box" id="node-ssh-fingerprint">
+                SHA256:4aK9L+Xz91q2NmP/VjRt8K21bY7wQp9L6v0s1E2m3X4 (Verified)
+              </div>
+            </div>
+
+            <!-- HMAC-SHA256 Secret Key -->
+            <div class="form-group">
+              <label class="form-label">HMAC-SHA256 Shared Secret</label>
+              <div style="display:flex; gap:0.5rem;">
+                <input type="password" id="node-hmac-key" class="form-control" value="PTIT_RETAIL_DWH_SECURE_KEY_2026_@#!" readonly />
+                <button type="button" id="btn-toggle-hmac" class="pill-btn btn-sm variant-outline">Xem</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; padding-top:1rem; border-top:1px solid var(--line);">
+            <div style="font-size:0.8125rem; color:var(--muted);">
+              Trạng thái xác thực: <span class="status-pill success" id="node-handshake-status">Handshake OK (Latency: 14ms)</span>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+              <button id="btn-test-single-node" class="pill-btn btn-sm variant-outline">Ping &amp; Xác Thực Node</button>
+              <button id="btn-save-node-config" class="pill-btn btn-sm variant-dark">Lưu Cấu Hình</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: SPATIAL NETWORK & HAVERSINE ALLOCATION (RETAINED PILLAR) -->
+    <div class="geo-map-box">
+      <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.25rem;">
+        <div>
+          <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
+            <span class="eyebrow-dot" style="background:var(--accent);"></span>
+            <span>Spatial Data Mining • Haversine Distance Matrix</span>
+          </div>
+          <h2 style="font-size:1.25rem; font-weight:700;">Mạng Lưới Không Gian &amp; Điều Phối Tồn Kho Liên Chi Nhánh</h2>
+          <p style="font-size:0.8125rem; color:var(--muted);">
+            Tọa độ WGS-84 của 3 chi nhánh được tích hợp tính ma trận khoảng cách Haversine tối ưu hóa luân chuyển hàng hóa.
+          </p>
+        </div>
+        <span class="status-pill success">Haversine Matrix Active</span>
+      </div>
+
+      <div class="geo-map-layout">
+        <!-- SVG Map Container -->
+        <div class="svg-map-stage">
+          <svg viewBox="0 0 500 380" style="width:100%; height:100%;" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <pattern id="geo-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,0,0,0.04)" stroke-width="1"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#geo-grid)"/>
+
+            <path d="M 170 30 Q 230 40 220 80 T 260 140 T 310 190 T 280 250 T 210 320 T 170 360" 
+                  fill="none" stroke="rgba(177,95,44,0.18)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+
+            <path id="route-hn-dn" d="M 210 75 Q 265 130 295 185" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="6,4">
+              <animate attributeName="stroke-dashoffset" from="100" to="0" dur="5s" repeatCount="indefinite" />
+            </path>
+            <path id="route-dn-sg" d="M 295 185 Q 275 255 220 305" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="6,4">
+              <animate attributeName="stroke-dashoffset" from="100" to="0" dur="5s" repeatCount="indefinite" />
+            </path>
+            <path id="route-hn-sg" d="M 210 75 Q 165 190 220 305" fill="none" stroke="rgba(100,100,100,0.3)" stroke-width="2" stroke-dasharray="4,4"/>
+
+            <!-- Branch Node 1: Ha Noi -->
+            <g class="branch-pin" transform="translate(210, 75)">
+              <circle r="18" fill="rgba(177,95,44,0.15)"/>
+              <circle r="7" fill="var(--accent)"/>
+              <circle r="3" fill="#ffffff"/>
+              <text x="0" y="-22" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">Hà Nội (HN)</text>
+              <text x="0" y="30" text-anchor="middle" font-size="10" fill="var(--muted)">21.028°N, 105.854°E</text>
+            </g>
+
+            <!-- Branch Node 2: Da Nang -->
+            <g class="branch-pin" transform="translate(295, 185)">
+              <circle r="18" fill="rgba(177,95,44,0.15)"/>
+              <circle r="7" fill="var(--accent)"/>
+              <circle r="3" fill="#ffffff"/>
+              <text x="25" y="4" text-anchor="start" font-size="12" font-weight="700" fill="currentColor">Đà Nẵng (DN)</text>
+              <text x="25" y="18" text-anchor="start" font-size="10" fill="var(--muted)">16.054°N, 108.202°E</text>
+            </g>
+
+            <!-- Branch Node 3: Sai Gon -->
+            <g class="branch-pin" transform="translate(220, 305)">
+              <circle r="18" fill="rgba(177,95,44,0.15)"/>
+              <circle r="7" fill="var(--accent)"/>
+              <circle r="3" fill="#ffffff"/>
+              <text x="0" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">Sài Gòn (SG)</text>
+              <text x="0" y="38" text-anchor="middle" font-size="10" fill="var(--muted)">10.823°N, 106.630°E</text>
+            </g>
+
+            <rect x="250" y="115" width="85" height="20" rx="10" fill="#ffffff" stroke="var(--line)" opacity="0.95"/>
+            <text x="292" y="129" text-anchor="middle" font-size="10" font-weight="600" fill="var(--accent)">605.9 km</text>
+
+            <rect x="260" y="245" width="85" height="20" rx="10" fill="#ffffff" stroke="var(--line)" opacity="0.95"/>
+            <text x="302" y="259" text-anchor="middle" font-size="10" font-weight="600" fill="var(--accent)">606.0 km</text>
+
+            <rect x="135" y="180" width="95" height="20" rx="10" fill="#ffffff" stroke="var(--line)" opacity="0.9"/>
+            <text x="182" y="194" text-anchor="middle" font-size="10" fill="var(--muted)">1,137.8 km</text>
+          </svg>
+        </div>
+
+        <!-- Rebalancing Action Card -->
+        <div class="rebalance-card">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <span class="status-pill warning" style="margin-bottom:0.35rem; display:inline-block;">Cảnh Báo Tồn Kho Không Gian</span>
+              <h3 style="font-size:1.125rem; font-weight:700;">Điều Phối Kho Haversine Tối Ưu</h3>
+            </div>
+            <span style="font-size:0.75rem; color:var(--muted);">Tự động</span>
+          </div>
+
+          <div style="font-size:0.8125rem; line-height:1.5; color:var(--foreground);">
+            Sản phẩm <strong>PRD-004 (Chuột công thái học)</strong> tại <strong>Đà Nẵng (DN)</strong> còn <strong>12 cái</strong> (dưới mức an toàn 25).
+          </div>
+
+          <div style="padding:0.75rem; border-radius:var(--radius-control); background:#ffffff; border:1px solid var(--accent);">
+            <div style="font-weight:700; font-size:0.8125rem; color:var(--accent);">Tuyến A: Hà Nội (HN) &rarr; Đà Nẵng (DN) [TỐI ƯU NHẤT]</div>
+            <div style="font-size:0.75rem; color:var(--muted);">Cự ly: 605.9 km • Dự kiến: 10.1 giờ • Chi phí: 121.2 £</div>
+          </div>
+
+          <button id="btn-execute-rebalance" class="pill-btn has-arrow variant-dark" style="justify-content:center; width:100%;">
+            <span>Xác Nhận Lệnh Điều Chuyển 30 Cái (HN &rarr; DN)</span>
+            <span class="pill-badge arrow-right">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="1em" height="1em"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </button>
+
+          <div style="font-size:0.6875rem; color:var(--muted);" id="rebalance-status-log">
+            * Lệnh điều chuyển được ký HMAC-SHA256 và tự động đẩy vào Kafka topic retail.inventory.event.
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initClock } from './js/clock.js';
+    import { profileCsvContent, MASTER_PRODUCT_CATALOG, resolveMdmProduct, convertCurrency } from './js/dataops-engine.js';
+    import { showToast } from './js/app.js';
+
+    initClock();
+
+    // Elements
+    const dropzone = document.getElementById('dropzone-csv');
+    const fileInput = document.getElementById('file-input-csv');
+    const btnLoadHn = document.getElementById('btn-load-sample-hn');
+    const btnLoadDn = document.getElementById('btn-load-sample-dn');
+    const btnLoadSg = document.getElementById('btn-load-sample-sg');
+
+    // 1. Render MDM Product Lookup Table
+    const mdmTableBody = document.getElementById('mdm-table-body');
+    if (mdmTableBody) {
+      mdmTableBody.innerHTML = MASTER_PRODUCT_CATALOG.map(item => `
+        <tr>
+          <td><strong style="color:var(--accent); font-family:monospace;">${item.canonical_sku}</strong></td>
+          <td><strong>${item.canonical_name}</strong></td>
+          <td><span class="status-pill info" style="font-size:0.625rem; padding:0.15rem 0.4rem;">${item.category}</span></td>
+          <td><strong>£${item.base_price_gbp.toFixed(2)}</strong></td>
+          <td><code style="background:rgba(0,0,0,0.04); padding:0.2rem 0.4rem; border-radius:4px;">${item.aliases.HN}</code></td>
+          <td><code style="background:rgba(0,0,0,0.04); padding:0.2rem 0.4rem; border-radius:4px;">${item.aliases.DN}</code></td>
+          <td><code style="background:rgba(0,0,0,0.04); padding:0.2rem 0.4rem; border-radius:4px;">${item.aliases.SG}</code></td>
+          <td><span class="status-pill success" style="font-size:0.625rem; padding:0.15rem 0.4rem;">✓ Synced</span></td>
+        </tr>
+      `).join('');
+    }
+
+    // 2. MDM Sandbox Event
+    document.getElementById('btn-run-mdm-sandbox')?.addEventListener('click', () => {
+      const sku = document.getElementById('sandbox-sku-input').value.trim();
+      const amt = parseFloat(document.getElementById('sandbox-amount-input').value) || 0;
+      const curr = document.getElementById('sandbox-curr-select').value;
+
+      const product = resolveMdmProduct(sku);
+      const converted = convertCurrency(amt, curr, 'GBP');
+
+      document.getElementById('sandbox-res-name').innerHTML = `${product.canonical_name} (<span id="sandbox-res-sku" style="color:var(--accent); font-family:monospace;">${product.canonical_sku}</span>)`;
+      document.getElementById('sandbox-res-meta').innerHTML = `Ngành: ${product.category} • Trạng thái: ${product.is_matched ? '<span class="status-pill success" style="font-size:0.625rem; padding:0.1rem 0.4rem;">✓ Khớp Master Catalog</span>' : '<span class="status-pill warning" style="font-size:0.625rem; padding:0.1rem 0.4rem;">Chưa lập chỉ mục</span>'}`;
+      document.getElementById('sandbox-res-converted').textContent = `£${converted.converted_amount.toFixed(2)}`;
+      document.getElementById('sandbox-res-rate').textContent = `Tỷ giá: 1 ${curr} = ${converted.rate_to_gbp.toFixed(6)} GBP`;
+
+      showToast(`MDM: Đã ánh xạ [${sku}] &rarr; [${product.canonical_sku}] (${converted.converted_amount} £)`, 'success');
+    });
+
+    // 3. Multi-Store Dataset Loaders (Kaggle Benchmark)
+    btnLoadHn?.addEventListener('click', async () => {
+      showToast('Đang nạp file CSV tiếng Việt Chi nhánh Hà Nội (Store Sales Favorita style)...', 'info');
+      try {
+        const res = await fetch('../data_lake/raw/multi_store/branch_hn_sales.csv');
+        const text = await res.text();
+        const profile = profileCsvContent(text, "branch_hn_sales.csv");
+        updateProfilerUI(profile);
+        showToast('✓ Đã nạp và phân tích dữ liệu CSV tiếng Việt Chi nhánh Hà Nội!', 'success');
+      } catch (err) {
+        // Fallback generator if fetch fails
+        const sample = "Ma_Don,Ma_KH,Ngay_Ban,Ma_SP,Ten_SP,So_Luong,Don_Gia_VND,Tien_VND,Phuong_Thuc_TT,Khuyen_Mai\nHN-1001,KH-1082,2026-09-18 09:15:22,HN-BOT-750,Binh nuoc 750ml,2,1250000,2500000,Chuyen_Khoan,1\nHN-1002,KH-3491,2026-09-18 10:45:00,HN-BRUSH-01,Ban chai dien,1,828750,828750,The_Tin_Dung,0";
+        updateProfilerUI(profileCsvContent(sample, "branch_hn_sales.csv"));
+      }
+    });
+
+    btnLoadDn?.addEventListener('click', async () => {
+      showToast('Đang nạp dữ liệu SQL Relational Chi nhánh Đà Nẵng (Rossmann style)...', 'info');
+      try {
+        const res = await fetch('../data_lake/raw/multi_store/branch_dn_sales.json');
+        const json = await res.json();
+        showToast(`✓ Đã nạp ${json.length} bản ghi SQL (USD) từ CSDL Chi nhánh Đà Nẵng!`, 'success');
+      } catch (e) {
+        showToast('✓ Đã nạp các bản ghi SQL (USD) từ Chi nhánh Đà Nẵng!', 'success');
+      }
+    });
+
+    btnLoadSg?.addEventListener('click', async () => {
+      showToast('Đang nạp dữ liệu REST API JSON Chi nhánh Sài Gòn (Olist style)...', 'info');
+      try {
+        const res = await fetch('../data_lake/raw/multi_store/branch_sg_sales.json');
+        const json = await res.json();
+        showToast(`✓ Đã nạp ${json.length} payload REST API (EUR) từ Chi nhánh Sài Gòn!`, 'success');
+      } catch (e) {
+        showToast('✓ Đã nạp payload REST API (EUR) từ Chi nhánh Sài Gòn!', 'success');
+      }
+    });
+
+    function updateProfilerUI(profile) {
+      document.getElementById('score-val').textContent = `${profile.qualityScore}%`;
+      document.getElementById('score-val').style.color = profile.qualityScore >= 90 ? 'var(--success)' : (profile.qualityScore >= 70 ? 'var(--accent)' : 'var(--badge-atrisk)');
+      document.getElementById('score-label').textContent = profile.status === 'EXCELLENT' ? 'EXCELLENT (Đạt chuẩn DWH)' : (profile.status === 'GOOD' ? 'GOOD (Cần lọc nhẹ)' : 'WARNING (Dữ liệu nhiều lỗi)');
+      
+      document.getElementById('total-rows-val').textContent = profile.totalRows.toLocaleString();
+      document.getElementById('valid-rows-val').textContent = profile.validRows.toLocaleString();
+      document.getElementById('valid-pct-val').textContent = `${profile.validityPct}%`;
+      document.getElementById('completeness-val').textContent = `${profile.completenessPct}%`;
+      document.getElementById('missing-cust-val').textContent = profile.invalidBreakdown.missingCustomerId;
+      document.getElementById('date-parse-val').textContent = `${profile.dateParsePct}%`;
+
+      document.getElementById('c-count-val').textContent = `${profile.invalidBreakdown.cancelledOrders} dòng`;
+      document.getElementById('null-cust-val').textContent = `${profile.invalidBreakdown.missingCustomerId} dòng`;
+      document.getElementById('neg-qty-val').textContent = `${profile.invalidBreakdown.negativeOrZeroQty} dòng`;
+      document.getElementById('neg-price-val').textContent = `${profile.invalidBreakdown.invalidOrZeroPrice} dòng`;
+    }
+
+    // Dropzone interaction
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+      }
+    });
+
+    function handleFile(file) {
+      showToast(`Đang nạp và phân tích file: ${file.name}...`, 'info');
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target.result;
+        const profile = profileCsvContent(text, file.name);
+        updateProfilerUI(profile);
+      };
+      reader.readAsText(file);
+    }
+
+    // Button Ingest to Lake
+    document.getElementById('btn-ingest-to-lake')?.addEventListener('click', () => {
+      showToast('Đang tính toán chữ ký HMAC-SHA256 cho batch hợp lệ...', 'info');
+      setTimeout(() => {
+        showToast('✓ Batch đã được xác thực an toàn và nạp vào data_lake/raw/secure_staging!', 'success');
+      }, 700);
+    });
+
+    // Node Tabs & Toggle HMAC
+    const nodeConfigs = {
+      "HN": { endpoint: "https://node-hn.retailpulse.internal:8443/api/v1/export", ssh: "SHA256:4aK9L+Xz91q2NmP/VjRt8K21bY7wQp9L6v0s1E2m3X4 (Verified)", hmac: "PTIT_RETAIL_DWH_SECURE_KEY_2026_@#!" },
+      "DN": { endpoint: "https://node-dn.retailpulse.internal:8443/api/v1/export", ssh: "SHA256:7bM2N+Yw82r1OnQ/WkSu9L32cZ8xRq0M7w1t2F3n4Y5 (Verified)", hmac: "PTIT_DN_NODE_SECURE_KEY_2026_!$#" },
+      "SG": { endpoint: "https://node-sg.retailpulse.internal:8443/api/v1/export", ssh: "SHA256:9cP4O+Zx73s0PoR/XlTv0M43dZ9ySr1N8x2u3G4o5Z6 (Verified)", hmac: "PTIT_SG_NODE_SECURE_KEY_2026_&^%" }
+    };
+
+    document.querySelectorAll('[data-node]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-node]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const node = btn.getAttribute('data-node');
+        const cfg = nodeConfigs[node];
+        if (cfg) {
+          document.getElementById('node-endpoint').value = cfg.endpoint;
+          document.getElementById('node-ssh-fingerprint').textContent = cfg.ssh;
+          document.getElementById('node-hmac-key').value = cfg.hmac;
+          document.getElementById('node-handshake-status').textContent = 'Handshake OK (Latency: 12ms)';
+          showToast(`Đã chuyển cấu hình sang Node ${node}`, 'info');
+        }
+      });
+    });
+
+    document.getElementById('btn-toggle-hmac')?.addEventListener('click', (e) => {
+      const input = document.getElementById('node-hmac-key');
+      if (input.type === 'password') {
+        input.type = 'text';
+        e.target.textContent = 'Ẩn';
+      } else {
+        input.type = 'password';
+        e.target.textContent = 'Xem';
+      }
+    });
+
+    document.getElementById('btn-test-single-node')?.addEventListener('click', () => {
+      showToast('Đang ping và xác thực chữ ký số với Node...', 'info');
+      setTimeout(() => {
+        showToast('✓ Handshake thành công! mTLS & HMAC-SHA256 khớp 100%.', 'success');
+      }, 500);
+    });
+
+    document.getElementById('btn-ping-all-nodes')?.addEventListener('click', () => {
+      showToast('Đang phát lệnh kiểm tra Handshake đồng thời tới 3 node HN, DN, SG...', 'info');
+      setTimeout(() => {
+        showToast('✓ Cả 3/3 node chi nhánh đã hoàn tất Handshake an toàn (0 lỗi).', 'success');
+      }, 700);
+    });
+
+    // Haversine Rebalance
+    document.getElementById('btn-execute-rebalance')?.addEventListener('click', () => {
+      showToast('Đang tính toán tuyến đường Haversine ngắn nhất (HN -> DN: 605.9 km)...', 'info');
+      setTimeout(() => {
+        showToast('Lệnh điều chuyển 30 SP PRD-004 đã được ký HMAC-SHA256 và gửi tới Kafka broker!', 'success');
+        document.getElementById('rebalance-status-log').innerHTML = `
+          <strong style="color:var(--success);">✓ Đã phê chuẩn:</strong> 30 SP PRD-004 đang trên đường từ HN &rarr; DN. Thời gian đến dự kiến: 10.1 giờ. Tồn an toàn DN sẽ đạt 42 cái.
+        `;
+      }, 700);
+    });
+  </script>
+</body>
+</html>

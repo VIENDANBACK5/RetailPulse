@@ -1,0 +1,59 @@
+/* ==========================================================================
+   DESIGN TOKENS & CSS VARIABLES
+   RetailPulse — Enterprise Retail DWH & Customer Mining Platform
+   ========================================================================== */
+:root {
+  /* Color Palette */
+  --background: #ffffff;
+  --foreground: #111111;
+  --ink: #0a0a0a;
+  --ink-soft: #161616;
+  --ink-card: #121212;
+  --muted: #8d8d8d;
+  --subtle: #b6b6b6;
+  --line: #e6e5e2;
+  --line-dark: rgba(255, 255, 255, 0.12);
+  --surface: #f1f0ee;
+  --surface-2: #e3e2df;
+  --accent: #b15f2c;
+  --accent-from: #cf8047;
+  --accent-to: #97501f;
+  --accent-light: rgba(177, 95, 44, 0.12);
+  --hero-from: #ecebe9;
+  --hero-to: #c9c9c9;
+
+  /* Status Colors */
+  --success: #10b981;
+  --success-bg: rgba(16, 185, 129, 0.12);
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.12);
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.12);
+  --info: #3b82f6;
+  --info-bg: rgba(59, 130, 246, 0.12);
+
+  /* Cluster Segment Badges */
+  --badge-vip: #cf8047;
+  --badge-loyal: #2b7a78;
+  --badge-atrisk: #d97706;
+  --badge-lost: #4b5563;
+
+  /* Geometry & Radii */
+  --radius-pill: 9999px;
+  --radius-card: 2rem;
+  --radius-card-sm: 1.25rem;
+  --radius-control: 0.875rem;
+  --radius-sm: 0.5rem;
+
+  /* Typography & Layout */
+  --font-main: 'Onest', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --text-watermark: 13rem;
+  --container-shell: 88rem;
+
+  /* Spring Animations & Easings */
+  --spring-snappy: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --spring-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --spring-gentle: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-reveal: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-word: cubic-bezier(0.165, 0.84, 0.44, 1);
+}

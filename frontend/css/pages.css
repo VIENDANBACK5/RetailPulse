@@ -1,0 +1,408 @@
+/* ==========================================================================
+   PAGE-SPECIFIC STYLES (DASHBOARD, OPERATIONS, ETL, SEGMENTS)
+   ========================================================================== */
+
+/* Page Headers / Banner */
+.page-banner {
+  padding-block: 2.5rem 1.5rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 2rem;
+  background: var(--surface);
+}
+body.dark-mode .page-banner {
+  border-bottom-color: var(--line-dark);
+  background: var(--ink-soft);
+}
+.page-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+@media (min-width: 640px) {
+  .page-title-wrap {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+.page-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+@media (min-width: 768px) {
+  .page-title {
+    font-size: 2.25rem;
+  }
+}
+.page-subtitle {
+  font-size: 0.875rem;
+  color: var(--muted);
+  max-width: 40rem;
+}
+
+/* KPI Metric Cards Grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 640px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .kpi-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.kpi-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card-sm);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: transform 0.3s var(--spring-snappy), box-shadow 0.3s ease;
+}
+body.dark-mode .kpi-card {
+  background: var(--ink-card);
+  border-color: var(--line-dark);
+}
+.kpi-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+.kpi-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.kpi-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.kpi-icon {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--accent);
+}
+body.dark-mode .kpi-icon {
+  background: rgba(255, 255, 255, 0.08);
+}
+.kpi-val {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.kpi-sub {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* Dashboard 2-Col Layout */
+.dashboard-row-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 1024px) {
+  .dashboard-row-2 {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* Chart Canvas Placeholder / Container */
+.chart-box {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card-sm);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+body.dark-mode .chart-box {
+  background: var(--ink-card);
+  border-color: var(--line-dark);
+}
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.chart-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+/* SVG Bar & Line Visualizations */
+.svg-chart-wrap {
+  width: 100%;
+  height: 14rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  padding-block: 1rem;
+}
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  height: 100%;
+  justify-content: flex-end;
+}
+.bar-fill {
+  width: 100%;
+  max-width: 2.5rem;
+  background: var(--surface-2);
+  border-radius: 0.375rem 0.375rem 0 0;
+  transition: height 0.6s var(--spring-smooth), background 0.2s ease;
+}
+.bar-col:hover .bar-fill {
+  background: var(--accent);
+}
+.bar-label {
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+
+/* System Health List */
+.health-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+.health-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font-size: 0.8125rem;
+}
+body.dark-mode .health-item {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Operations POS & Forms Layout */
+.ops-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+@media (min-width: 1024px) {
+  .ops-grid {
+    grid-template-columns: 1.4fr 1fr;
+  }
+}
+
+/* Pipeline Stage Stepper */
+.pipeline-stepper {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 768px) {
+  .pipeline-stepper {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.pipeline-step-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card-sm);
+  background: #ffffff;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+body.dark-mode .pipeline-step-card {
+  background: var(--ink-card);
+  border-color: var(--line-dark);
+}
+.step-num {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+.step-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.step-desc {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* Segments Filter Bar */
+.segments-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.filter-chip-btn {
+  padding: 0.375rem 0.875rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(17, 17, 17, 0.7);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+body.dark-mode .filter-chip-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--line-dark);
+  color: rgba(255, 255, 255, 0.7);
+}
+.filter-chip-btn.active {
+  background: var(--ink);
+  color: #ffffff;
+  border-color: var(--ink);
+}
+body.dark-mode .filter-chip-btn.active {
+  background: #ffffff;
+  color: var(--ink);
+  border-color: #ffffff;
+}
+
+/* Model Selector Switch */
+.model-tab-switch {
+  display: inline-flex;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 0.25rem;
+  gap: 0.25rem;
+}
+body.dark-mode .model-tab-switch {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--line-dark);
+}
+.model-tab-btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.model-tab-btn.active {
+  background: var(--ink);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+body.dark-mode .model-tab-btn.active {
+  background: #ffffff;
+  color: var(--ink);
+}
+
+/* Latent Coordinate Chip */
+.latent-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: monospace;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+body.dark-mode .latent-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--line-dark);
+}
+
+/* Spatial Geographic Map & Balancing Container */
+.geo-map-box {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card-sm);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+body.dark-mode .geo-map-box {
+  background: var(--ink-card);
+  border-color: var(--line-dark);
+}
+.geo-map-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 1024px) {
+  .geo-map-layout {
+    grid-template-columns: 1.1fr 1fr;
+  }
+}
+.svg-map-stage {
+  width: 100%;
+  height: 380px;
+  background: linear-gradient(180deg, rgba(230, 240, 255, 0.2) 0%, rgba(245, 245, 245, 0.6) 100%);
+  border-radius: var(--radius-card-sm);
+  border: 1px dashed var(--line);
+  position: relative;
+  overflow: hidden;
+}
+body.dark-mode .svg-map-stage {
+  background: linear-gradient(180deg, rgba(15, 25, 40, 0.4) 0%, rgba(20, 20, 20, 0.8) 100%);
+  border-color: var(--line-dark);
+}
+.branch-pin {
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.branch-pin:hover {
+  transform: scale(1.15);
+}
+.rebalance-card {
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+body.dark-mode .rebalance-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--line-dark);
+}
+

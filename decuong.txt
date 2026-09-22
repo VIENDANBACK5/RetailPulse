@@ -1,0 +1,165 @@
+HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG
+ĐỀ CƯƠNG BÀI TẬP LỚN
+Môn học Kho dữ liệu và khai phá dữ liệu
+
+
+Xây dựng kho dữ liệu bán hàng và ứng dụng phân cụm khách hàng hỗ trợ chăm sóc khách hàng
+
+Ứng dụng RFM và K-means trên dữ liệu giao dịch bán lẻ
+
+Giảng viên hướng dẫn: [Điền họ tên giảng viên]
+Lớp học phần: [Điền mã lớp học phần]
+Nhóm thực hiện: [Điền tên hoặc số nhóm]
+Họ và tên thành viên	Mã sinh viên	Lớp
+[Điền thành viên]	[Điền mã sinh viên]	[Điền lớp]
+[Điền thành viên]	[Điền mã sinh viên]	[Điền lớp]
+[Điền thành viên]	[Điền mã sinh viên]	[Điền lớp]
+[Điền thành viên]	[Điền mã sinh viên]	[Điền lớp]
+
+Hà Nội, tháng 9 năm 2026
+ 
+1 Tổng quan và mục tiêu đề tài
+1.1 Giới thiệu
+Nhóm đề xuất xây dựng kho dữ liệu bán hàng, tích hợp dữ liệu từ cơ sở dữ liệu, API và file để phục vụ báo cáo kinh doanh và phân cụm khách hàng. Phần khai phá dữ liệu sử dụng các đặc trưng RFM và thuật toán K-means nhằm nhận diện những nhóm khách hàng có hành vi mua sắm tương đồng, từ đó đề xuất cách chăm sóc phù hợp.
+Đây là đề cương triển khai ban đầu. Các công nghệ, quy mô và tiến độ dưới đây là phương án dự kiến; tài liệu chưa trình bày kết quả thực nghiệm hoặc khẳng định hiệu quả kinh doanh đã đạt được.
+1.2 Lý do chọn đề tài
+Dữ liệu bán hàng phát sinh qua nhiều giao dịch và chi nhánh thường phục vụ trước hết cho tác nghiệp. Việc tổng hợp lịch sử, đối chiếu doanh thu và tìm hiểu hành vi khách hàng cần một lớp dữ liệu được làm sạch, tổ chức thống nhất. Đề tài kết hợp nội dung kho dữ liệu với một bài toán khai phá có đầu ra dễ diễn giải và có thể sử dụng trong hệ thống quản lý bán hàng.
+1.3 Mục tiêu cụ thể
+• Tích hợp ba loại nguồn dữ liệu gồm CSDL giao dịch, API tồn kho và file lịch sử bán hàng.
+• Xây dựng Data Lake lưu dữ liệu nguồn và quy trình ETL có kiểm tra chất lượng, ghi nhật ký, chống nạp trùng.
+• Thiết kế Data Warehouse theo mô hình chiều để phân tích bán hàng và tồn kho.
+• Xây dựng báo cáo Power BI và phân cụm khách hàng bằng RFM kết hợp K-means.
+• Đánh giá chất lượng dữ liệu, tính đúng của báo cáo, độ tách biệt và ý nghĩa nghiệp vụ của các cụm khách hàng.
+1.4 Câu hỏi phân tích
+Doanh thu và lượng bán biến động như thế nào theo thời gian? Sản phẩm nào đóng góp nhiều vào giá trị bán hàng? Tồn kho tại các chi nhánh được cập nhật đến thời điểm nào? Có những nhóm khách hàng nào khác biệt về lần mua gần nhất, tần suất mua và tổng chi tiêu? Mỗi nhóm nên được ưu tiên chăm sóc theo hướng nào?
+ 
+2 Phạm vi và yêu cầu của đề tài
+2.1 Phạm vi triển khai
+Đề tài tập trung vào tích hợp dữ liệu bán lẻ, xây dựng kho dữ liệu, báo cáo BI và phân cụm khách hàng. Bộ Online Retail II là nguồn chính cho phân tích RFM và K-means. CSDL giao dịch mẫu và API tồn kho được xây dựng ở mức tối thiểu để minh họa tích hợp nhiều loại nguồn. Đề tài không đặt mục tiêu xây dựng một phần mềm quản lý bán hàng hoàn chỉnh.
+
+Đầu ra nghiệp vụ chính là các nhóm khách hàng có đặc trưng mua sắm tương đồng và gợi ý chăm sóc theo từng nhóm. Chức năng này chỉ hỗ trợ quyết định, chưa triển khai chiến dịch tự động hoặc đo lường tác động thực tế đến doanh thu.
+Phạm vi dữ liệu được chia rõ: lịch sử UCI dùng cho phân tích kinh doanh và thực nghiệm phân cụm; dữ liệu CSDL và API mẫu dùng để kiểm tra luồng tích hợp, cập nhật và đối soát. Các nguồn được gắn nhãn riêng, không coi dữ liệu mẫu là dữ liệu thực của doanh nghiệp.
+2.2 Đối chiếu các yêu cầu của học phần
+Yêu cầu	Thành phần dự kiến
+CSDL	CSDL tác nghiệp PostgreSQL của hệ thống bán hàng.
+API	API tồn kho của các node chi nhánh, trả dữ liệu JSON.
+File	File Excel Online Retail II; giữ nguyên bản gốc.
+ETL	Python và pandas; xử lý theo lịch và cho phép chạy thủ công.
+Data Lake	Kho lưu file nguồn, JSON và bản trích xuất, phân vùng theo nguồn và ngày.
+Data Warehouse	PostgreSQL riêng cho dữ liệu phân tích, tổ chức fact và dimension.
+BI tool	Power BI với báo cáo kinh doanh, tồn kho và nhóm khách hàng.
+ML	K-means trên đặc trưng RFM đã tiền xử lý và chuẩn hóa.
+
+Phương án đăng ký sử dụng ML không giám sát và API nội bộ do nhóm xây dựng. Nếu giảng viên yêu cầu riêng Deep Learning hoặc API bên ngoài, nhóm sẽ điều chỉnh phạm vi theo yêu cầu học phần.
+ 
+3 Nguồn dữ liệu và quy tắc sử dụng
+3.1 Dữ liệu lịch sử
+Nguồn chính là Online Retail II của UCI, gồm 1.067.371 bản ghi giao dịch trong giai đoạn 2009–2011. Các trường chính gồm số hóa đơn, mã hàng, số lượng, ngày giao dịch, đơn giá, mã khách hàng và quốc gia. Bộ dữ liệu có giá trị thiếu, giao dịch hủy và đơn giá theo GBP; nguồn được công bố theo giấy phép CC BY 4.0 [1].
+Nhóm dự kiến chọn một cửa sổ phân tích 12 tháng liên tục trong dữ liệu lịch sử. Việc chọn chính xác khoảng thời gian và số khách sẽ được chốt sau bước khảo sát. Giữ toàn bộ giao dịch của khách trong cửa sổ đã chọn để không làm sai tần suất và tổng giá trị mua.
+3.2 Dữ liệu vận hành và dữ liệu mô phỏng
+Ứng dụng tạo đơn hàng mới, danh mục khách hàng, nhân viên và trạng thái thanh toán. Ba node chi nhánh cung cấp tồn kho qua API. Tồn đầu kỳ và phiếu nhập mẫu được tạo có kiểm soát, tuân theo quan hệ tồn cuối bằng tồn đầu cộng nhập trừ xuất. Các dữ liệu này được gắn nhãn mô phỏng.
+UCI không có chi nhánh, tồn kho hoặc nhân viên. Dữ liệu lịch sử được gán chi nhánh “Không xác định”. Mã định danh phải kèm nguồn để không ghép nhầm khách hàng UCI với khách hàng demo. Không cộng trực tiếp tiền GBP của UCI với VND của ứng dụng; báo cáo phân tách theo nguồn và đơn vị tiền tệ.
+3.3 Làm sạch và bảo toàn dữ liệu
+• Giữ nguyên dữ liệu thô; lưu nguồn, thời điểm lấy, mã lần chạy và số dòng đầu vào. Chuẩn hóa tên cột thực tế trong file sang bộ tên thống nhất.
+• Dòng thiếu mã khách vẫn có thể phục vụ tổng hợp bán hàng nếu các trường giao dịch hợp lệ; không đưa vào RFM và không gom tất cả khách thiếu mã thành một khách.
+• Giao dịch hủy, hoàn và số lượng âm được phân loại riêng. Không xóa trước khi đối soát; chỉ liên kết với đơn gốc khi có đủ căn cứ.
+• Phân tích RFM phiên bản đầu sử dụng các giao dịch mua hợp lệ có số lượng và đơn giá dương, không mang mã hủy. M thể hiện tổng giá trị các lần mua này, chưa khấu trừ hoàn trả; báo cáo ghi rõ giới hạn.
+• Không mặc định số hóa đơn cộng mã sản phẩm là khóa dòng duy nhất. Dùng định danh nguồn và dòng nguồn; kiểm tra trùng nội dung riêng để tránh xóa nhầm giao dịch hợp lệ.
+ 
+4 Kiến trúc và thiết kế kho dữ liệu
+4.1 Các lớp xử lý
+Luồng phân tích gồm thu thập dữ liệu từ CSDL, API và file; lưu bản gốc vào Data Lake; làm sạch tại vùng staging; nạp Data Warehouse; tạo báo cáo BI và bảng RFM; chạy phân cụm; lưu kết quả để hiển thị trên BI. Data Lake dự kiến dùng kho đối tượng tương thích S3, với vùng raw và curated cùng thông tin nguồn và lần chạy.
+ETL dự kiến chạy hằng ngày và chạy thủ công khi trình diễn. Mỗi lần chạy kiểm tra cấu trúc, số dòng, dữ liệu lỗi và tổng giá trị trước khi công bố kết quả. File nhận diện bằng mã băm và chỉ số dòng; dữ liệu API/CSDL dùng khóa nguồn, phiên bản hoặc thời điểm cập nhật. Cơ chế upsert và nhật ký xử lý giúp chạy lại không nhân đôi dữ liệu.
+4.2 Mô hình dữ liệu dự kiến
+Kho dữ liệu tổ chức theo mô hình chiều, trong đó fact chứa số liệu sự kiện và dimension cung cấp ngữ cảnh phân tích [2]. Các bảng chính được xác định ở mức chi tiết sau.
+Bảng	Mức chi tiết và nội dung
+FactSales	Một dòng giao dịch nguồn; khóa ngày, sản phẩm, khách, chi nhánh, nguồn; số hóa đơn, loại giao dịch, số lượng và giá trị tiền.
+FactInventorySnapshot	Một sản phẩm tại một chi nhánh ở một thời điểm chụp tồn; số lượng tồn và thời điểm lấy dữ liệu.
+DimDate và DimProduct	Ngày, tháng, quý, năm; mã sản phẩm, mô tả và nhóm hàng nếu có nguồn đáng tin cậy.
+DimCustomer và DimBranch	Khách theo nguồn; chi nhánh và bản ghi “Không xác định” cho lịch sử không có chi nhánh.
+DimSource	Nguồn dữ liệu và thông tin phân biệt lịch sử với mô phỏng; tiền tệ được lưu rõ trong mô hình.
+CustomerSegmentSnapshot	Một khách tại một lần phân tích; cửa sổ RFM, giá trị R F M, nhãn cụm, phiên bản mô hình.
+
+4.3 Quy tắc tính chỉ số
+Doanh số mua và giá trị hủy/hoàn được trình bày riêng; chỉ gọi là doanh thu thuần khi đã quy định và đối soát cách bù trừ. Số đơn được đếm theo hóa đơn phân biệt trong từng nguồn. Tồn kho được cộng giữa các sản phẩm hoặc chi nhánh tại mốc tương ứng, không cộng số tồn của nhiều ngày thành tổng tồn. Dashboard luôn hiển thị thời điểm cập nhật.
+ 
+5 Phương pháp phân cụm khách hàng
+5.1 Xây dựng đặc trưng RFM
+Mỗi quan sát tương ứng một khách hàng có mã hợp lệ và ít nhất một lần mua hợp lệ trong cửa sổ phân tích. Chọn ngày tham chiếu T ngay sau ngày kết thúc cửa sổ; không dùng ngày hiện tại để tính R cho dữ liệu lịch sử. Thực nghiệm chính chạy riêng trên UCI, không trộn hành vi demo vào mô hình lịch sử.
+Đặc trưng	Định nghĩa trong đề tài
+R — Recency	Số ngày từ lần mua hợp lệ gần nhất đến T. R nhỏ nghĩa là vừa mua gần đây.
+F — Frequency	Số hóa đơn mua hợp lệ phân biệt trong cửa sổ; không đếm số dòng sản phẩm.
+M — Monetary	Tổng số lượng nhân đơn giá của các giao dịch mua hợp lệ trong cửa sổ, cùng đơn vị tiền tệ.
+
+5.2 Quy trình thực nghiệm
+• Khảo sát phân phối RFM, khách mua sỉ và giá trị ngoại lệ; không loại bỏ khách có chi tiêu lớn chỉ để làm cụm đẹp hơn.
+• Thử biến đổi log1p đối với đặc trưng lệch phải, sau đó chuẩn hóa bằng StandardScaler. Lưu cả RFM gốc để diễn giải.
+• Chạy K-means với K từ 2 đến 6 nếu số khách và số điểm phân biệt cho phép; dùng nhiều lần khởi tạo, ghi random_state, n_init và phiên bản thư viện.
+• So sánh inertia, silhouette, quy mô từng cụm và độ ổn định khi đổi hạt giống ngẫu nhiên. Khi cần lấy mẫu để tính silhouette, ghi rõ kích thước và cách lấy mẫu.
+• Chọn K dựa trên cả kết quả định lượng và khả năng diễn giải; lưu pipeline tiền xử lý, mô hình và bảng phân cụm.
+5.3 Đánh giá và diễn giải
+K-means gom các điểm gần nhau theo khoảng cách và nhạy với thang đo, ngoại lệ cũng như lựa chọn số cụm. Silhouette đánh giá độ gắn kết và tách biệt; không phải tỷ lệ dự đoán đúng [3]. Nhóm không đặt trước ngưỡng điểm hoặc khẳng định số cụm tối ưu khi chưa thực nghiệm.
+Sau khi huấn luyện, mô tả mỗi cụm bằng số khách, trung vị RFM và tỷ trọng giá trị mua. Tên như “mua thường xuyên” hay “lâu chưa quay lại” chỉ được đặt sau khi xem kết quả. Đề xuất chăm sóc là diễn giải hỗ trợ quản lý; chưa chứng minh làm tăng doanh thu hoặc dự đoán khách sẽ rời bỏ.
+ 
+6 Chức năng trình diễn và tiêu chí nghiệm thu
+6.1 Báo cáo và sản phẩm bàn giao
+Đầu ra	Nội dung dự kiến
+BI kinh doanh	Giá trị mua, hủy/hoàn, lượng bán, số đơn, sản phẩm nổi bật; bộ lọc thời gian, nguồn và tiền tệ.
+BI tồn kho	Tồn mới nhất từng chi nhánh; thời điểm cập nhật; đánh dấu node chưa lấy được dữ liệu.
+BI khách hàng	Số khách mỗi cụm, trung vị RFM, tỷ trọng giá trị mua và gợi ý chăm sóc.
+Mã nguồn và tài liệu	CSDL và API mẫu; script ETL và ML; DDL kho dữ liệu; file Power BI; hướng dẫn chạy và báo cáo thực nghiệm.
+Minh chứng	Nhật ký ETL, bảng đối soát, kết quả thử các K, cấu hình mô hình và ảnh trình diễn.
+
+6.2 Tiêu chí kiểm tra
+• Có dữ liệu được thu thập thực tế từ đủ ba loại nguồn CSDL, API và file; truy ngược được đến bản gốc trong Data Lake.
+• Nạp lại cùng đầu vào không tăng sai số dòng và tổng tiền. Các dòng bị loại có lý do, số lượng và vị trí lưu để kiểm tra.
+• Tổng giá trị hợp lệ trước và sau ETL khớp theo nguồn, kỳ và tiền tệ; phép tính tiền dùng kiểu số thập phân và quy tắc làm tròn thống nhất.
+• Bộ lọc BI trả kết quả khớp truy vấn SQL đối chứng; tồn kho hiển thị đúng mốc chụp và dữ liệu cũ được nhận diện.
+• Mỗi khách đủ điều kiện có một nhãn trong một lần phân tích; có bảng so sánh K, mô tả cụm và giới hạn mô hình.
+• Thử mất kết nối một node: báo trạng thái không đầy đủ, không coi dữ liệu thiếu là tồn bằng 0; khi phục hồi, đồng bộ không trùng.
+6.3 Kịch bản trình diễn
+Tạo đơn và xác nhận thanh toán trên ứng dụng; kiểm tra tồn kho chi nhánh thay đổi theo quy tắc nghiệp vụ. Thu thập dữ liệu CSDL, gọi API và đọc file; chạy ETL, kiểm tra nhật ký và đối soát. Mở BI để xem dữ liệu mới của môi trường demo. Tiếp đó chạy hoặc tải kết quả phân cụm lịch sử UCI, giải thích các cụm và gợi ý chăm sóc. Chạy lại ETL để chứng minh chống trùng và mô phỏng lỗi một node để kiểm tra phục hồi.
+ 
+7 Kế hoạch triển khai và rủi ro
+7.1 Tiến độ dự kiến trong tám tuần
+Mốc tuần được tính từ khi đề cương được thông qua và sẽ điều chỉnh theo lịch học phần. Việc chuẩn bị CSDL và API mẫu có thể thực hiện song song với khảo sát dữ liệu lịch sử.
+Tuần	Công việc trọng tâm	Đầu ra
+1	Chốt yêu cầu, khảo sát UCI, thống nhất mã và quy tắc tiền tệ	Đặc tả và báo cáo khảo sát
+2	Thiết kế CSDL, API, Data Lake và mô hình chiều	Sơ đồ và hợp đồng dữ liệu
+3	Dựng dữ liệu demo và thu thập đủ ba loại nguồn	Dữ liệu raw và nhật ký
+4	Làm sạch, nạp kho dữ liệu, chống trùng và đối soát	Pipeline ETL chạy được
+5	Lập bảng RFM, chuẩn hóa và thử K-means	Bảng so sánh K và mô hình
+6	Xây báo cáo BI và diễn giải cụm	Các trang báo cáo
+7	Tích hợp, thử lỗi node và kiểm tra số liệu	Biên bản kiểm tra
+8	Hoàn thiện báo cáo, mã nguồn và luyện trình diễn	Bộ sản phẩm nộp
+
+7.2 Tổ chức công việc
+Phân chia theo bốn nhóm việc: khảo sát và chuẩn bị nguồn dữ liệu; Data Lake và ETL; thiết kế kho dữ liệu và BI; phân cụm và đánh giá. Tên người phụ trách được cập nhật sau khi nhóm thống nhất. Mỗi người cần hiểu luồng dữ liệu tổng thể; các quy tắc xử lý và công thức phải được rà soát chéo.
+7.3 Rủi ro và biện pháp
+Rủi ro	Biện pháp dự kiến
+Dữ liệu thiếu hoặc không thống nhất	Khảo sát sớm, lập quy tắc xử lý, giữ bản gốc và đối soát.
+Cụm khó diễn giải hoặc mất cân đối	Kiểm tra phân phối, chuẩn hóa, thử K; báo cáo giới hạn thay vì ép kết quả.
+Quá tải triển khai	Giữ một thuật toán ML và ETL theo lô; chưa triển khai DL, Kafka hoặc gửi chiến dịch.
+Lệch yêu cầu học phần	Xác nhận ML không giám sát và API nội bộ khi duyệt đề cương.
+
+ 
+8 Kết quả dự kiến và tài liệu tham khảo
+8.1 Kết quả dự kiến
+Kết thúc đề tài, nhóm dự kiến có một quy trình dữ liệu có thể chạy lặp lại từ nguồn đến báo cáo, một kho dữ liệu bán hàng và tồn kho có quy tắc đối soát rõ ràng, cùng mô hình phân cụm khách hàng có thể giải thích bằng RFM. Bộ sản phẩm phục vụ học phần Kho dữ liệu và khai phá dữ liệu, kèm minh chứng về tích hợp nguồn, chất lượng dữ liệu, báo cáo và thực nghiệm ML.
+Giá trị của đề tài được đánh giá qua tính đúng của dữ liệu, mức độ hoàn chỉnh của luồng xử lý và chất lượng diễn giải. Các gợi ý chăm sóc khách hàng là đầu ra hỗ trợ quyết định, cần thử nghiệm nghiệp vụ riêng nếu muốn đánh giá hiệu quả kinh doanh thực tế.
+8.2 Công nghệ dự kiến
+Thành phần	Lựa chọn ban đầu
+Ứng dụng và API	Dịch vụ API mẫu trả JSON và giao diện tối thiểu để tạo giao dịch kiểm thử.
+CSDL và kho dữ liệu	PostgreSQL; tách CSDL tác nghiệp khỏi CSDL phân tích.
+Data Lake	Kho đối tượng tương thích S3 cho dữ liệu raw và curated.
+ETL và ML	Python, pandas, scikit-learn; lập lịch theo lô.
+BI và môi trường demo	Power BI Desktop; Docker Compose cho các dịch vụ phù hợp.
+
+8.3 Tài liệu tham khảo
+[1] Chen, D. (2012). Online Retail II. UCI Machine Learning Repository. DOI 10.24432/C5CG6D.
+https://archive.ics.uci.edu/dataset/502/online+retail+ii
+[2] Microsoft Learn. Understand star schema and the importance for Power BI.
+https://learn.microsoft.com/en-us/power-bi/guidance/star-schema
+[3] scikit-learn. Clustering — K-means and clustering performance evaluation.
+https://scikit-learn.org/stable/modules/clustering.html
+K-means is not last choice.

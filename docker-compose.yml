@@ -1,0 +1,147 @@
+version: '3.8'
+
+services:
+  # ====================================================================
+  # 1. CSDL TÁC NGHIỆP (OLTP - APP DB)
+  # Quản lý đơn hàng, khách hàng, chi nhánh
+  # Cổng Host: 5432 -> Cổng Container: 5432
+  # ====================================================================
+  oltp-db:
+    image: postgres:16-alpine
+    container_name: retail-oltp-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: retail_app_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - oltp_data:/var/lib/postgresql/data
+      - ./sql/01_init_oltp.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d retail_app_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - retail-network
+
+  # ====================================================================
+  # 2. KHO DỮ LIỆU (OLAP - DATA WAREHOUSE)
+  # Mô hình chiều Star Schema (FactSales, FactInventory, Dim,...)
+  # Cổng Host: 5433 -> Cổng Container: 5432 (Tránh trùng cổng với OLTP)
+  # Power BI Desktop kết nối vào: localhost:5433 / retail_dwh_db
+  # ====================================================================
+  dwh-db:
+    image: postgres:16-alpine
+    container_name: retail-dwh-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: retail_dwh_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - dwh_data:/var/lib/postgresql/data
+      - ./sql/02_init_dwh.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d retail_dwh_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - retail-network
+
+  # ====================================================================
+  # 3. ỨNG DỤNG TÁC NGHIỆP & MOCK API TỒN KHO (FASTAPI)
+  # Cổng Host: 8000
+  # Swagger UI: http://localhost:8000/docs
+  # ====================================================================
+  app:
+    build:
+      context: ./fastapi-base
+      dockerfile: Dockerfile
+    container_name: retail-fastapi-app
+    restart: unless-stopped
+    environment:
+      PROJECT_NAME: BTL_DATA_MINING_APP
+      POSTGRES_HOST: oltp-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: retail_app_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      SECRET_KEY: btl_secret_key_ptit_2026
+      API_PREFIX: /api
+      API_VERSION: v1
+    ports:
+      - "8001:8000"
+    depends_on:
+      oltp-db:
+        condition: service_healthy
+    networks:
+      - retail-network
+
+  # ====================================================================
+  # 4. RUNNER: ĐƯỜNG ỐNG ETL & KHAI PHÁ DỮ LIỆU ML
+  # Chạy theo lệnh hoặc định kỳ nạp dữ liệu vào Data Warehouse
+  # ====================================================================
+  pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: retail-pipeline-runner
+    environment:
+      OLTP_HOST: oltp-db
+      OLTP_PORT: 5432
+      OLTP_DB: retail_app_db
+      DWH_HOST: dwh-db
+      DWH_PORT: 5432
+      DWH_DB: retail_dwh_db
+      APP_HOST: app
+      APP_PORT: 8000
+    volumes:
+      - ./data_lake:/workspace/data_lake
+      - ./models:/workspace/models
+      - ./src:/workspace/src
+      - ./config:/workspace/config
+    depends_on:
+      oltp-db:
+        condition: service_healthy
+      dwh-db:
+        condition: service_healthy
+      app:
+        condition: service_started
+    networks:
+      - retail-network
+
+  # ====================================================================
+  # 5. GIAO DIỆN QUẢN TRỊ CSDL (PGADMIN - OPTIONAL)
+  # Bật khi cần xem trực quan bảng qua web: docker compose --profile tools up -d
+  # Đăng nhập: admin@ptit.edu.vn / admin tại http://localhost:5050
+  # ====================================================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: retail-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@ptit.edu.vn
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    profiles:
+      - tools
+    depends_on:
+      - oltp-db
+      - dwh-db
+    networks:
+      - retail-network
+
+volumes:
+  oltp_data:
+  dwh_data:
+
+networks:
+  retail-network:
+    driver: bridge

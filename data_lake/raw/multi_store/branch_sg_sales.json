@@ -1,0 +1,96 @@
+[
+  {
+    "orderRef": "SG-API-9001",
+    "customerGlobalId": "SG-CUST-1082",
+    "createdAtIso": "2026-09-18T09:40:15.000Z",
+    "currency": "EUR",
+    "subtotalEur": 45.38,
+    "channel": "MobileApp",
+    "paymentDetails": {
+      "method": "ApplePay",
+      "gateway": "Stripe",
+      "status": "COMPLETED"
+    },
+    "promoCode": "AUTUMN10",
+    "lineItems": [
+      {
+        "productCode": "SG-HYDRA-750",
+        "name": "Hydra Thermal Bottle 750ml",
+        "quantity": 1,
+        "unitPriceEur": 45.38
+      }
+    ]
+  },
+  {
+    "orderRef": "SG-API-9002",
+    "customerGlobalId": "SG-CUST-3310",
+    "createdAtIso": "2026-09-19T13:10:00.000Z",
+    "currency": "EUR",
+    "subtotalEur": 60.18,
+    "channel": "WebStore",
+    "paymentDetails": {
+      "method": "CreditCard",
+      "gateway": "VNPay",
+      "status": "COMPLETED"
+    },
+    "promoCode": null,
+    "lineItems": [
+      {
+        "productCode": "SG-ELEC-TOOTH",
+        "name": "SmartSonic Electric Toothbrush",
+        "quantity": 2,
+        "unitPriceEur": 30.09
+      }
+    ]
+  },
+  {
+    "orderRef": "SG-API-9003",
+    "customerGlobalId": "SG-CUST-6102",
+    "createdAtIso": "2026-09-20T16:25:30.000Z",
+    "currency": "EUR",
+    "subtotalEur": 23.59,
+    "channel": "StoreSelfCheckout",
+    "paymentDetails": {
+      "method": "MoMo",
+      "gateway": "InternalPOS",
+      "status": "COMPLETED"
+    },
+    "promoCode": null,
+    "lineItems": [
+      {
+        "productCode": "SG-LUMEN-DK",
+        "name": "LED Desk Lamp Anti-Myopia",
+        "quantity": 1,
+        "unitPriceEur": 23.59
+      }
+    ]
+  },
+  {
+    "orderRef": "SG-API-9004",
+    "customerGlobalId": "SG-CUST-8874",
+    "createdAtIso": "2026-09-21T11:00:20.000Z",
+    "currency": "EUR",
+    "subtotalEur": 53.22,
+    "channel": "MobileApp",
+    "paymentDetails": {
+      "method": "ApplePay",
+      "gateway": "Stripe",
+      "status": "COMPLETED"
+    },
+    "promoCode": "FREESHIP",
+    "lineItems": [
+      {
+        "productCode": "SG-ERGOMOUSE",
+        "name": "ErgoPro Wireless Mouse",
+        "quantity": 1,
+        "unitPriceEur": 35.28
+      },
+      {
+        "productCode": "SG-YOGAMAT-TPE",
+        "name": "TPE Eco Yoga Mat 6mm",
+        "quantity": 1,
+        "unitPriceEur": 17.94
+      }
+    ]
+  }
+]

@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RetailPulse — Enterprise Retail DWH &amp; Customer Mining Platform</title>
+  <meta name="description" content="Hệ thống Kho Dữ liệu Bán lẻ Đa chi nhánh và Nền tảng Khai phá Dữ liệu Khách hàng với Star Schema DWH, đường ống ETL đa nguồn chuẩn hóa SHA256 và thuật toán K-Means RFM — PTIT BTL 2026." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Modular CSS Imports -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+
+  <style>
+    /* Hero & Landing specific animations and layout */
+    #page-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      background: var(--ink);
+      color: #ffffff;
+      border-radius: 0 0 var(--radius-card) var(--radius-card);
+      transform: translateY(0%);
+      transition: transform 0.75s var(--spring-smooth);
+    }
+    #page-loader.is-exiting {
+      transform: translateY(-100%);
+    }
+    .loader-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      text-align: center;
+      transition: opacity 0.6s var(--spring-smooth), transform 0.6s var(--spring-smooth);
+    }
+    #page-loader.is-exiting .loader-center {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+    .loader-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    @media (min-width: 640px) { .loader-brand { font-size: 1.875rem; } }
+    .loader-brand svg { width: 1.875rem; height: 1.875rem; color: var(--accent-from); }
+    .loader-desc { max-width: 28ch; font-size: 0.875rem; color: rgba(255, 255, 255, 0.55); }
+    .loader-progress-block { width: min(22rem, 72vw); display: flex; flex-direction: column; gap: 0.75rem; }
+    .loader-track { height: 1px; width: 100%; background: rgba(255, 255, 255, 0.15); position: relative; overflow: hidden; }
+    .loader-fill { height: 100%; width: 0%; background: var(--accent-from); transition: width 0.1s ease-out; }
+    .loader-status-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; font-weight: 500; text-transform: uppercase; color: rgba(255, 255, 255, 0.45); }
+    .loader-counter { color: rgba(255, 255, 255, 0.8); font-variant-numeric: tabular-nums; }
+
+    /* Header */
+    #site-header {
+      position: absolute;
+      inset-inline: 0;
+      top: 0;
+      z-index: 50;
+      opacity: 0;
+      transform: translateY(-14px);
+      transition: opacity 0.7s var(--spring-smooth), transform 0.7s var(--spring-smooth);
+    }
+    #site-header.is-ready { opacity: 1; transform: translateY(0); }
+    .header-shell { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.25rem; }
+    @media (min-width: 640px) { .header-shell { padding: 1.5rem 2rem; } }
+    .header-brand-inner { display: flex; align-items: center; gap: 0.5rem; font-size: 1.125rem; font-weight: 600; }
+    .header-brand svg { width: 1.25rem; height: 1.25rem; color: var(--accent); }
+    .header-nav { display: none; }
+    @media (min-width: 1024px) { .header-nav { display: flex; } }
+    .header-nav ul { display: flex; align-items: center; gap: 1.75rem; font-size: 0.875rem; font-weight: 500; }
+    .header-nav-item button, .header-nav-item a { display: inline-flex; align-items: center; gap: 0.25rem; opacity: 0.8; transition: all 0.2s ease; }
+    .header-nav-item button:hover, .header-nav-item a:hover { opacity: 1; transform: translateY(-2px); }
+
+    .clock-chip {
+      display: none;
+      align-items: center;
+      border: 1px solid rgba(230, 229, 226, 0.8);
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(4px);
+      border-radius: var(--radius-control);
+      padding: 0.5rem 0.75rem;
+      gap: 0.75rem;
+      font-size: 0.75rem;
+      color: rgba(17, 17, 17, 0.7);
+    }
+    @media (min-width: 768px) { .clock-chip { display: flex; } }
+    .menu-btn {
+      border: 1px solid rgba(230, 229, 226, 0.8);
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(4px);
+      border-radius: var(--radius-control);
+      padding: 0.5rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Hero */
+    #home {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      border-radius: 0 0 var(--radius-card) var(--radius-card);
+      background: var(--hero-to);
+    }
+    .liquid-container { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+    .liquid-base-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    #liquid-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .hero-vignette { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(to bottom, rgba(255, 255, 255, 0.35), transparent, rgba(255, 255, 255, 0.35)); }
+    .hero-watermark {
+      pointer-events: none;
+      position: absolute;
+      inset-inline: 0;
+      bottom: 7rem;
+      z-index: 1;
+      text-align: center;
+      user-select: none;
+      font-weight: 700;
+      line-height: 1;
+      font-size: clamp(5.5rem, 13vw, 13rem);
+      letter-spacing: -0.03em;
+      color: rgba(255, 255, 255, 0.4);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s var(--spring-smooth), transform 1s var(--spring-smooth);
+    }
+    .hero-watermark.is-ready { opacity: 0.4; transform: translateY(0); }
+
+    .hero-content {
+      position: relative;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      padding: 7rem 1.25rem 5rem;
+    }
+    @media (min-width: 640px) { .hero-content { padding: 7rem 2rem 5rem; } }
+    @media (min-width: 1024px) {
+      .hero-content {
+        display: grid;
+        min-height: 100lvh;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 2.5rem;
+        padding: 9rem 2rem 7rem;
+        align-items: center;
+      }
+    }
+    .hero-col-left { display: flex; flex-direction: column; gap: 1.75rem; }
+    @media (min-width: 1024px) { .hero-col-left { grid-column: span 7; } }
+    .hero-h1 { font-size: 2.25rem; font-weight: 600; line-height: 0.98; letter-spacing: -0.02em; }
+    @media (min-width: 640px) { .hero-h1 { font-size: 3rem; } }
+    @media (min-width: 768px) { .hero-h1 { font-size: 3.75rem; } }
+
+    .hero-col-right { display: flex; flex-direction: column; align-items: flex-start; gap: 2rem; }
+    @media (min-width: 1024px) { .hero-col-right { grid-column: span 5; align-items: flex-end; } }
+
+    /* Hero Carousel Card */
+    .hero-carousel-card {
+      width: 100%;
+      max-width: 24rem;
+      border-radius: var(--radius-card-sm);
+      background: rgba(255, 255, 255, 0.7);
+      padding: 0.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(230, 229, 226, 0.7);
+      backdrop-filter: blur(12px);
+    }
+    @media (min-width: 1024px) { .hero-carousel-card { width: 19rem; } }
+    .carousel-inner { display: flex; gap: 0.5rem; cursor: pointer; border-radius: var(--radius-control); }
+    .carousel-tile-left { aspect-ratio: 1; width: 6rem; display: grid; place-items: center; border-radius: var(--radius-control); background: var(--ink); color: #ffffff; flex-shrink: 0; }
+    .carousel-tile-left svg { width: 2rem; height: 2rem; color: var(--accent-from); }
+    .carousel-panel-right { flex: 1; border-radius: var(--radius-control); background: rgba(241, 240, 238, 0.7); padding: 0.75rem; display: flex; flex-direction: column; justify-content: space-between; min-height: 6rem; }
+    .carousel-content-slot { position: relative; min-height: 3.25rem; }
+    .carousel-item { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 0.25rem; opacity: 0; transform: translateY(14px); transition: all 0.4s var(--spring-smooth); }
+    .carousel-item.active { opacity: 1; transform: translateY(0); }
+    .carousel-caption { font-size: 0.65rem; font-weight: 500; text-transform: uppercase; color: rgba(17, 17, 17, 0.45); }
+    .carousel-title { font-size: 0.875rem; font-weight: 500; line-height: 1.35; }
+    .carousel-dashes { display: flex; align-items: center; gap: 0.25rem; }
+    .carousel-dash { height: 0.25rem; border-radius: var(--radius-pill); transition: all 0.3s ease; }
+    .carousel-dash.active { width: 1rem; background: rgba(17, 17, 17, 0.7); }
+    .carousel-dash.inactive { width: 0.375rem; background: rgba(17, 17, 17, 0.2); }
+
+    /* Partners */
+    .hero-partners { width: 100%; max-width: 24rem; }
+    @media (min-width: 1024px) { .hero-partners { width: 19rem; text-align: right; } }
+    .partners-grid { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; }
+    @media (min-width: 1024px) { .partners-grid { justify-content: flex-end; } }
+    .partner-item { display: inline-flex; align-items: center; gap: 0.375rem; font-size: 0.75rem; color: rgba(17, 17, 17, 0.7); }
+
+    /* Status Bar */
+    .hero-status-bar { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; border-top: 1px solid rgba(17, 17, 17, 0.1); padding-block: 1.25rem; font-size: 0.75rem; font-weight: 500; text-transform: uppercase; color: rgba(17, 17, 17, 0.6); }
+
+    /* About Section */
+    #architecture { background: #ffffff; }
+    .about-shell { display: grid; grid-template-columns: 1fr; align-items: center; gap: 3rem; padding-block: 5rem; }
+    @media (min-width: 1024px) { .about-shell { grid-template-columns: 1fr 1fr; padding-block: 7rem; } }
+    .about-globe-block { position: relative; min-height: 14rem; display: flex; flex-direction: column; justify-content: space-between; }
+    @media (min-width: 1024px) { .about-globe-block { min-height: 20rem; } }
+    .about-bg-globe { position: absolute; left: -1rem; top: 50%; transform: translateY(-50%); width: 14rem; height: 14rem; color: rgba(17, 17, 17, 0.08); pointer-events: none; }
+    .about-h2 { font-size: 1.5rem; font-weight: 500; line-height: 1.35; }
+    @media (min-width: 640px) { .about-h2 { font-size: 1.875rem; } }
+    .text-muted { color: var(--muted); }
+
+    /* Create Band */
+    .create-band-section { background: #ffffff; }
+    .create-band-list { display: flex; flex-direction: column; gap: 0.75rem; padding-block: 2.5rem; }
+    @media (min-width: 640px) { .create-band-list { flex-direction: row; gap: 1rem; } }
+    .create-band-tile { display: grid; place-items: center; height: 6rem; border-radius: var(--radius-pill); font-size: 1.875rem; font-weight: 500; transition: transform 0.3s var(--spring-snappy); }
+    @media (min-width: 640px) { .create-band-tile { height: 10rem; font-size: 2.25rem; } }
+    .create-band-tile:hover { transform: scale(1.03); }
+    .create-band-tile.variant-light { background: var(--surface); color: #111111; }
+    .create-band-tile.variant-accent { background: linear-gradient(to bottom right, var(--accent-from), var(--accent-to)); color: #ffffff; }
+    .create-band-tile.variant-dark { background: var(--ink); color: #ffffff; }
+    .create-band-tile.variant-ghost { background: rgba(241, 240, 238, 0.6); color: rgba(17, 17, 17, 0.35); }
+
+    /* Works Cards */
+    #works { background: #ffffff; padding-block: 2.5rem 5rem; }
+    .portfolio-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+    @media (min-width: 768px) { .portfolio-grid { grid-template-columns: repeat(2, 1fr); } }
+    .portfolio-card { position: relative; min-height: 24rem; border-radius: var(--radius-card); background: var(--ink); padding: 1.5rem; color: #ffffff; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.4s var(--spring-snappy); }
+    @media (min-width: 640px) { .portfolio-card { min-height: 28rem; padding: 2rem; } }
+    .portfolio-card:hover { transform: translateY(-8px) scale(1.012); }
+    .card-badge { width: 2.75rem; height: 2.75rem; display: grid; place-items: center; border-radius: var(--radius-pill); background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.15); transition: transform 0.3s ease; }
+    .portfolio-card:hover .card-badge { transform: rotate(45deg) scale(1.08); }
+    .card-watermark { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; font-size: 4.5rem; color: rgba(255, 255, 255, 0.06); }
+    .card-title { font-size: 1.5rem; font-weight: 500; }
+    @media (min-width: 640px) { .card-title { font-size: 1.875rem; } }
+    .card-desc { margin-top: 0.5rem; font-size: 0.875rem; color: rgba(255, 255, 255, 0.55); line-height: 1.45; }
+    .card-tags { margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tag-chip { display: inline-flex; border: 1px solid rgba(255, 255, 255, 0.25); color: #ffffff; border-radius: var(--radius-pill); padding: 0.375rem 0.875rem; font-size: 0.75rem; }
+
+    /* Services */
+    #services { background: #ffffff; padding-block: 5rem; }
+    .services-list { display: flex; flex-direction: column; }
+    .service-row { display: flex; align-items: center; gap: 1rem; border-radius: var(--radius-card-sm); padding: 1.5rem; border-top: 1px solid var(--line); transition: background 0.3s ease, padding 0.3s ease; cursor: pointer; }
+    .service-row:hover { background: var(--surface); padding-left: 2rem; }
+    .service-index { width: 2rem; font-size: 0.875rem; color: var(--muted); }
+    .service-title { flex: 1; font-size: 1.5rem; font-weight: 500; }
+    @media (min-width: 768px) { .service-title { font-size: 2rem; } }
+    .service-desc { display: none; max-width: 22rem; font-size: 0.875rem; color: var(--muted); }
+    @media (min-width: 1024px) { .service-desc { display: block; } }
+    .service-arrow-badge { width: 2.5rem; height: 2.5rem; display: grid; place-items: center; border-radius: var(--radius-pill); background: var(--ink); color: #ffffff; }
+
+    /* Stats */
+    #stats { background: #ffffff; padding-bottom: 5rem; }
+    .stats-panel { border-radius: var(--radius-card); background: var(--ink); padding: 3rem 1.5rem; color: #ffffff; }
+    @media (min-width: 640px) { .stats-panel { padding: 4rem 2rem; } }
+    .stats-grid { margin-top: 3.5rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem 3rem; }
+    @media (min-width: 1024px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+    .stat-number-wrap { font-size: 3rem; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+    @media (min-width: 768px) { .stat-number-wrap { font-size: 4.5rem; } }
+
+    /* Footer */
+    footer { position: relative; overflow: hidden; border-radius: var(--radius-card) var(--radius-card) 0 0; background: var(--ink); color: #ffffff; }
+    .footer-shell { position: relative; z-index: 10; padding: 5rem 1.25rem 2.5rem; }
+    .footer-cta-row { display: flex; flex-direction: column; gap: 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 4rem; }
+    @media (min-width: 1024px) { .footer-cta-row { flex-direction: row; align-items: flex-end; justify-content: space-between; } }
+    .footer-cols { display: grid; grid-template-columns: 1fr; gap: 3rem; padding-block: 4rem; }
+    @media (min-width: 768px) { .footer-cols { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .footer-cols { grid-template-columns: 1.5fr 1fr 1.2fr 1fr; } }
+    .footer-watermark { position: absolute; inset-inline: 0; bottom: -1.5rem; text-align: center; pointer-events: none; user-select: none; font-size: clamp(5.5rem, 13vw, 13rem); font-weight: 700; color: rgba(255, 255, 255, 0.04); }
+
+    /* Overlays */
+    #nav-menu { position: fixed; inset: 0; z-index: 115; display: flex; flex-direction: column; background: var(--ink); color: #ffffff; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+    #nav-menu.is-open { opacity: 1; pointer-events: auto; }
+    .nav-link-btn { display: flex; align-items: baseline; gap: 1rem; font-size: 2rem; font-weight: 600; padding-block: 0.5rem; }
+    @media (min-width: 640px) { .nav-link-btn { font-size: 3.25rem; } }
+
+    #request-modal { position: fixed; inset: 0; z-index: 110; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(17, 17, 17, 0.35); backdrop-filter: blur(16px); opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }
+    #request-modal.is-open { opacity: 1; pointer-events: auto; }
+    .modal-panel { position: relative; width: 100%; max-width: 36rem; max-height: 90vh; overflow-y: auto; border-radius: var(--radius-card); background: #ffffff; padding: 2rem; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25); border: 1px solid var(--line); }
+    .modal-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--line); padding-bottom: 0.75rem; }
+    .modal-tab-btn { padding: 0.5rem 1rem; border-radius: var(--radius-pill); font-size: 0.8125rem; font-weight: 500; color: var(--muted); }
+    .modal-tab-btn.active { background: var(--ink); color: #ffffff; }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Chuyển đến nội dung chính</a>
+
+  <!-- ========================================================================
+       PAGE LOADER
+       ======================================================================== -->
+  <div id="page-loader">
+    <div class="loader-center">
+      <div class="loader-brand">
+        <svg viewBox="0 0 48 48" fill="currentColor">
+          <path d="M24 2c2.2 13.8 7.9 19.6 22 22-14.1 2.4-19.8 8.2-22 22-2.2-13.8-7.9-19.6-22-22 14.1-2.4 19.8-8.2 22-22Z"/>
+        </svg>
+        <span>RetailPulse DWH</span>
+      </div>
+      <p class="loader-desc">Kho Dữ liệu Bán lẻ Đa chi nhánh &amp; Khai phá Khách hàng Chuẩn xác.</p>
+    </div>
+
+    <div class="loader-progress-block">
+      <div class="loader-track">
+        <div class="loader-fill" id="loader-progress-fill"></div>
+      </div>
+      <div class="loader-status-row">
+        <span id="loader-status-text">INITIALIZING DWH...</span>
+        <span class="loader-counter" id="loader-counter-text">000</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       HEADER
+       ======================================================================== -->
+  <header id="site-header">
+    <div class="shell header-shell">
+      <a href="index.html" class="header-brand" aria-label="RetailPulse Trang chủ">
+        <span class="header-brand-inner">
+          <svg viewBox="0 0 48 48" fill="currentColor">
+            <path d="M24 2c2.2 13.8 7.9 19.6 22 22-14.1 2.4-19.8 8.2-22 22-2.2-13.8-7.9-19.6-22-22 14.1-2.4 19.8-8.2 22-22Z"/>
+          </svg>
+          <span>RetailPulse</span>
+        </span>
+      </a>
+
+      <!-- Navigation Hub -->
+      <nav class="header-nav" aria-label="Điều hướng chính">
+        <ul>
+          <li class="header-nav-item"><a href="dashboard.html" style="color:var(--accent); font-weight:600;">📊 DataOps Overview</a></li>
+          <li class="header-nav-item"><a href="operations.html">📥 Ingestion &amp; Nodes</a></li>
+          <li class="header-nav-item"><a href="etl-monitor.html">⚡ Pipeline &amp; Kafka</a></li>
+          <li class="header-nav-item"><a href="customer-segments.html">🧠 MLOps &amp; Registry</a></li>
+          <li class="header-nav-item"><button id="header-contact-btn">🎯 Live Simulator</button></li>
+        </ul>
+      </nav>
+
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div class="clock-chip">
+          <span style="color:var(--muted);">Local</span>
+          <span id="live-time-str" style="font-weight:600;">9:41pm</span>
+          <span>•</span>
+          <span id="live-date-str">22 September, 2026</span>
+        </div>
+
+        <button class="menu-btn" id="open-menu-btn">Menu</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       HERO & SECTIONS
+       ======================================================================== -->
+  <main id="main">
+    <section id="home">
+      <div class="liquid-container" id="liquid-wrap">
+        <img class="liquid-base-img" src="https://api.getlayers.ai/storage/v1/object/public/public/assets/lumora-e8b711fc68/hero/after.jpg" alt="Retail DWH" fetchpriority="high" />
+        <canvas id="liquid-canvas" aria-hidden="true"></canvas>
+      </div>
+
+      <div class="hero-vignette"></div>
+      <div class="hero-watermark" id="hero-watermark">RETAIL DWH</div>
+
+      <div class="shell hero-content">
+        <div class="hero-col-left">
+          <div class="eyebrow tone-dark fade-reveal" id="hero-eyebrow">
+            <span class="eyebrow-dot"></span>
+            <span>PTIT Data Mining &amp; DWH Project • 2026</span>
+          </div>
+
+          <h1 class="hero-h1" id="hero-h1">
+            <span class="line-wrap"><span class="line-inner">Multi-source Retail,</span></span><br />
+            <span class="line-wrap"><span class="line-inner">shipped with</span></span><br />
+            <span class="line-wrap"><span class="line-inner">Star Schema &amp; K-Means.</span></span>
+          </h1>
+
+          <div class="fade-reveal" id="hero-rating" style="display: flex; align-items: center; gap: 0.75rem;">
+            <span style="color:var(--accent); font-size:1rem;">★★★★★</span>
+            <span style="font-size:0.875rem; font-weight:500; color:rgba(17,17,17,0.7);">1,072+ Khách hàng • 30,000+ Giao dịch • Silhouette 0.309</span>
+          </div>
+
+          <div class="fade-reveal" id="hero-ctas" style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+            <a href="dashboard.html" class="pill-btn has-arrow variant-dark">
+              <span>Vào Bảng Quản trị</span>
+              <span class="pill-badge arrow-right">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </span>
+            </a>
+
+            <button class="pill-btn no-arrow variant-outline open-modal-btn">
+              <span>Thử nghiệm RFM Live</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="hero-col-right">
+          <!-- HeroCard Carousel -->
+          <div class="hero-carousel-card fade-reveal" id="hero-card">
+            <div class="carousel-inner" id="carousel-click-area">
+              <div class="carousel-tile-left">
+                <svg viewBox="0 0 48 48" fill="currentColor"><path d="M24 2c2.2 13.8 7.9 19.6 22 22-14.1 2.4-19.8 8.2-22 22-2.2-13.8-7.9-19.6-22-22 14.1-2.4 19.8-8.2 22-22Z"/></svg>
+              </div>
+
+              <div class="carousel-panel-right">
+                <div class="carousel-content-slot">
+                  <div class="carousel-item active" data-slide="0">
+                    <span class="carousel-caption">STAR SCHEMA DWH</span>
+                    <h3 class="carousel-title">2 Facts, 5 Dims. Zero Data Loss.</h3>
+                  </div>
+                  <div class="carousel-item" data-slide="1">
+                    <span class="carousel-caption">MACHINE LEARNING</span>
+                    <h3 class="carousel-title">K-Means k=4. Log-transformed RFM.</h3>
+                  </div>
+                  <div class="carousel-item" data-slide="2">
+                    <span class="carousel-caption">MULTI-SOURCE ETL</span>
+                    <h3 class="carousel-title">HN, DN, SG. Idempotent SHA256.</h3>
+                  </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div class="carousel-dashes">
+                    <div class="carousel-dash active"></div>
+                    <div class="carousel-dash inactive"></div>
+                    <div class="carousel-dash inactive"></div>
+                  </div>
+                  <div style="display: flex; gap: 0.25rem;">
+                    <button class="pill-btn btn-sm variant-light" id="carousel-prev-btn">&lt;</button>
+                    <button class="pill-btn btn-sm variant-light" id="carousel-next-btn">&gt;</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Connected Stack -->
+          <div class="hero-partners fade-reveal" id="hero-partners">
+            <div style="font-size:0.75rem; font-weight:500; color:var(--muted); margin-bottom:0.5rem;">Connected Nodes</div>
+            <div class="partners-grid">
+              <span class="partner-item">PostgreSQL DWH</span>
+              <span class="partner-item">FastAPI Core</span>
+              <span class="partner-item">UCI Retail Lake</span>
+              <span class="partner-item">Chi nhánh HN</span>
+              <span class="partner-item">Chi nhánh DN</span>
+              <span class="partner-item">Chi nhánh SG</span>
+              <span class="partner-item">Power BI</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="shell hero-status-bar fade-reveal" id="hero-status-bar">
+        <span>PTIT RIPT-CNS Standard</span>
+        <span class="status-center">Distributed Retail Intelligence</span>
+        <span>Cuộn để khám phá &darr;</span>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="architecture">
+      <div class="shell about-shell">
+        <div class="about-globe-block">
+          <svg class="about-bg-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="9.25"/><path d="M12 2.75c2.6 2.3 4 5.8 4 9.25s-1.4 6.95-4 9.25c-2.6-2.3-4-5.8-4-9.25s1.4-6.95 4-9.25zM2.75 12h18.5"/></svg>
+          <div class="eyebrow tone-dark"><span class="eyebrow-dot"></span><span>The Architecture</span></div>
+          <div style="display:flex; align-items:center; gap:0.75rem; font-size:0.875rem;">
+            <span>Mạng lưới bán lẻ phân tán 3 chi nhánh (Hà Nội, Đà Nẵng, TP. Hồ Chí Minh).</span>
+          </div>
+        </div>
+
+        <div class="about-statement">
+          <h2 class="about-h2" id="about-statement-h2">
+            Hệ thống tích hợp dữ liệu bán lẻ và tồn kho thời gian thực từ 3 chi nhánh và hồ dữ liệu lịch sử UCI, <span class="text-muted">tự động xử lý dữ liệu bẩn, chống trùng lặp băm SHA256, nạp vào Star Schema và phân khúc khách hàng bằng mô hình K-Means.</span>
+          </h2>
+
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+            <a href="operations.html" class="pill-btn has-arrow variant-dark">
+              <span>Vận hành Chi nhánh</span>
+              <span class="pill-badge arrow-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="1em" height="1em"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+            </a>
+            <a href="etl-monitor.html" class="pill-btn no-arrow variant-outline">Xem Luồng ETL</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Create Band -->
+    <section class="create-band-section">
+      <ul class="shell create-band-list">
+        <li class="create-band-item"><div class="create-band-tile variant-light">Extract</div></li>
+        <li class="create-band-item"><div class="create-band-tile variant-accent">Transform</div></li>
+        <li class="create-band-item"><div class="create-band-tile variant-dark">&rarr;</div></li>
+        <li class="create-band-item"><div class="create-band-tile variant-ghost">Insights</div></li>
+      </ul>
+    </section>
+
+    <!-- Core Pillars -->
+    <section id="works">
+      <div class="shell">
+        <div style="text-align: center; margin-bottom: 3rem;">
+          <div class="eyebrow tone-dark" style="margin-bottom:0.5rem;"><span class="eyebrow-dot"></span><span>Core Pillars</span></div>
+          <h2 style="font-size:2.5rem; font-weight:700; letter-spacing:-0.02em;">Star Schema &amp; Mining Engine</h2>
+        </div>
+
+        <div class="portfolio-grid">
+          <article class="portfolio-card">
+            <div>
+              <div style="font-size:0.75rem; text-transform:uppercase; color:rgba(255,255,255,0.45);">Core DWH — PostgreSQL 16</div>
+              <h3 class="card-title" style="margin-top:0.75rem;">FactSales &amp; Semi-additive Inventory</h3>
+              <p class="card-desc">Thiết kế chuẩn Star Schema với FactSales (grain từng dòng hóa đơn), FactInventorySnapshot theo dõi mức tồn cuối ngày cùng 5 chiều: Date, Customer, Product, Branch, Source.</p>
+            </div>
+            <div class="card-tags">
+              <span class="tag-chip">Star Schema</span>
+              <span class="tag-chip">FactSales</span>
+              <span class="tag-chip">Semi-additive</span>
+            </div>
+          </article>
+
+          <article class="portfolio-card">
+            <div>
+              <div style="font-size:0.75rem; text-transform:uppercase; color:rgba(255,255,255,0.45);">Data Engineering — Python Engine</div>
+              <h3 class="card-title" style="margin-top:0.75rem;">Idempotent Multi-Source Ingestion</h3>
+              <p class="card-desc">Tích hợp dữ liệu song song từ UCI batch file, PostgreSQL tác nghiệp và REST API 3 chi nhánh. Tự động gắn cờ đơn hủy is_cancelled, băm SHA256 chống trùng lặp.</p>
+            </div>
+            <div class="card-tags">
+              <span class="tag-chip">Idempotency</span>
+              <span class="tag-chip">SHA256 Hash</span>
+              <span class="tag-chip">Reconciliation</span>
+            </div>
+          </article>
+
+          <article class="portfolio-card">
+            <div>
+              <div style="font-size:0.75rem; text-transform:uppercase; color:rgba(255,255,255,0.45);">Data Mining — Machine Learning</div>
+              <h3 class="card-title" style="margin-top:0.75rem;">Log-Transformed RFM Clustering</h3>
+              <p class="card-desc">Chuẩn hóa Recency theo ngày tham chiếu T, khử lệch phải bằng ln(1+x) và StandardScaler. Đánh giá Silhouette K=4 tối ưu (0.309).</p>
+            </div>
+            <div class="card-tags">
+              <span class="tag-chip">K-Means</span>
+              <span class="tag-chip">RFM Model</span>
+              <span class="tag-chip">Silhouette 0.309</span>
+            </div>
+          </article>
+
+          <article class="portfolio-card">
+            <div>
+              <div style="font-size:0.75rem; text-transform:uppercase; color:rgba(255,255,255,0.45);">Business Intelligence — Dashboard</div>
+              <h3 class="card-title" style="margin-top:0.75rem;">3-Page Interactive Decision Support</h3>
+              <p class="card-desc">Bộ báo cáo trực quan hóa chuyên sâu 3 trang: Doanh số &amp; Tăng trưởng, Giám sát Tồn kho Đa chi nhánh, và Ma trận Phân khúc Khách hàng RFM.</p>
+            </div>
+            <div class="card-tags">
+              <span class="tag-chip">Power BI</span>
+              <span class="tag-chip">Interactive BI</span>
+              <span class="tag-chip">Sales Matrix</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section id="stats">
+      <div class="shell">
+        <div class="stats-panel">
+          <div class="eyebrow tone-light"><span class="eyebrow-dot"></span><span>Thực nghiệm &amp; Số liệu</span></div>
+          <h2 style="font-size:2.25rem; font-weight:600; margin-top:0.5rem;">Proof in the data, not the words.</h2>
+
+          <div class="stats-grid">
+            <div>
+              <div class="stat-number-wrap">1,072+</div>
+              <div style="color:var(--muted); font-size:0.875rem; margin-top:0.5rem;">Khách hàng đã phân cụm</div>
+            </div>
+            <div>
+              <div class="stat-number-wrap">30,000+</div>
+              <div style="color:var(--muted); font-size:0.875rem; margin-top:0.5rem;">Giao dịch nạp vào DWH</div>
+            </div>
+            <div>
+              <div class="stat-number-wrap">0.309</div>
+              <div style="color:var(--muted); font-size:0.875rem; margin-top:0.5rem;">Silhouette Score (K=4 tối ưu)</div>
+            </div>
+            <div>
+              <div class="stat-number-wrap">3</div>
+              <div style="color:var(--muted); font-size:0.875rem; margin-top:0.5rem;">Chi nhánh kết nối (HN, DN, SG)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="shell footer-shell">
+      <div class="footer-cta-row">
+        <h2 style="font-size:2.5rem; font-weight:700;">Sẵn sàng quản trị &amp; vận hành kho dữ liệu?</h2>
+        <a href="dashboard.html" class="pill-btn has-arrow variant-light">
+          <span>Truy cập Dashboard</span>
+          <span class="pill-badge arrow-up-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="1em" height="1em"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+        </a>
+      </div>
+
+      <div class="footer-cols">
+        <div>
+          <div style="font-size:1.125rem; font-weight:600; margin-bottom:0.75rem;">RetailPulse DWH</div>
+          <p style="font-size:0.875rem; color:var(--muted);">Hệ thống Kho Dữ liệu Bán lẻ Đa chi nhánh &amp; Nền tảng Khai phá Dữ liệu Khách hàng — PTIT BTL 2026.</p>
+        </div>
+        <div>
+          <div style="font-size:0.75rem; text-transform:uppercase; color:var(--muted); margin-bottom:1rem;">Hệ thống Trang</div>
+          <ul style="display:flex; flex-direction:column; gap:0.5rem; font-size:0.875rem;">
+            <li><a href="dashboard.html"> Bảng điều khiển Tổng quan</a></li>
+            <li><a href="operations.html"> Vận hành Chi nhánh &amp; Tồn kho</a></li>
+            <li><a href="etl-monitor.html"> Giám sát Đường ống ETL</a></li>
+            <li><a href="customer-segments.html"> Khai phá Phân khúc Khách hàng</a></li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:0.75rem; text-transform:uppercase; color:var(--muted); margin-bottom:1rem;">REST Endpoints</div>
+          <ul style="display:flex; flex-direction:column; gap:0.5rem; font-size:0.875rem;">
+            <li><a href="http://localhost:8001/docs" target="_blank" rel="noopener">FastAPI Swagger UI</a></li>
+            <li><a href="http://localhost:8001/api/v1/inventory/HN" target="_blank" rel="noopener">Tồn kho Node HN</a></li>
+            <li><a href="http://localhost:8001/api/v1/inventory/DN" target="_blank" rel="noopener">Tồn kho Node DN</a></li>
+            <li><a href="http://localhost:8001/api/v1/inventory/SG" target="_blank" rel="noopener">Tồn kho Node SG</a></li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:0.75rem; text-transform:uppercase; color:var(--muted); margin-bottom:1rem;">Đồ án BTL</div>
+          <ul style="display:flex; flex-direction:column; gap:0.5rem; font-size:0.875rem; color:var(--muted);">
+            <li>Kho Dữ liệu &amp; Khai phá</li>
+            <li>Học viện CN Bưu chính Viễn thông</li>
+            <li>Khoa CNTT — 2026</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.1); padding-top:2rem; font-size:0.75rem; color:var(--muted);">
+        <span>&copy; 2026 RetailPulse — PTIT Data Mining &amp; DWH Project.</span>
+        <span>Version 2.0 (Modular Multi-Page Portal)</span>
+      </div>
+
+      <div class="footer-watermark">RETAILPULSE</div>
+    </div>
+  </footer>
+
+  <!-- Nav Menu Overlay -->
+  <div id="nav-menu">
+    <div class="shell" style="padding:1.5rem 2rem; display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-weight:700; font-size:1.25rem;">RetailPulse DWH</span>
+      <button class="pill-btn btn-sm variant-outline" id="close-menu-btn" style="color:#fff; border-color:rgba(255,255,255,0.3);">Close</button>
+    </div>
+    <div class="shell" style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:0.5rem;">
+      <a href="index.html" class="nav-link-btn">01 Trang chủ Showcase</a>
+      <a href="dashboard.html" class="nav-link-btn">02 Bảng điều khiển Tổng quan</a>
+      <a href="operations.html" class="nav-link-btn">03 Vận hành Chi nhánh &amp; Kho</a>
+      <a href="etl-monitor.html" class="nav-link-btn">04 Giám sát Đường ống ETL</a>
+      <a href="customer-segments.html" class="nav-link-btn">05 Khai phá Phân khúc Khách hàng</a>
+    </div>
+  </div>
+
+  <!-- Modal Simulator -->
+  <div id="request-modal">
+    <div class="modal-panel" id="modal-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 style="font-size:1.5rem; font-weight:700;">Live RFM Simulator</h2>
+        <button id="close-modal-btn" style="font-size:1.5rem; color:var(--muted);">&times;</button>
+      </div>
+
+      <form id="rfm-simulator-form">
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.75rem; margin-bottom:1rem;">
+          <div class="form-group">
+            <label class="form-label">Recency (R - ngày)</label>
+            <input type="number" id="sim-recency" class="form-control" value="15" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Frequency (F - đơn)</label>
+            <input type="number" id="sim-frequency" class="form-control" value="8" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Monetary (M - £)</label>
+            <input type="number" id="sim-monetary" class="form-control" value="1800" required />
+          </div>
+        </div>
+
+        <button type="submit" class="pill-btn has-arrow variant-dark" style="width:100%; justify-content:center;">
+          <span>Phân tích Cụm ngay</span>
+          <span class="pill-badge arrow-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="1em" height="1em"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </button>
+      </form>
+
+      <div id="simulator-result-box" style="margin-top:1.5rem; background:var(--ink); color:#fff; padding:1.25rem; border-radius:var(--radius-card-sm); display:none; flex-direction:column; gap:0.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span id="res-badge" class="cluster-badge vip">VIP / CHAMPIONS</span>
+          <span id="res-cluster-id" style="font-size:0.75rem; color:rgba(255,255,255,0.5);">Cluster #1</span>
+        </div>
+        <h3 id="res-title" style="font-size:1.25rem; font-weight:600;">Khách hàng VIP</h3>
+        <p id="res-strategy" style="font-size:0.875rem; color:rgba(255,255,255,0.8); line-height:1.4;"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="importmap">
+  { "imports": { "lenis": "https://unpkg.com/lenis@1.3.23/dist/lenis.mjs" } }
+  </script>
+
+  <script type="module">
+    import { initLenis } from './js/lenis-smooth.js';
+    import './js/adaptive-grid.js';
+    import { initClock } from './js/clock.js';
+    import { initLiquidReveal } from './js/liquid-reveal.js';
+    import { calculateSegment } from './js/rfm-engine.js';
+    import { showToast } from './js/app.js';
+
+    const { stopScroll, startScroll } = initLenis();
+    initClock();
+    initLiquidReveal();
+
+    // Loader animation
+    const loader = document.getElementById('page-loader');
+    const loaderFill = document.getElementById('loader-progress-fill');
+    const loaderCounter = document.getElementById('loader-counter-text');
+    const loaderStatus = document.getElementById('loader-status-text');
+
+    stopScroll();
+    let p = 0;
+    const interval = setInterval(() => {
+      p += 2;
+      if (p > 100) p = 100;
+      if (loaderFill) loaderFill.style.width = p + '%';
+      if (loaderCounter) loaderCounter.textContent = String(p).padStart(3, '0');
+
+      if (p < 30) loaderStatus.textContent = "CONNECTING BRANCH NODES (HN, DN, SG)...";
+      else if (p < 70) loaderStatus.textContent = "INGESTING UCI LAKE & STAR SCHEMA...";
+      else if (p < 95) loaderStatus.textContent = "RUNNING K-MEANS RFM (K=4)...";
+      else loaderStatus.textContent = "DATA WAREHOUSE READY";
+
+      if (p >= 100) {
+        clearInterval(interval);
+        setTimeout(() => {
+          loader.classList.add('is-exiting');
+          startScroll();
+          setTimeout(() => {
+            loader.style.display = 'none';
+            document.getElementById('site-header')?.classList.add('is-ready');
+            document.getElementById('hero-eyebrow')?.classList.add('revealed');
+            document.getElementById('hero-h1')?.classList.add('revealed');
+            document.getElementById('hero-watermark')?.classList.add('is-ready');
+            document.getElementById('hero-card')?.classList.add('revealed');
+            document.getElementById('hero-partners')?.classList.add('revealed');
+            document.getElementById('hero-rating')?.classList.add('revealed');
+            document.getElementById('hero-ctas')?.classList.add('revealed');
+            document.getElementById('hero-status-bar')?.classList.add('revealed');
+          }, 700);
+        }, 200);
+      }
+    }, 25);
+
+    // Carousel
+    let activeSlide = 0;
+    const slides = document.querySelectorAll('.carousel-item');
+    const dashes = document.querySelectorAll('.carousel-dash');
+    function setSlide(idx) {
+      activeSlide = (idx + slides.length) % slides.length;
+      slides.forEach((s, i) => s.classList.toggle('active', i === activeSlide));
+      dashes.forEach((d, i) => {
+        d.classList.toggle('active', i === activeSlide);
+        d.classList.toggle('inactive', i !== activeSlide);
+      });
+    }
+    document.getElementById('carousel-next-btn')?.addEventListener('click', (e) => { e.stopPropagation(); setSlide(activeSlide + 1); });
+    document.getElementById('carousel-prev-btn')?.addEventListener('click', (e) => { e.stopPropagation(); setSlide(activeSlide - 1); });
+    document.getElementById('carousel-click-area')?.addEventListener('click', () => setSlide(activeSlide + 1));
+
+    // Nav Menu
+    const navMenu = document.getElementById('nav-menu');
+    document.getElementById('open-menu-btn')?.addEventListener('click', () => { navMenu.classList.add('is-open'); stopScroll(); });
+    document.getElementById('close-menu-btn')?.addEventListener('click', () => { navMenu.classList.remove('is-open'); startScroll(); });
+
+    // Modal Simulator
+    const modal = document.getElementById('request-modal');
+    function openModal() { modal.classList.add('is-open'); stopScroll(); }
+    function closeModal() { modal.classList.remove('is-open'); startScroll(); }
+    document.querySelectorAll('.open-modal-btn').forEach(btn => btn.addEventListener('click', openModal));
+    document.getElementById('header-contact-btn')?.addEventListener('click', openModal);
+    document.getElementById('close-modal-btn')?.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    // Simulator Form
+    const rfmForm = document.getElementById('rfm-simulator-form');
+    const resBox = document.getElementById('simulator-result-box');
+    rfmForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const r = parseFloat(document.getElementById('sim-recency').value);
+      const f = parseFloat(document.getElementById('sim-frequency').value);
+      const m = parseFloat(document.getElementById('sim-monetary').value);
+      const res = calculateSegment(r, f, m);
+
+      document.getElementById('res-badge').className = `cluster-badge ${res.badgeClass}`;
+      document.getElementById('res-badge').textContent = res.badgeText;
+      document.getElementById('res-cluster-id').textContent = `Cluster #${res.id}`;
+      document.getElementById('res-title').textContent = res.name;
+      document.getElementById('res-strategy').innerHTML = `<strong>Chiến lược Khuyến nghị:</strong> ${res.strategy}`;
+      resBox.style.display = 'flex';
+      showToast(`Đã phân loại thành công: ${res.name}`, 'success');
+    });
+  </script>
+</body>
+</html>
