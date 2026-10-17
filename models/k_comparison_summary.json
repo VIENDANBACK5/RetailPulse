@@ -1,0 +1,72 @@
+[
+  {
+    "k": 2,
+    "inertia": 24.65,
+    "silhouette_score": 0.5893,
+    "min_cluster_pct": 37.9,
+    "max_cluster_pct": 62.1,
+    "cluster_sizes": [
+      18,
+      11
+    ],
+    "stability_ari_seed_test": 1.0
+  },
+  {
+    "k": 3,
+    "inertia": 12.1,
+    "silhouette_score": 0.6179,
+    "min_cluster_pct": 6.9,
+    "max_cluster_pct": 55.2,
+    "cluster_sizes": [
+      16,
+      11,
+      2
+    ],
+    "stability_ari_seed_test": 1.0
+  },
+  {
+    "k": 4,
+    "inertia": 6.4,
+    "silhouette_score": 0.6149,
+    "min_cluster_pct": 6.9,
+    "max_cluster_pct": 37.9,
+    "cluster_sizes": [
+      11,
+      8,
+      2,
+      8
+    ],
+    "stability_ari_seed_test": 1.0
+  },
+  {
+    "k": 5,
+    "inertia": 3.71,
+    "silhouette_score": 0.5889,
+    "min_cluster_pct": 6.9,
+    "max_cluster_pct": 27.6,
+    "cluster_sizes": [
+      8,
+      5,
+      2,
+      6,
+      8
+    ],
+    "stability_ari_seed_test": 1.0
+  },
+  {
+    "k": 6,
+    "inertia": 2.78,
+    "silhouette_score": 0.5553,
+    "min_cluster_pct": 3.4,
+    "max_cluster_pct": 27.6,
+    "cluster_sizes": [
+      8,
+      6,
+      8,
+      1,
+      5,
+      1
+    ],
+    "stability_ari_seed_test": 1.0
+  }
+]

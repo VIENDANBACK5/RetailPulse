@@ -9,6 +9,8 @@ from src.utils.db_helper import get_dwh_engine
 def export_segments_to_dwh(
     result_df: pd.DataFrame,
     analysis_date: datetime.date = None,
+    window_start: datetime.date = None,
+    window_end: datetime.date = None,
     model_version: str = "v1.0-kmeans",
     engine: Engine = None
 ) -> int:
@@ -28,6 +30,8 @@ def export_segments_to_dwh(
     for _, row in result_df.iterrows():
         records.append({
             "analysis_date": analysis_date,
+            "window_start": window_start,
+            "window_end": window_end,
             "customer_key": int(row["customer_key"]),
             "recency": float(row["recency"]),
             "frequency": int(row["frequency"]),
@@ -39,14 +43,16 @@ def export_segments_to_dwh(
 
     sql = text("""
         INSERT INTO customer_segment_snapshot (
-            analysis_date, customer_key, recency, frequency, monetary,
+            analysis_date, window_start, window_end, customer_key, recency, frequency, monetary,
             cluster_id, cluster_name, model_version
         ) VALUES (
-            :analysis_date, :customer_key, :recency, :frequency, :monetary,
+            :analysis_date, :window_start, :window_end, :customer_key, :recency, :frequency, :monetary,
             :cluster_id, :cluster_name, :model_version
         )
         ON CONFLICT (analysis_date, customer_key, model_version)
         DO UPDATE SET
+            window_start = EXCLUDED.window_start,
+            window_end = EXCLUDED.window_end,
             recency = EXCLUDED.recency,
             frequency = EXCLUDED.frequency,
             monetary = EXCLUDED.monetary,

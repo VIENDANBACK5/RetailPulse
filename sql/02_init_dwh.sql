@@ -80,8 +80,8 @@ CREATE TABLE IF NOT EXISTS fact_inventory_snapshot (
     branch_key INTEGER NOT NULL REFERENCES dim_branch(branch_key),
     product_key INTEGER NOT NULL REFERENCES dim_product(product_key),
     source_key INTEGER NOT NULL REFERENCES dim_source(source_key),
-    stock_on_hand INTEGER NOT NULL,
-    snapshot_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    stock_on_hand INTEGER,                    -- NULL khi node OFFLINE để không gây hiểu nhầm là tồn = 0
+    snapshot_time TIMESTAMP WITH TIME ZONE,   -- NULL khi node OFFLINE (không gán fake timestamp)
     node_status VARCHAR(50) DEFAULT 'ONLINE', -- 'ONLINE', 'OFFLINE'
     batch_id VARCHAR(100) NOT NULL,
     loaded_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -92,6 +92,8 @@ CREATE TABLE IF NOT EXISTS fact_inventory_snapshot (
 CREATE TABLE IF NOT EXISTS customer_segment_snapshot (
     segment_key BIGSERIAL PRIMARY KEY,
     analysis_date DATE NOT NULL,
+    window_start DATE,                        -- Ngày bắt đầu cửa sổ RFM (12 tháng)
+    window_end DATE,                          -- Ngày kết thúc cửa sổ RFM
     customer_key INTEGER NOT NULL REFERENCES dim_customer(customer_key),
     recency DOUBLE PRECISION NOT NULL,
     frequency INTEGER NOT NULL,
@@ -159,3 +161,23 @@ CREATE INDEX IF NOT EXISTS idx_fact_sales_branch ON fact_sales(branch_key);
 CREATE INDEX IF NOT EXISTS idx_fact_sales_source ON fact_sales(source_key);
 CREATE INDEX IF NOT EXISTS idx_fact_sales_invoice ON fact_sales(invoice_no);
 CREATE INDEX IF NOT EXISTS idx_fact_inv_date_branch ON fact_inventory_snapshot(date_key, branch_key);
+
+-- Cập nhật cấu trúc nếu bảng đã tồn tại trước đó (Migration an toàn)
+DO $$
+BEGIN
+    -- Cho phép NULL khi node OFFLINE
+    ALTER TABLE fact_inventory_snapshot ALTER COLUMN stock_on_hand DROP NOT NULL;
+    ALTER TABLE fact_inventory_snapshot ALTER COLUMN snapshot_time DROP NOT NULL;
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+    -- Bổ sung cột cửa sổ thời gian RFM
+    ALTER TABLE customer_segment_snapshot ADD COLUMN IF NOT EXISTS window_start DATE;
+    ALTER TABLE customer_segment_snapshot ADD COLUMN IF NOT EXISTS window_end DATE;
+EXCEPTION
+    WHEN OTHERS THEN NULL;
+END $$;
+

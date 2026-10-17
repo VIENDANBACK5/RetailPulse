@@ -142,12 +142,12 @@ def extract_api_inventory(branch_nodes: List[Dict[str, str]] = None) -> List[Dic
             else:
                 raise Exception(f"HTTP {resp.status_code}")
         except Exception as ex:
-            # Mô phỏng node mất kết nối
+            # Mô phỏng node mất kết nối: không dùng timestamp hiện tại giả mạo mốc chụp
             print(f"  ⚠️ Node {code}: MẤT KẾT NỐI / OFFLINE ({ex})")
             results.append({
                 "branch_code": code,
                 "status": "OFFLINE",
-                "snapshot_time": time.time(),
+                "snapshot_time": None,
                 "items": []
             })
 

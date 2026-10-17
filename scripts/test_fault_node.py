@@ -30,9 +30,9 @@ def run_fault_simulation():
 
     # Cấu hình thử nghiệm: Node DN trỏ tới cổng chết (port 9999 không tồn tại)
     test_branch_nodes = [
-        {"code": "HN", "name": "Chi nhánh Hà Nội", "url": "http://localhost:8000/api/v1/inventory/HN"},
+        {"code": "HN", "name": "Chi nhánh Hà Nội", "url": "http://localhost:8001/api/v1/inventory/HN"},
         {"code": "DN", "name": "Chi nhánh Đà Nẵng (Giả lập mất mạng)", "url": "http://localhost:9999/api/v1/inventory/DN"},
-        {"code": "SG", "name": "Chi nhánh TP. Hồ Chí Minh", "url": "http://localhost:8000/api/v1/inventory/SG"},
+        {"code": "SG", "name": "Chi nhánh TP. Hồ Chí Minh", "url": "http://localhost:8001/api/v1/inventory/SG"},
     ]
 
     print("\n1. Bắt đầu gọi API thu thập dữ liệu tồn kho từ 3 chi nhánh...")

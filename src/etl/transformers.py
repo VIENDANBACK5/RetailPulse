@@ -97,7 +97,8 @@ def transform_inventory_snapshots(snapshots: List[Dict[str, Any]], source_code: 
     for node in snapshots:
         branch_code = node.get("branch_code", "UNKNOWN")
         status = node.get("status", "OFFLINE")
-        snapshot_time = datetime.datetime.fromtimestamp(node.get("snapshot_time", time.time()))
+        raw_time = node.get("snapshot_time")
+        snapshot_time = datetime.datetime.fromtimestamp(raw_time) if raw_time else None
 
         if status == "ONLINE" and node.get("items"):
             for item in node["items"]:
@@ -106,17 +107,18 @@ def transform_inventory_snapshots(snapshots: List[Dict[str, Any]], source_code: 
                     "branch_code": branch_code,
                     "stock_code": item.get("stock_code"),
                     "stock_on_hand": item.get("stock_on_hand", 0),
-                    "snapshot_time": snapshot_time,
+                    "snapshot_time": snapshot_time or datetime.datetime.now(),
                     "node_status": "ONLINE",
                     "source_code": source_code
                 })
         else:
-            # Node mất kết nối: ghi nhận bản ghi cảnh báo với stock_on_hand = 0 hoặc giữ nguyên
+            # Node mất kết nối: Tuân thủ đề cương 6.2 - Không coi dữ liệu thiếu là tồn bằng 0!
+            # Ghi nhận stock_on_hand = None (NULL trong DWH) kèm trạng thái OFFLINE để Dashboard cảnh báo rõ ràng
             records.append({
                 "date_key": date_key,
                 "branch_code": branch_code,
                 "stock_code": "ALL_PRODUCTS",
-                "stock_on_hand": 0,
+                "stock_on_hand": None,
                 "snapshot_time": snapshot_time,
                 "node_status": "OFFLINE",
                 "source_code": source_code

@@ -26,8 +26,8 @@ if %ERRORLEVEL% NEQ 0 (
 )
 echo.
 
-echo [3/4] Khoi chay Pipeline Khai pha Du lieu (RFM Extraction + K-Means)...
-python src/mining/pipeline.py --k 4
+echo [3/4] Khoi chay Pipeline Khai pha Du lieu (RFM Extraction + Thuc nghiem K=2..6 + K-Means)...
+python src/mining/pipeline.py
 if %ERRORLEVEL% NEQ 0 (
     echo [LOI] Khong the thuc thi pipeline khai pha du lieu.
     pause

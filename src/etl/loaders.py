@@ -146,9 +146,17 @@ def load_fact_sales(engine: Engine, valid_df: pd.DataFrame, batch_id: str) -> Tu
             res = conn.execute(insert_sql, chunk)
             inserted_count += (res.rowcount if res.rowcount != -1 else len(chunk))
 
-    total_amount = float(valid_df["total_amount"].sum())
-    print(f"  + Hoàn tất nạp FactSales: Đã xử lý {len(fact_rows):,} bản ghi (Tổng tiền: {total_amount:,.2f})")
-    return len(fact_rows), total_amount
+    # Truy vấn DWH trực tiếp để đối soát số lượng và số tiền thực tế đã nạp (không dùng counter nội bộ)
+    with engine.connect() as conn:
+        audit_res = conn.execute(
+            text("SELECT COUNT(*), COALESCE(SUM(total_amount), 0.0) FROM fact_sales WHERE batch_id = :batch_id"),
+            {"batch_id": str(batch_id)}
+        ).fetchone()
+        dwh_actual_count = audit_res[0] if audit_res else inserted_count
+        dwh_actual_amount = round(float(audit_res[1]), 2) if audit_res else round(float(valid_df["total_amount"].sum()), 2)
+
+    print(f"  + Hoàn tất nạp FactSales: Đã xác nhận trong DWH {dwh_actual_count:,} bản ghi (Tổng tiền: {dwh_actual_amount:,.2f})")
+    return dwh_actual_count, dwh_actual_amount
 
 
 def load_fact_inventory(engine: Engine, inv_df: pd.DataFrame, batch_id: str) -> int:
@@ -177,13 +185,21 @@ def load_fact_inventory(engine: Engine, inv_df: pd.DataFrame, batch_id: str) -> 
         for _, row in inv_df.iterrows():
             b_key = branch_map.get(row["branch_code"], 1)
             p_key = prod_map.get(row["stock_code"], prod_map["ALL_PRODUCTS"])
+            
+            # An toàn xử lý giá trị tồn kho None khi node OFFLINE (không ép int gây crash)
+            stock_raw = row["stock_on_hand"]
+            stock_val = int(stock_raw) if (pd.notnull(stock_raw) and stock_raw is not None) else None
+            
+            snap_raw = row["snapshot_time"]
+            snap_val = snap_raw if (pd.notnull(snap_raw) and snap_raw is not None) else None
+
             rows_to_insert.append({
                 "date_key": int(row["date_key"]),
                 "branch_key": int(b_key),
                 "product_key": int(p_key),
                 "source_key": int(source_key),
-                "stock_on_hand": int(row["stock_on_hand"]),
-                "snapshot_time": row["snapshot_time"],
+                "stock_on_hand": stock_val,
+                "snapshot_time": snap_val,
                 "node_status": str(row["node_status"]),
                 "batch_id": str(batch_id)
             })

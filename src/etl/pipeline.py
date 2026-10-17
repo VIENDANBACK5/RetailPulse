@@ -76,12 +76,22 @@ def run_etl_pipeline(sources: list = None):
         except Exception as ex:
             print(f"❌ Lỗi khi xử lý nguồn UCI: {ex}")
 
+    failed_sources = []
+    success_sources = []
+
     # 3. Xử lý Nguồn 2: CSDL Tác nghiệp Bán hàng (App DB)
     if "app" in sources:
         print("\n--- [XỬ LÝ NGUỒN 2: CSDL TÁC NGHIỆP BÁN HÀNG (APP DB)] ---")
         try:
             raw_app_df = extract_app_db_orders()
             if not raw_app_df.empty:
+                # Lưu bản gốc thô vào Data Lake (tuân thủ nguyên tắc Data Lake Landing Layer)
+                app_lake_dir = os.path.join(BASE_DIR, "data_lake", "raw", "app_db")
+                os.makedirs(app_lake_dir, exist_ok=True)
+                lake_file = os.path.join(app_lake_dir, f"orders_{batch_id}.csv")
+                raw_app_df.to_csv(lake_file, index=False)
+                print(f"  💾 Đã lưu trữ bản sao thô vào Data Lake: {lake_file}")
+
                 valid_app_df, rejected_app_df = transform_sales_data(raw_app_df, source_code="APP_OPERATIONAL")
                 inserted_count, dwh_amount = load_fact_sales(dwh_engine, valid_app_df, batch_id)
                 load_rejected_records(dwh_engine, rejected_app_df, batch_id, source_code="APP_OPERATIONAL")
@@ -97,23 +107,39 @@ def run_etl_pipeline(sources: list = None):
                     source_total_amount=source_amount,
                     dwh_total_amount=dwh_amount
                 )
+                success_sources.append("app")
             else:
                 print("ℹ️ Chưa có đơn hàng mới nào từ App DB.")
+                success_sources.append("app")
         except Exception as ex:
             print(f"❌ Lỗi khi xử lý nguồn App DB: {ex}")
+            failed_sources.append("app")
 
     # 4. Xử lý Nguồn 3: API Tồn kho 3 Chi nhánh (FastAPI)
     if "api" in sources:
         print("\n--- [XỬ LÝ NGUỒN 3: API TỒN KHO CÁC CHI NHÁNH (JSON)] ---")
         try:
             inventory_snapshots = extract_api_inventory()
+            
+            # Lưu bản gốc thô JSON vào Data Lake
+            import json
+            api_lake_dir = os.path.join(BASE_DIR, "data_lake", "raw", "inventory_api")
+            os.makedirs(api_lake_dir, exist_ok=True)
+            lake_json = os.path.join(api_lake_dir, f"inventory_{batch_id}.json")
+            with open(lake_json, "w", encoding="utf-8") as f:
+                json.dump(inventory_snapshots, f, ensure_ascii=False, indent=2, default=str)
+            print(f"  💾 Đã lưu trữ JSON snapshot thô vào Data Lake: {lake_json}")
+
             inv_df = transform_inventory_snapshots(inventory_snapshots, source_code="APP_OPERATIONAL")
             load_fact_inventory(dwh_engine, inv_df, batch_id)
+            success_sources.append("api")
         except Exception as ex:
             print(f"❌ Lỗi khi xử lý nguồn API Tồn kho: {ex}")
+            failed_sources.append("api")
 
     elapsed = time.time() - start_time
-    print(f"\n🎉 [HOÀN TẤT ĐƯỜNG ỐNG ETL] Tổng thời gian thực thi: {elapsed:.2f} giây")
+    batch_status = "FULL_SUCCESS" if not failed_sources else ("PARTIAL" if success_sources else "FAILED")
+    print(f"\n🎉 [HOÀN TẤT ĐƯỜNG ỐNG ETL] Mã phiên: {batch_id} | Trạng thái: {batch_status} | Thời gian: {elapsed:.2f}s")
     print("=" * 70)
 
 

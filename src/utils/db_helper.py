@@ -55,9 +55,10 @@ def populate_dim_date(engine: Engine = None, start_year: int = 2008, end_year: i
 
     with engine.connect() as conn:
         count = conn.execute(text("SELECT COUNT(*) FROM dim_date")).scalar()
-        if count > 0:
+        if count > 1000:
             print(f"ℹ️ DimDate đã có sẵn {count} bản ghi.")
             return
+        existing_keys = set(r[0] for r in conn.execute(text("SELECT date_key FROM dim_date")).fetchall())
 
     print(f"🚀 Đang sinh dữ liệu lịch DimDate từ năm {start_year} đến {end_year}...")
     start_date = datetime.date(start_year, 1, 1)
@@ -78,5 +79,7 @@ def populate_dim_date(engine: Engine = None, start_year: int = 2008, end_year: i
         'is_holiday': False
     })
 
-    dim_date_df.to_sql('dim_date', engine, if_exists='append', index=False, method='multi')
+    dim_date_df = dim_date_df[~dim_date_df['date_key'].isin(existing_keys)]
+    if not dim_date_df.empty:
+        dim_date_df.to_sql('dim_date', engine, if_exists='append', index=False, method='multi')
     print(f"✅ Đã nạp thành công {len(dim_date_df)} ngày vào bảng DimDate!")
