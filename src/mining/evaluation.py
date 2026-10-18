@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score, adjusted_rand_score
 import json
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 sys.path.append(BASE_DIR)

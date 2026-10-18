@@ -3,9 +3,6 @@ import sys
 import random
 import datetime
 import pandas as pd
-import requests
-import zipfile
-import io
 
 if sys.platform == "win32":
     try:

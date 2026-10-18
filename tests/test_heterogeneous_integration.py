@@ -14,12 +14,11 @@ import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from src.dataops.mdm_engine import mdm_manager, MasterDataManager
+from src.dataops.mdm_engine import MasterDataManager
 from src.dataops.canonical_model import (
     parse_vietnamese_csv_record,
     parse_sql_record,
     parse_rest_json_payload,
-    auto_detect_and_canonicalize
 )
 from src.streaming.branch_producers import (
     CsvBranchAdapterProducer,
@@ -28,7 +27,6 @@ from src.streaming.branch_producers import (
     HeterogeneousBranchSimulator,
     CANONICAL_TOPIC
 )
-from src.streaming.kafka_engine import broker
 
 
 class TestHeterogeneousIntegration(unittest.TestCase):

@@ -7,11 +7,9 @@ Phân phối dữ liệu đầu ra phục vụ tự động hóa Marketing & CRM
 """
 
 import sys
-import os
-import json
 import time
 import secrets
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 if sys.platform == "win32":
     try:

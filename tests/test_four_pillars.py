@@ -14,10 +14,9 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from src.streaming.kafka_engine import broker, produce_order_event, produce_inventory_event
-from src.streaming.stream_processor import stream_processor, RealTimeStreamProcessor
-from src.mining.deep_autoencoder import train_deep_autoencoder
-from src.mining.spatial_optimization import compute_spatial_matrix, haversine_distance, find_optimal_stock_transfer, BRANCH_COORDINATES
+from src.streaming.kafka_engine import produce_order_event, produce_inventory_event
+from src.streaming.stream_processor import stream_processor
+from src.mining.spatial_optimization import compute_spatial_matrix, find_optimal_stock_transfer
 from src.security.pipeline_guard import generate_hmac_signature, verify_payload_signature, SecureStagingManager
 
 

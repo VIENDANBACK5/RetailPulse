@@ -8,7 +8,7 @@ import sys
 import os
 import json
 import math
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 if sys.platform == "win32":
     try:

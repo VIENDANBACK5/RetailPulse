@@ -12,7 +12,7 @@ import json
 import time
 import hmac
 import hashlib
-from typing import Dict, Any, Tuple
+from typing import Tuple
 
 if sys.platform == "win32":
     try:

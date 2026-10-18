@@ -4,7 +4,6 @@ Tiêu thụ luồng sự kiện từ Kafka Topic `retail.orders.event`,
 tính toán chỉ số doanh số thời gian thực (Sliding Windows) và cập nhật DWH với độ trễ < 1 giây.
 """
 
-import time
 from typing import Dict, Any
 from src.streaming.kafka_engine import broker, KafkaMessage
 

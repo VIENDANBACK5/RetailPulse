@@ -5,11 +5,9 @@ cho kiến trúc xử lý luồng sự kiện thời gian thực (Event-Driven S
 """
 
 import time
-import json
 import uuid
 import threading
-from typing import Dict, List, Callable, Optional
-from queue import Queue
+from typing import List, Callable, Optional
 
 class KafkaMessage:
     def __init__(self, topic: str, key: str, value: dict, headers: Optional[dict] = None):

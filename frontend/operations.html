@@ -9,10 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/variables.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/base.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/components.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/pages.css?ui=workspace-20261018-ux1">
   <style>
     /* Ingestion dropzone & profiler specific styles */
     .dropzone-box {
@@ -47,34 +47,33 @@
       background: rgba(255, 255, 255, 0.05);
     }
   </style>
+  <link rel="stylesheet" href="css/refinements.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/workspace.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/workspace-pages.css?ui=workspace-20261018-ux1">
 </head>
-<body>
+<body class="portal-app has-sidebar workspace-page ingestion-workspace">
+  <a href="#main" class="skip-link">Chuyển đến nội dung chính</a>
+
   <!-- Header -->
-  <header class="portal-header">
-    <div class="shell portal-header-shell">
-      <a href="index.html" class="brand-wrap">
-        <svg viewBox="0 0 48 48" fill="currentColor">
-          <path d="M24 2c2.2 13.8 7.9 19.6 22 22-14.1 2.4-19.8 8.2-22 22-2.2-13.8-7.9-19.6-22-22 14.1-2.4 19.8-8.2 22-22Z"/>
-        </svg>
-        <span>RetailPulse <span style="font-weight:400; font-size:0.875rem; color:var(--muted);">/ DataOps Ingestion</span></span>
-      </a>
 
-      <nav class="portal-nav-links" aria-label="Điều hướng">
-        <div class="portal-nav-item"><a href="index.html">Trang chủ</a></div>
-        <div class="portal-nav-item"><a href="dashboard.html">📊 DataOps Overview</a></div>
-        <div class="portal-nav-item"><a href="operations.html" class="active">📥 Ingestion &amp; Nodes</a></div>
-        <div class="portal-nav-item"><a href="etl-monitor.html">⚡ Pipeline &amp; Kafka</a></div>
-        <div class="portal-nav-item"><a href="customer-segments.html">🧠 MLOps &amp; Registry</a></div>
-      </nav>
-
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <span class="status-pill success" id="badge-api-status">DataOps Online</span>
-        <div class="clock-chip" style="display: flex;">
-          <span id="live-time-str">9:41pm</span>
-        </div>
-      </div>
-    </div>
+  <aside class="workspace-sidebar" id="app-sidebar" aria-label="Thanh điều hướng workspace">
+    <button class="sidebar-close" id="sidebar-close" type="button" aria-label="Đóng điều hướng"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#close"/></svg></button>
+    <a class="workspace-brand" href="index.html?ui=workspace-20261018-ux1" aria-label="RetailPulse - Trang chủ"><span class="workspace-brand-mark"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#brand"/></svg></span>RetailPulse</a>
+    <div class="workspace-identity"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><div><strong>Retail Analytics</strong><small>Data Warehouse &amp; Mining</small></div></div>
+    <nav aria-label="Điều hướng chính"><div class="sidebar-label">WORKSPACE</div><div class="sidebar-nav"><a class="sidebar-link" href="dashboard.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#layout"/></svg><span>Tổng quan</span></a><a class="sidebar-link active" href="operations.html?ui=workspace-20261018-ux1" aria-current="page"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><span>Dữ liệu &amp; chi nhánh</span><span class="sidebar-active-dot" aria-hidden="true"></span></a><a class="sidebar-link" href="etl-monitor.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#workflow"/></svg><span>Pipeline &amp; Kafka</span></a><a class="sidebar-link" href="customer-segments.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#users"/></svg><span>Mô hình &amp; phân khúc</span></a></div></nav>
+    <nav class="sidebar-secondary" aria-label="Truy cập báo cáo"><div class="sidebar-label">BÁO CÁO</div><div class="sidebar-nav">
+      <a class="sidebar-link" href="dashboard.html?ui=workspace-20261018-ux1#revenue-section"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#chart"/></svg><span>Giá trị giao dịch</span></a>
+      <a class="sidebar-link" href="dashboard.html?ui=workspace-20261018-ux1#branch-section"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#package"/></svg><span>Chi nhánh &amp; tồn kho</span></a>
+      <a class="sidebar-link" href="dashboard.html?ui=workspace-20261018-ux1#system-status"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#activity"/></svg><span>Trạng thái hệ thống</span></a>
+    </div></nav>
+    <div class="sidebar-bottom"><a class="sidebar-link" href="index.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#arrow-up-right"/></svg><span>Giới thiệu dự án</span></a><div class="sidebar-project"><span class="project-monogram">RP</span><div><strong>RetailPulse Project</strong><small>Data Warehouse &amp; Data Mining</small></div></div></div>
+  </aside>
+  <button class="sidebar-backdrop" id="sidebar-backdrop" type="button" aria-label="Đóng thanh điều hướng" tabindex="-1" hidden></button>
+  <header class="workspace-topbar">
+    <div class="workspace-breadcrumb"><button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Mở điều hướng" aria-controls="app-sidebar" aria-expanded="false"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#menu"/></svg></button><span>Workspace</span><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#chevron"/></svg><strong>Dữ liệu &amp; chi nhánh</strong></div>
+    <div class="workspace-topbar-meta"><span class="status-pill success" id="badge-api-status">DataOps Online</span><div class="clock-chip"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#clock"/></svg><span id="live-time-str">--:--</span></div></div>
   </header>
+
 
   <!-- Page Banner -->
   <section class="page-banner">
@@ -83,32 +82,33 @@
         <div>
           <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
             <span class="eyebrow-dot" style="background:var(--accent);"></span>
-            <span>Multi-Store DataOps • Kaggle Benchmark Standards (Favorita, Rossmann, Olist)</span>
+            <span>DATAOPS WORKSPACE / INGESTION</span>
           </div>
-          <h1 class="page-title">Quản Trị Dữ Liệu Đa Chi Nhánh &amp; MDM Studio</h1>
-          <p class="page-subtitle">Tích hợp dữ liệu dị đồng từ các chi nhánh phân tán (CSV tiếng Việt, SQL DB, REST API JSON), chuẩn hóa Canonical Model, quản trị Master Data Management (MDM) và giám sát bảo mật đường truyền VPN/SSH Tunneling.</p>
+          <h1 class="page-title">Dữ liệu &amp; chi nhánh</h1>
+          <p class="page-subtitle">Nạp dữ liệu, kiểm tra chất lượng, chuẩn hóa mã sản phẩm và quản lý kết nối giữa các chi nhánh.</p>
         </div>
-        <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
-          <button id="btn-load-sample-hn" class="pill-btn btn-sm variant-dark">📥 Nạp CSV Chi Nhánh HN (Favorita Style)</button>
-          <button id="btn-load-sample-dn" class="pill-btn btn-sm variant-outline">🗄️ Nạp SQL Chi Nhánh DN (Rossmann Style)</button>
-          <button id="btn-load-sample-sg" class="pill-btn btn-sm variant-outline">🌐 Nạp REST API Sài Gòn (Olist Style)</button>
+        <div class="page-actions">
+          <button id="btn-load-sample-hn" class="pill-btn btn-sm variant-dark"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#file"/></svg><span>CSV · Hà Nội</span></button>
+          <button id="btn-load-sample-dn" class="pill-btn btn-sm variant-outline"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><span>SQL · Đà Nẵng</span></button>
+          <button id="btn-load-sample-sg" class="pill-btn btn-sm variant-outline"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#globe"/></svg><span>JSON · Sài Gòn</span></button>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Main Content -->
-  <main class="shell" style="padding-bottom: 5rem;">
+  <div class="shell"><nav class="workspace-section-nav" aria-label="Các khu vực trong trang"><span>Trong trang này</span><a href="#ingestion-upload"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#upload"/></svg><span>Nạp dữ liệu</span></a><a href="#ingestion-mdm"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><span>MDM & tiền tệ</span></a><a href="#ingestion-nodes"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#globe"/></svg><span>Kết nối</span></a><a href="#ingestion-spatial"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#map"/></svg><span>Tồn kho</span></a></nav></div>
+  <main id="main" class="shell workspace-content" style="padding-bottom: 5rem;">
 
     <!-- SECTION 1: DATA INGESTION & INSTANT PROFILING -->
-    <div class="card-box" style="margin-bottom: 2rem;">
+    <div class="card-box workspace-panel" style="margin-bottom: 2rem;" id="ingestion-upload">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
         <div>
           <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
             <span class="eyebrow-dot"></span>
-            <span>Tính năng 1: Data Ingestion &amp; Validation</span>
+            <span>DATA INGESTION</span>
           </div>
-          <h2 style="font-size:1.25rem; font-weight:700;">Giao Diện Upload &amp; Phân Tích Chất Lượng Tức Thì (Data Profiling)</h2>
+          <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#upload"/></svg><span>Nạp &amp; kiểm tra dữ liệu</span></h2>
           <p style="font-size:0.8125rem; color:var(--muted);">
             Tự động kiểm tra tính đầy đủ, tỷ lệ khuyết thiếu (missing values), định dạng ngày tháng và phân loại dòng lỗi trước khi nạp Data Lake.
           </p>
@@ -119,14 +119,14 @@
       <!-- Upload Dropzone Area -->
       <div class="dropzone-box" id="dropzone-csv" style="margin-bottom:1.5rem;">
         <input type="file" id="file-input-csv" accept=".csv,.txt" style="display:none;" />
-        <div style="font-size:2rem; margin-bottom:0.5rem;">📁</div>
+        <div style="font-size:2rem; margin-bottom:0.5rem;"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#folder"/></svg></div>
         <div style="font-weight:600; font-size:1rem; margin-bottom:0.25rem;">Kéo thả file CSV bán hàng vào đây, hoặc click để chọn file</div>
         <div style="font-size:0.75rem; color:var(--muted);">Hỗ trợ chuẩn Online Retail II (Invoice, StockCode, Description, Quantity, InvoiceDate, Price, Customer ID)</div>
       </div>
 
       <!-- Live Data Quality Scorecard Result -->
       <div id="profiling-result-box" style="display:block;">
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(11rem, 1fr)); gap:1rem; margin-bottom:1.5rem;">
+        <div style="display:grid; gap:1rem; margin-bottom:1.5rem" class="quality-grid">
           <!-- Overall Quality Score -->
           <div class="scorecard-metric" style="border-left: 4px solid var(--success);">
             <div style="font-size:0.6875rem; text-transform:uppercase; color:var(--muted); font-weight:600;">Data Quality Score</div>
@@ -157,29 +157,29 @@
         </div>
 
         <!-- Breakdown of Invalid Rows -->
-        <div style="background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-card-sm); padding:1.25rem; margin-bottom:1.5rem;">
-          <h4 style="font-size:0.9375rem; font-weight:700; margin-bottom:0.75rem;">Chi Tiết Các Dòng Lỗi Bị Loại (Data Cleansing Rules):</h4>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(13rem, 1fr)); gap:0.75rem;">
-            <div style="padding:0.625rem; border-radius:var(--radius-control); background:#ffffff; border:1px solid var(--line);">
+        <div style="background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-card-sm); padding:1.25rem; margin-bottom:1.5rem;" class="workspace-inset">
+          <h4 style="margin-bottom:0.75rem">Chi tiết bản ghi bị loại</h4>
+          <div style="display:grid; gap:0.75rem" class="workspace-source-grid rejection-grid">
+            <div style="padding:0.625rem; border-radius:var(--radius-control); background:#ffffff; border:1px solid var(--line);" class="workspace-source-card">
               <span style="font-size:0.75rem; color:var(--muted);">Đơn hoàn hủy (Invoice 'C'):</span>
               <div style="font-weight:700; font-size:1.125rem; color:var(--accent);" id="c-count-val">22 dòng</div>
             </div>
-            <div style="padding:0.625rem; border-radius:var(--radius-control); background:#ffffff; border:1px solid var(--line);">
+            <div style="padding:0.625rem; border-radius:var(--radius-control); background:#ffffff; border:1px solid var(--line);" class="workspace-source-card">
               <span style="font-size:0.75rem; color:var(--muted);">Khuyết thiếu Customer ID:</span>
               <div style="font-weight:700; font-size:1.125rem; color:var(--warning);" id="null-cust-val">15 dòng</div>
             </div>
-            <div style="padding:0.625rem; border-radius:var(--radius-control); background:#ffffff; border:1px solid var(--line);">
+            <div style="padding:0.625rem; border-radius:var(--radius-control); background:#ffffff; border:1px solid var(--line);" class="workspace-source-card">
               <span style="font-size:0.75rem; color:var(--muted);">Số lượng âm hoặc bằng 0:</span>
               <div style="font-weight:700; font-size:1.125rem; color:var(--badge-atrisk);" id="neg-qty-val">11 dòng</div>
             </div>
-            <div style="padding:0.625rem; border-radius:var(--radius-control); background:#ffffff; border:1px solid var(--line);">
+            <div style="padding:0.625rem; border-radius:var(--radius-control); background:#ffffff; border:1px solid var(--line);" class="workspace-source-card">
               <span style="font-size:0.75rem; color:var(--muted);">Đơn giá không hợp lệ (<= 0):</span>
               <div style="font-weight:700; font-size:1.125rem; color:var(--badge-atrisk);" id="neg-price-val">4 dòng</div>
             </div>
           </div>
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;" class="workspace-actions-row">
           <div style="font-size:0.8125rem; color:var(--muted);">
             * Các dòng hợp lệ sẽ được tự động đóng gói, ký chữ ký HMAC-SHA256 và chuyển vào vùng Staging cách ly.
           </div>
@@ -194,14 +194,14 @@
     </div>
 
     <!-- SECTION 1B: MASTER DATA MANAGEMENT (MDM STUDIO) & CANONICAL DATA MODEL -->
-    <div class="card-box" style="margin-bottom: 2rem;">
+    <div class="card-box workspace-panel" style="margin-bottom: 2rem;" id="ingestion-mdm">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
         <div>
           <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
             <span class="eyebrow-dot" style="background:var(--accent);"></span>
-            <span>Tính năng 1B: Master Data Management (MDM) &amp; Schema Normalization</span>
+            <span>MASTER DATA</span>
           </div>
-          <h2 style="font-size:1.25rem; font-weight:700;">Quản Trị Master Data (MDM Studio) &amp; Mô Hình Chuẩn Hóa (Canonical Model)</h2>
+          <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><span>Chuẩn hóa sản phẩm</span></h2>
           <p style="font-size:0.8125rem; color:var(--muted);">
             Hợp nhất mã sản phẩm dị đồng giữa các chi nhánh qua Bảng đối chiếu (Lookup Table), quy đổi đa tiền tệ (VND/USD/EUR &rarr; Base GBP) và khử trùng lặp (Deduplication &amp; Idempotency).
           </p>
@@ -213,8 +213,8 @@
       </div>
 
       <!-- Kaggle Multi-Store Benchmark Highlights -->
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(16rem, 1fr)); gap:1rem; margin-bottom:1.5rem;">
-        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line);">
+      <div style="display:grid; gap:1rem; margin-bottom:1.5rem" class="workspace-source-grid">
+        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line);" class="workspace-source-card">
           <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">
             <span style="font-size:0.75rem; font-weight:700; color:var(--accent);">CORPORACIÓN FAVORITA</span>
             <span class="status-pill success" style="font-size:0.625rem; padding:0.15rem 0.4rem;">Store Sales Benchmark</span>
@@ -224,7 +224,7 @@
           </p>
         </div>
 
-        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line);">
+        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line);" class="workspace-source-card">
           <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">
             <span style="font-size:0.75rem; font-weight:700; color:var(--accent);">ROSSMANN STORE SALES</span>
             <span class="status-pill info" style="font-size:0.625rem; padding:0.15rem 0.4rem;">1,115 Stores Benchmark</span>
@@ -234,7 +234,7 @@
           </p>
         </div>
 
-        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line);">
+        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line);" class="workspace-source-card">
           <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">
             <span style="font-size:0.75rem; font-weight:700; color:var(--accent);">OLIST BRAZILIAN E-COMMERCE</span>
             <span class="status-pill warning" style="font-size:0.625rem; padding:0.15rem 0.4rem;">Spatial Multi-Seller</span>
@@ -248,7 +248,7 @@
       <!-- MDM Product Lookup Table -->
       <div style="border:1px solid var(--line); border-radius:var(--radius-card-sm); padding:1.25rem; background:#ffffff; margin-bottom:1.5rem;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
-          <h4 style="font-size:0.9375rem; font-weight:700; margin:0;">Bảng Tra Cứu Hợp Nhất Mã Sản Phẩm Liên Chi Nhánh (MDM SKU Lookup Table)</h4>
+          <h4 style="margin:0">Bảng ánh xạ sản phẩm</h4>
           <span style="font-size:0.75rem; color:var(--muted);">Quy đổi tự động khi Kafka Ingestion nhận gói tin</span>
         </div>
         <div class="portal-table-wrap">
@@ -273,22 +273,22 @@
       </div>
 
       <!-- Live MDM SKU Resolver & Currency Conversion Sandbox -->
-      <div style="border:1px solid var(--line); border-radius:var(--radius-card-sm); padding:1.25rem; background:var(--surface);">
-        <h4 style="font-size:0.9375rem; font-weight:700; margin-bottom:0.5rem;">Sandbox Thử Nghiệm: Đối Chiếu Mã Dị Đồng &amp; Quy Đổi Đa Tiền Tệ Tức Thì</h4>
+      <div style="border:1px solid var(--line); border-radius:var(--radius-card-sm); padding:1.25rem; background:var(--surface);" class="workspace-inset">
+        <h4 style="margin-bottom:0.5rem">Thử mã sản phẩm &amp; quy đổi tiền tệ</h4>
         <p style="font-size:0.75rem; color:var(--muted); margin-bottom:1rem;">
           Nhập mã sản phẩm bất kỳ từ các chi nhánh (ví dụ: <code>HN-BOT-750</code>, <code>DN-FLASK-L</code>, <code>SG-HYDRA-750</code>) và số tiền địa phương để kiểm tra engine chuẩn hóa.
         </p>
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(13rem, 1fr)); gap:1rem; align-items:flex-end;">
+        <div style="display:grid; gap:1rem; align-items:flex-end" class="workspace-field-grid">
           <div class="form-group" style="margin:0;">
-            <label class="form-label" style="font-size:0.75rem;">Mã SKU Chi Nhánh</label>
+            <label class="form-label" style="font-size:0.75rem;" for="sandbox-sku-input">Mã SKU Chi Nhánh</label>
             <input type="text" id="sandbox-sku-input" class="form-control" value="SG-HYDRA-750" />
           </div>
           <div class="form-group" style="margin:0;">
-            <label class="form-label" style="font-size:0.75rem;">Số Tiền Địa Phương</label>
+            <label class="form-label" style="font-size:0.75rem;" for="sandbox-amount-input">Số Tiền Địa Phương</label>
             <input type="number" id="sandbox-amount-input" class="form-control" value="45.38" step="0.01" />
           </div>
           <div class="form-group" style="margin:0;">
-            <label class="form-label" style="font-size:0.75rem;">Đơn Vị Tiền Tệ</label>
+            <label class="form-label" style="font-size:0.75rem;" for="sandbox-curr-select">Đơn Vị Tiền Tệ</label>
             <select id="sandbox-curr-select" class="form-control">
               <option value="EUR" selected>EUR (€) - Sài Gòn REST API</option>
               <option value="USD">USD ($) - Đà Nẵng SQL DB</option>
@@ -320,14 +320,14 @@
     </div>
 
     <!-- SECTION 2: DISTRIBUTED NODE CONNECTIVITY & NETWORK SECURITY (VPN / SSH TUNNELING) -->
-    <div class="card-box" style="margin-bottom: 2rem;">
+    <div class="card-box workspace-panel" style="margin-bottom: 2rem;" id="ingestion-nodes">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
         <div>
           <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
             <span class="eyebrow-dot" style="background:var(--accent);"></span>
-            <span>Tính năng 2: Secure Network Ingestion (Site-to-Site VPN &amp; SSH Reverse Tunnel)</span>
+            <span>BRANCH CONNECTIONS</span>
           </div>
-          <h2 style="font-size:1.25rem; font-weight:700;">Bảo Mật Mạng Luồng Thu Thập &amp; Đường Truyền Mã Hóa</h2>
+          <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#globe"/></svg><span>Kết nối chi nhánh</span></h2>
           <p style="font-size:0.8125rem; color:var(--muted);">
             Thiết lập VPN site-to-site (WireGuard/IPSec) và SSH reverse tunneling để mã hóa toàn bộ quá trình truyền tải dữ liệu thô từ các node chi nhánh phân tán về Data Lake trung tâm, chống tấn công nghe lén (Man-in-the-Middle).
           </p>
@@ -336,9 +336,9 @@
       </div>
 
       <!-- Live Network Topology Cards -->
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(18rem, 1fr)); gap:1rem; margin-bottom:1.5rem;">
+      <div style="display:grid; gap:1rem; margin-bottom:1.5rem" class="workspace-source-grid">
         <!-- HN Card -->
-        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--accent);">
+        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--accent);" class="workspace-source-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
             <strong style="font-size:0.875rem;">Node Hà Nội (Store #1)</strong>
             <span class="status-pill success" style="font-size:0.625rem; padding:0.15rem 0.4rem;">VPN CONNECTED</span>
@@ -353,7 +353,7 @@
         </div>
 
         <!-- DN Card -->
-        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--info, #2d55ff);">
+        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--info, #2d55ff);" class="workspace-source-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
             <strong style="font-size:0.875rem;">Node Đà Nẵng (Store #2)</strong>
             <span class="status-pill success" style="font-size:0.625rem; padding:0.15rem 0.4rem;">VPN CONNECTED</span>
@@ -368,7 +368,7 @@
         </div>
 
         <!-- SG Card -->
-        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--success);">
+        <div style="padding:1rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--success);" class="workspace-source-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
             <strong style="font-size:0.875rem;">Node Sài Gòn (Store #3)</strong>
             <span class="status-pill success" style="font-size:0.625rem; padding:0.15rem 0.4rem;">mTLS CONNECTED</span>
@@ -395,16 +395,16 @@
 
         <!-- Node Config Card Details -->
         <div style="border:1px solid var(--line); border-radius:var(--radius-card-sm); padding:1.5rem; background:#ffffff;">
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(18rem, 1fr)); gap:1.25rem; margin-bottom:1.25rem;">
+          <div style="display:grid; gap:1.25rem; margin-bottom:1.25rem" class="workspace-field-grid">
             <!-- Endpoint Config -->
             <div class="form-group">
-              <label class="form-label">API Endpoint URL (mTLS / HTTPS)</label>
+              <label class="form-label" for="node-endpoint">API Endpoint URL (mTLS / HTTPS)</label>
               <input type="text" id="node-endpoint" class="form-control" value="https://node-hn.retailpulse.internal:8443/api/v1/export" />
             </div>
 
             <!-- Protocol & Port -->
             <div class="form-group">
-              <label class="form-label">Giao Thức Thu Thập</label>
+              <label class="form-label" for="node-protocol">Giao Thức Thu Thập</label>
               <select id="node-protocol" class="form-control">
                 <option value="https_mtls" selected>HTTPS with mTLS Client Certificate</option>
                 <option value="ssh_tunnel">SSH Reverse Tunnel (Port 2222)</option>
@@ -422,7 +422,7 @@
 
             <!-- HMAC-SHA256 Secret Key -->
             <div class="form-group">
-              <label class="form-label">HMAC-SHA256 Shared Secret</label>
+              <label class="form-label" for="node-hmac-key">HMAC-SHA256 Shared Secret</label>
               <div style="display:flex; gap:0.5rem;">
                 <input type="password" id="node-hmac-key" class="form-control" value="PTIT_RETAIL_DWH_SECURE_KEY_2026_@#!" readonly />
                 <button type="button" id="btn-toggle-hmac" class="pill-btn btn-sm variant-outline">Xem</button>
@@ -444,14 +444,14 @@
     </div>
 
     <!-- SECTION 3: SPATIAL NETWORK & HAVERSINE ALLOCATION (RETAINED PILLAR) -->
-    <div class="geo-map-box">
+    <div class="geo-map-box workspace-panel" id="ingestion-spatial">
       <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.25rem;">
         <div>
           <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
             <span class="eyebrow-dot" style="background:var(--accent);"></span>
-            <span>Spatial Data Mining • Haversine Distance Matrix</span>
+            <span>SPATIAL ALLOCATION</span>
           </div>
-          <h2 style="font-size:1.25rem; font-weight:700;">Mạng Lưới Không Gian &amp; Điều Phối Tồn Kho Liên Chi Nhánh</h2>
+          <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#map"/></svg><span>Điều phối tồn kho</span></h2>
           <p style="font-size:0.8125rem; color:var(--muted);">
             Tọa độ WGS-84 của 3 chi nhánh được tích hợp tính ma trận khoảng cách Haversine tối ưu hóa luân chuyển hàng hóa.
           </p>
@@ -524,7 +524,7 @@
           <div style="display:flex; justify-content:space-between; align-items:flex-start;">
             <div>
               <span class="status-pill warning" style="margin-bottom:0.35rem; display:inline-block;">Cảnh Báo Tồn Kho Không Gian</span>
-              <h3 style="font-size:1.125rem; font-weight:700;">Điều Phối Kho Haversine Tối Ưu</h3>
+              <h3>Điều Phối Kho Haversine Tối Ưu</h3>
             </div>
             <span style="font-size:0.75rem; color:var(--muted);">Tự động</span>
           </div>
@@ -552,6 +552,8 @@
       </div>
     </div>
   </main>
+
+  <footer class="portal-footer"><div class="shell"><span>RetailPulse / Data Warehouse &amp; Data Mining</span><a href="index.html?ui=workspace-20261018-ux1">Về trang giới thiệu &rarr;</a></div></footer>
 
   <script type="module">
     import { initClock } from './js/clock.js';
@@ -752,5 +754,6 @@
       }, 700);
     });
   </script>
+  <script type="module" src="js/sidebar.js?ui=workspace-20261018-ux1"></script>
 </body>
 </html>
