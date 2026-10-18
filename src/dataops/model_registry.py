@@ -11,12 +11,7 @@ import sys
 import os
 import json
 import time
-import numpy as np
-import pandas as pd
-from typing import Dict, List, Any, Optional
-from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
+from typing import Dict, Any, Optional
 
 if sys.platform == "win32":
     try:

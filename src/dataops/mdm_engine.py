@@ -7,9 +7,7 @@ Giải quyết dữ liệu phân mảnh giữa các chi nhánh:
 """
 
 import hashlib
-import json
-import time
-from typing import Dict, Optional, Tuple, List
+from typing import Dict, Tuple
 
 # Tỷ giá chuẩn hóa về GBP (Base Currency)
 # 1 GBP = 32,500 VND

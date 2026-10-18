@@ -9,10 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/variables.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/base.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/components.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/pages.css?ui=workspace-20261018-ux1">
   <style>
     .param-slider-wrap {
       display: flex;
@@ -39,34 +39,33 @@
       line-height: 1.45;
     }
   </style>
+  <link rel="stylesheet" href="css/refinements.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/workspace.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/workspace-pages.css?ui=workspace-20261018-ux1">
 </head>
-<body>
+<body class="portal-app has-sidebar workspace-page models-workspace">
+  <a href="#main" class="skip-link">Chuyển đến nội dung chính</a>
+
   <!-- Header -->
-  <header class="portal-header">
-    <div class="shell portal-header-shell">
-      <a href="index.html" class="brand-wrap">
-        <svg viewBox="0 0 48 48" fill="currentColor">
-          <path d="M24 2c2.2 13.8 7.9 19.6 22 22-14.1 2.4-19.8 8.2-22 22-2.2-13.8-7.9-19.6-22-22 14.1-2.4 19.8-8.2 22-22Z"/>
-        </svg>
-        <span>RetailPulse <span style="font-weight:400; font-size:0.875rem; color:var(--muted);">/ MLOps Registry</span></span>
-      </a>
 
-      <nav class="portal-nav-links" aria-label="Điều hướng">
-        <div class="portal-nav-item"><a href="index.html">Trang chủ</a></div>
-        <div class="portal-nav-item"><a href="dashboard.html">📊 DataOps Overview</a></div>
-        <div class="portal-nav-item"><a href="operations.html">📥 Ingestion &amp; Nodes</a></div>
-        <div class="portal-nav-item"><a href="etl-monitor.html">⚡ Pipeline &amp; Kafka</a></div>
-        <div class="portal-nav-item"><a href="customer-segments.html" class="active">🧠 MLOps &amp; Registry</a></div>
-      </nav>
-
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <span class="status-pill success" id="active-serving-pill">Serving: v2.0-autoencoder</span>
-        <div class="clock-chip" style="display: flex;">
-          <span id="live-time-str">9:41pm</span>
-        </div>
-      </div>
-    </div>
+  <aside class="workspace-sidebar" id="app-sidebar" aria-label="Thanh điều hướng workspace">
+    <button class="sidebar-close" id="sidebar-close" type="button" aria-label="Đóng điều hướng"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#close"/></svg></button>
+    <a class="workspace-brand" href="index.html?ui=workspace-20261018-ux1" aria-label="RetailPulse - Trang chủ"><span class="workspace-brand-mark"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#brand"/></svg></span>RetailPulse</a>
+    <div class="workspace-identity"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><div><strong>Retail Analytics</strong><small>Data Warehouse &amp; Mining</small></div></div>
+    <nav aria-label="Điều hướng chính"><div class="sidebar-label">WORKSPACE</div><div class="sidebar-nav"><a class="sidebar-link" href="dashboard.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#layout"/></svg><span>Tổng quan</span></a><a class="sidebar-link" href="operations.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><span>Dữ liệu &amp; chi nhánh</span></a><a class="sidebar-link" href="etl-monitor.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#workflow"/></svg><span>Pipeline &amp; Kafka</span></a><a class="sidebar-link active" href="customer-segments.html?ui=workspace-20261018-ux1" aria-current="page"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#users"/></svg><span>Mô hình &amp; phân khúc</span><span class="sidebar-active-dot" aria-hidden="true"></span></a></div></nav>
+    <nav class="sidebar-secondary" aria-label="Truy cập báo cáo"><div class="sidebar-label">BÁO CÁO</div><div class="sidebar-nav">
+      <a class="sidebar-link" href="dashboard.html?ui=workspace-20261018-ux1#revenue-section"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#chart"/></svg><span>Giá trị giao dịch</span></a>
+      <a class="sidebar-link" href="dashboard.html?ui=workspace-20261018-ux1#branch-section"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#package"/></svg><span>Chi nhánh &amp; tồn kho</span></a>
+      <a class="sidebar-link" href="dashboard.html?ui=workspace-20261018-ux1#system-status"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#activity"/></svg><span>Trạng thái hệ thống</span></a>
+    </div></nav>
+    <div class="sidebar-bottom"><a class="sidebar-link" href="index.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#arrow-up-right"/></svg><span>Giới thiệu dự án</span></a><div class="sidebar-project"><span class="project-monogram">RP</span><div><strong>RetailPulse Project</strong><small>Data Warehouse &amp; Data Mining</small></div></div></div>
+  </aside>
+  <button class="sidebar-backdrop" id="sidebar-backdrop" type="button" aria-label="Đóng thanh điều hướng" tabindex="-1" hidden></button>
+  <header class="workspace-topbar">
+    <div class="workspace-breadcrumb"><button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Mở điều hướng" aria-controls="app-sidebar" aria-expanded="false"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#menu"/></svg></button><span>Workspace</span><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#chevron"/></svg><strong>Mô hình &amp; phân khúc</strong></div>
+    <div class="workspace-topbar-meta"><span class="status-pill success" id="active-serving-pill">Serving: v2.0-autoencoder</span><div class="clock-chip"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#clock"/></svg><span id="live-time-str">--:--</span></div></div>
   </header>
+
 
   <!-- Page Banner -->
   <section class="page-banner">
@@ -75,27 +74,28 @@
         <div>
           <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
             <span class="eyebrow-dot" style="background:var(--accent);"></span>
-            <span>MLOps Lifecycle • Hyperparameter Tuning &amp; Model Versioning</span>
+            <span>MLOPS WORKSPACE / CUSTOMER SEGMENTS</span>
           </div>
-          <h1 class="page-title">MLOps Model Registry &amp; Tinh Chỉnh Thuật Toán</h1>
-          <p class="page-subtitle">Quản trị toàn bộ vòng đời mô hình phân cụm: tinh chỉnh siêu tham số K và trọng số RFM, so sánh các phiên bản qua Silhouette/Inertia, What-if analysis và sinh dynamic API cho CRM.</p>
+          <h1 class="page-title">Mô hình &amp; phân khúc khách hàng</h1>
+          <p class="page-subtitle">Tinh chỉnh tham số, so sánh phiên bản mô hình và khám phá các nhóm khách hàng từ đặc trưng RFM.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Main Content -->
-  <main class="shell" style="padding-bottom: 5rem;">
+  <div class="shell"><nav class="workspace-section-nav" aria-label="Các khu vực trong trang"><span>Trong trang này</span><a href="#models-tuning"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#boxes"/></svg><span>Tham số</span></a><a href="#models-registry"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><span>Model Registry</span></a><a href="#models-whatif"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#users"/></svg><span>RFM Simulator</span></a><a href="#models-activation"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#workflow"/></svg><span>CRM & API</span></a></nav></div>
+  <main id="main" class="shell workspace-content" style="padding-bottom: 5rem;">
 
     <!-- SECTION 1: HYPERPARAMETER TUNING CONTROL PANEL -->
-    <div class="card-box" style="margin-bottom: 2rem;">
+    <div class="card-box workspace-panel tuning-panel" style="margin-bottom: 2rem;" id="models-tuning">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
         <div>
           <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
             <span class="eyebrow-dot"></span>
-            <span>Tính năng: Hyperparameter Tuning Studio</span>
+            <span>MODEL STUDIO</span>
           </div>
-          <h2 style="font-size:1.25rem; font-weight:700;">Giao Diện Tinh Chỉnh Siêu Tham Số (Data Mining Tuning)</h2>
+          <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#boxes"/></svg><span>Tinh chỉnh mô hình</span></h2>
           <p style="font-size:0.8125rem; color:var(--muted);">
             Tự do thay đổi số cụm K, cửa sổ dữ liệu và tỷ trọng các biến R, F, M để huấn luyện và sinh ra phiên bản mô hình mới.
           </p>
@@ -104,12 +104,12 @@
       </div>
 
       <form id="form-hyperparams">
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(18rem, 1fr)); gap:1.5rem; margin-bottom:1.5rem;">
+        <div style="display:grid; gap:1.5rem; margin-bottom:1.5rem" class="workspace-field-grid">
           
           <!-- Param 1: K-Clusters Slider -->
           <div class="form-group">
             <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem;">
-              <label class="form-label" style="margin:0;">Số Lượng Cụm (K-Means / Autoencoder K):</label>
+              <label class="form-label" style="margin:0;" for="input-k">Số Lượng Cụm (K-Means / Autoencoder K):</label>
               <span class="param-val-badge" id="val-k-display" style="color:var(--accent); font-size:1rem;">K = 4</span>
             </div>
             <div class="param-slider-wrap">
@@ -122,7 +122,7 @@
 
           <!-- Param 2: Analysis Window -->
           <div class="form-group">
-            <label class="form-label">Cửa Sổ Thời Gian Phân Tích (Analysis Window)</label>
+            <label class="form-label" for="select-window">Cửa Sổ Thời Gian Phân Tích (Analysis Window)</label>
             <select id="select-window" class="form-control">
               <option value="12_months" selected>12 Tháng (Toàn bộ chu kỳ - Khuyến nghị)</option>
               <option value="6_months">6 Tháng Gần Nhất (Phát hiện xu hướng ngắn hạn)</option>
@@ -133,7 +133,7 @@
 
           <!-- Param 3: Algorithm Architecture -->
           <div class="form-group">
-            <label class="form-label">Thuật Toán Trích Xuất &amp; Phân Cụm</label>
+            <label class="form-label" for="select-algorithm">Thuật Toán Trích Xuất &amp; Phân Cụm</label>
             <select id="select-algorithm" class="form-control">
               <option value="autoencoder" selected>Deep Autoencoder Latent Space 3D (Non-linear)</option>
               <option value="kmeans">K-Means Truyền Thống (log1p + StandardScale)</option>
@@ -143,13 +143,13 @@
         </div>
 
         <!-- RFM Weights Sliders -->
-        <div style="background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-card-sm); padding:1.25rem; margin-bottom:1.5rem;">
+        <div style="background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-card-sm); padding:1.25rem; margin-bottom:1.5rem;" class="workspace-inset">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-            <h4 style="font-size:0.9375rem; font-weight:700;">Trọng Số Ưu Tiên Các Biến RFM (Weighted Normalization):</h4>
+            <h4>Trọng số đặc trưng RFM</h4>
             <span style="font-size:0.75rem; font-family:monospace; color:var(--muted);">Tổng trọng số = 1.00</span>
           </div>
 
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(14rem, 1fr)); gap:1.25rem;">
+          <div style="display:grid; gap:1.25rem" class="weight-grid">
             <!-- Weight R -->
             <div>
               <div style="display:flex; justify-content:space-between; font-size:0.75rem; margin-bottom:0.25rem;">
@@ -179,7 +179,7 @@
           </div>
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;" class="workspace-actions-row">
           <div style="font-size:0.8125rem; color:var(--muted);">
             * Lệnh huấn luyện sẽ kích hoạt microservice tính lại tâm cụm, đo Silhouette Score &amp; Inertia rồi lưu vào Model Registry.
           </div>
@@ -194,14 +194,14 @@
     </div>
 
     <!-- SECTION 2: MODEL VERSIONING & REGISTRY COMPARISON TABLE -->
-    <div class="card-box" style="margin-bottom: 2rem;">
+    <div class="card-box workspace-panel registry-panel" style="margin-bottom: 2rem;" id="models-registry">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
         <div>
           <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
             <span class="eyebrow-dot" style="background:var(--accent);"></span>
-            <span>Tính năng: MLOps Model Registry &amp; Comparison</span>
+            <span>MODEL REGISTRY</span>
           </div>
-          <h2 style="font-size:1.25rem; font-weight:700;">Bảng Quản Lý Phiên Bản Mô Hình (Model Versioning Registry)</h2>
+          <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><span>Phiên bản mô hình</span></h2>
           <p style="font-size:0.8125rem; color:var(--muted);">
             Lịch sử các phiên bản mô hình, đối chiếu trực tiếp Silhouette Score, Inertia (WCSS) và thao tác thăng cấp phục vụ (Promote to Production).
           </p>
@@ -234,30 +234,30 @@
     <!-- SECTION 3: WHAT-IF ANALYSIS & REALTIME INFERENCE -->
     <div class="dashboard-row-2">
       <!-- What-if Form -->
-      <div class="card-box" style="display:flex; flex-direction:column; justify-content:space-between;">
+      <div class="card-box workspace-panel" style="display:flex; flex-direction:column; justify-content:space-between;" id="models-whatif">
         <div>
           <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
             <span class="eyebrow-dot" style="background:var(--accent);"></span>
-            <span>Tính năng: What-if Analysis</span>
+            <span>RFM SIMULATOR</span>
           </div>
-          <h2 style="font-size:1.25rem; font-weight:700; margin-bottom:0.5rem;">Dự Đoán Thời Gian Thực (What-if Simulator)</h2>
+          <h2 style="margin-bottom:0.5rem" class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#users"/></svg><span>Thử phân khúc khách hàng</span></h2>
           <p style="font-size:0.8125rem; color:var(--muted); margin-bottom:1rem;">
             Nhập thử hành vi của một khách hàng bất kỳ để áp dụng mô hình đang Serving và phân loại phân khúc tức thì.
           </p>
 
-          <form id="form-whatif">
+          <form id="form-whatif" class="whatif-fields">
             <div class="form-group" style="margin-bottom:0.75rem;">
-              <label class="form-label">Recency (Số ngày kể từ lần mua gần nhất)</label>
+              <label class="form-label" for="whatif-r">Recency (Số ngày kể từ lần mua gần nhất)</label>
               <input type="number" id="whatif-r" class="form-control" value="28" min="1" required />
             </div>
 
             <div class="form-group" style="margin-bottom:0.75rem;">
-              <label class="form-label">Frequency (Tổng số đơn hàng đã mua)</label>
+              <label class="form-label" for="whatif-f">Frequency (Tổng số đơn hàng đã mua)</label>
               <input type="number" id="whatif-f" class="form-control" value="10" min="1" required />
             </div>
 
             <div class="form-group" style="margin-bottom:1.25rem;">
-              <label class="form-label">Monetary (Tổng tiền chi tiêu tích lũy £)</label>
+              <label class="form-label" for="whatif-m">Monetary (Tổng tiền chi tiêu tích lũy £)</label>
               <input type="number" id="whatif-m" class="form-control" value="1743" min="1" step="any" required />
             </div>
 
@@ -276,7 +276,7 @@
             <span class="cluster-badge vip" id="whatif-badge">VIP / CHAMPIONS</span>
             <span style="font-size:0.75rem; color:rgba(255,255,255,0.5);" id="whatif-dist">Khoảng cách tâm: 0.18</span>
           </div>
-          <h3 style="font-size:1.125rem; font-weight:700;" id="whatif-title">Khách Hàng VIP / Champions</h3>
+          <h3 id="whatif-title">Khách Hàng VIP / Champions</h3>
           
           <div id="whatif-latent-coords" style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-block:0.25rem;">
             <span class="latent-chip" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.2); color:#ffffff;">z₁: 1.82</span>
@@ -291,19 +291,19 @@
       </div>
 
       <!-- SECTION 4: DATA ACTIVATION & DYNAMIC CRM API GENERATOR -->
-      <div class="card-box" style="display:flex; flex-direction:column; justify-content:space-between;">
+      <div class="card-box workspace-panel" style="display:flex; flex-direction:column; justify-content:space-between;" id="models-activation">
         <div>
           <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
             <span class="eyebrow-dot" style="background:var(--accent);"></span>
-            <span>Tính năng: Data Activation &amp; CRM Sync</span>
+            <span>DATA ACTIVATION</span>
           </div>
-          <h2 style="font-size:1.25rem; font-weight:700; margin-bottom:0.5rem;">Trình Sinh Dynamic CRM API &amp; Webhook</h2>
+          <h2 style="margin-bottom:0.5rem" class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#workflow"/></svg><span>Đồng bộ CRM &amp; API</span></h2>
           <p style="font-size:0.8125rem; color:var(--muted); margin-bottom:1rem;">
             Thay vì xuất file Excel thủ công, sinh API endpoint / Webhook tự động đẩy danh sách khách hàng sang hệ thống CRM (HubSpot, Salesforce, Zalo OA).
           </p>
 
           <div class="form-group" style="margin-bottom:0.75rem;">
-            <label class="form-label">Chọn Phân Khúc Mục Tiêu</label>
+            <label class="form-label" for="activation-segment">Chọn Phân Khúc Mục Tiêu</label>
             <select id="activation-segment" class="form-control">
               <option value="at-risk" selected>Khách hàng Có nguy cơ rời bỏ (At Risk - Churn Prevention)</option>
               <option value="champions">Khách hàng VIP / Champions (Loyalty &amp; VIP Event)</option>
@@ -313,7 +313,7 @@
           </div>
 
           <div class="form-group" style="margin-bottom:0.75rem;">
-            <label class="form-label">Phương Thức Đồng Bộ</label>
+            <label class="form-label" for="activation-protocol">Phương Thức Đồng Bộ</label>
             <select id="activation-protocol" class="form-control">
               <option value="REST_PULL" selected>Internal REST API Feed (CRM chủ động gọi GET)</option>
               <option value="WEBHOOK_PUSH">Automated Webhook (DWH tự động PUSH khi có cụm mới)</option>
@@ -346,6 +346,8 @@ curl -X GET 'http://localhost:8001/api/v1/activation/segments/at-risk/feed?api_k
       </div>
     </div>
   </main>
+
+  <footer class="portal-footer"><div class="shell"><span>RetailPulse / Data Warehouse &amp; Data Mining</span><a href="index.html?ui=workspace-20261018-ux1">Về trang giới thiệu &rarr;</a></div></footer>
 
   <script type="module">
     import { initClock } from './js/clock.js';
@@ -533,5 +535,6 @@ curl -X GET 'http://localhost:8001/api/v1/activation/segments/at-risk/feed?api_k
       }, 500);
     });
   </script>
+  <script type="module" src="js/sidebar.js?ui=workspace-20261018-ux1"></script>
 </body>
 </html>

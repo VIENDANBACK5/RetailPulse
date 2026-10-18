@@ -9,308 +9,54 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/variables.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/base.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/components.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/pages.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/refinements.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/workspace.css?ui=workspace-20261018-ux1">
 </head>
-<body>
-  <!-- Header -->
-  <header class="portal-header">
-    <div class="shell portal-header-shell">
-      <a href="index.html" class="brand-wrap">
-        <svg viewBox="0 0 48 48" fill="currentColor">
-          <path d="M24 2c2.2 13.8 7.9 19.6 22 22-14.1 2.4-19.8 8.2-22 22-2.2-13.8-7.9-19.6-22-22 14.1-2.4 19.8-8.2 22-22Z"/>
-        </svg>
-        <span>RetailPulse <span style="font-weight:400; font-size:0.875rem; color:var(--muted);">/ DataOps &amp; MLOps</span></span>
-      </a>
+<body class="portal-app has-sidebar dashboard-workspace">
+  <a href="#main" class="skip-link">Chuyển đến nội dung chính</a>
 
-      <nav class="portal-nav-links" aria-label="Điều hướng">
-        <div class="portal-nav-item"><a href="index.html">Trang chủ</a></div>
-        <div class="portal-nav-item"><a href="dashboard.html" class="active">📊 DataOps Overview</a></div>
-        <div class="portal-nav-item"><a href="operations.html">📥 Ingestion &amp; Nodes</a></div>
-        <div class="portal-nav-item"><a href="etl-monitor.html">⚡ Pipeline &amp; Kafka</a></div>
-        <div class="portal-nav-item"><a href="customer-segments.html">🧠 MLOps &amp; Registry</a></div>
-      </nav>
-
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <span class="status-pill success">
-          <span style="width:6px; height:6px; border-radius:50%; background:currentColor;"></span>
-          DataOps Platform Active
-        </span>
-        <div class="clock-chip" style="display: flex;">
-          <span id="live-time-str">9:41pm</span>
-        </div>
-      </div>
-    </div>
+  <aside class="workspace-sidebar" id="app-sidebar" aria-label="Thanh điều hướng workspace">
+    <button class="sidebar-close" id="sidebar-close" type="button" aria-label="Đóng điều hướng"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#close"/></svg></button>
+    <a class="workspace-brand" href="index.html?ui=workspace-20261018-ux1" aria-label="RetailPulse - Trang chủ"><span class="workspace-brand-mark"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#brand"/></svg></span>RetailPulse</a>
+    <div class="workspace-identity"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><div><strong>Retail Analytics</strong><small>Data Warehouse &amp; Mining</small></div></div>
+    <nav aria-label="Điều hướng chính"><div class="sidebar-label">WORKSPACE</div><div class="sidebar-nav"><a class="sidebar-link active" href="dashboard.html?ui=workspace-20261018-ux1" aria-current="page"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#layout"/></svg><span>Tổng quan</span><span class="sidebar-active-dot" aria-hidden="true"></span></a><a class="sidebar-link" href="operations.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><span>Dữ liệu &amp; chi nhánh</span></a><a class="sidebar-link" href="etl-monitor.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#workflow"/></svg><span>Pipeline &amp; Kafka</span></a><a class="sidebar-link" href="customer-segments.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#users"/></svg><span>Mô hình &amp; phân khúc</span></a></div></nav>
+    <nav class="sidebar-secondary" aria-label="Truy cập báo cáo"><div class="sidebar-label">BÁO CÁO</div><div class="sidebar-nav">
+      <a class="sidebar-link" href="dashboard.html?ui=workspace-20261018-ux1#revenue-section"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#chart"/></svg><span>Giá trị giao dịch</span></a>
+      <a class="sidebar-link" href="dashboard.html?ui=workspace-20261018-ux1#branch-section"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#package"/></svg><span>Chi nhánh &amp; tồn kho</span></a>
+      <a class="sidebar-link" href="dashboard.html?ui=workspace-20261018-ux1#system-status"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#activity"/></svg><span>Trạng thái hệ thống</span></a>
+    </div></nav>
+    <div class="sidebar-bottom"><a class="sidebar-link" href="index.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#arrow-up-right"/></svg><span>Giới thiệu dự án</span></a><div class="sidebar-project"><span class="project-monogram">RP</span><div><strong>RetailPulse Project</strong><small>Data Warehouse &amp; Data Mining</small></div></div></div>
+  </aside>
+  <button class="sidebar-backdrop" id="sidebar-backdrop" type="button" aria-label="Đóng thanh điều hướng" tabindex="-1" hidden></button>
+  <header class="workspace-topbar">
+    <div class="workspace-breadcrumb"><button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Mở điều hướng" aria-controls="app-sidebar" aria-expanded="false"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#menu"/></svg></button><span>Workspace</span><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#chevron"/></svg><strong>Tổng quan</strong></div>
+    <div class="workspace-topbar-meta"><span class="dashboard-demo">Không gian demo</span><div class="clock-chip"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#clock"/></svg><span id="live-time-str">--:--</span></div></div>
   </header>
 
-  <!-- Page Banner -->
-  <section class="page-banner">
-    <div class="shell">
-      <div class="page-title-wrap">
-        <div>
-          <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
-            <span class="eyebrow-dot" style="background:var(--accent);"></span>
-            <span>DataOps &amp; MLOps Executive Dashboard • Lifecycle Overview</span>
-          </div>
-          <h1 class="page-title">Bảng Điều Khiển Tổng Quan DataOps &amp; MLOps</h1>
-          <p class="page-subtitle">Giám sát toàn diện vòng đời dữ liệu và mô hình: Data Profiling Quality Score, luồng Kafka sự kiện thời gian thực, mô hình Active Serving và Star Schema DWH.</p>
-        </div>
-        <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
-          <a href="operations.html" class="pill-btn btn-sm variant-dark">Nạp &amp; Validate Dữ Liệu</a>
-          <a href="customer-segments.html" class="pill-btn btn-sm variant-outline">Model Registry &amp; Tuning</a>
-        </div>
-      </div>
+  <main class="dashboard-main" id="main">
+    <section class="dashboard-intro" aria-labelledby="dashboard-title">
+      <div><div class="dashboard-overline">RETAIL INTELLIGENCE</div><h1 id="dashboard-title">Tổng quan hoạt động</h1><p>Dữ liệu bán lẻ, sức khỏe hệ thống và mô hình khách hàng.</p></div>
+      <div class="dashboard-actions"><button class="pill-btn variant-outline" type="button" id="btn-refresh-kpis"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#refresh"/></svg>Làm mới số liệu</button><a class="pill-btn variant-dark" href="operations.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#upload"/></svg>Nạp dữ liệu</a></div>
+    </section>
+    <section class="dashboard-metrics" aria-label="Các chỉ số tổng quan"><article class="metric-card revenue-metric"><div class="metric-heading"><span>Giá trị giao dịch</span><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#wallet"/></svg></div><div class="metric-value " id="kpi-revenue">1,842,500 £</div><p class="metric-caption">30,000 giao dịch · Đối soát 100% khớp</p></article><article class="metric-card"><div class="metric-heading"><span>Chất lượng dữ liệu</span><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#shield"/></svg></div><div class="metric-value " id="kpi-quality">96.2%</div><p class="metric-caption"><strong>948 / 1,000</strong> dòng hợp lệ</p></article><article class="metric-card"><div class="metric-heading"><span>Thông lượng sự kiện</span><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#activity"/></svg></div><div class="metric-value " id="kpi-stream">42.8 <small>msg/s</small></div><p class="metric-caption">Độ trễ xử lý &lt; 15 ms</p></article><article class="metric-card"><div class="metric-heading"><span>Mô hình đang phục vụ</span><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#boxes"/></svg></div><div class="metric-value model-value" id="kpi-model">v2.0-autoencoder</div><p class="metric-caption">Silhouette <strong>0.3214</strong> · MSE 0.0120</p></article></section>
+    <div class="dashboard-panels">
+      <section class="dashboard-panel" id="revenue-section" aria-labelledby="revenue-title">
+        <div class="panel-heading"><div><h2 id="revenue-title">Xu hướng giá trị giao dịch</h2><p>Phân bố theo tháng · Đơn vị: nghìn GBP</p></div><span class="chart-legend">Giá trị mua</span></div>
+        <div class="transaction-chart" id="revenue-bar-chart"><div class="chart-y-axis" aria-hidden="true"><span>300k</span><span>225k</span><span>150k</span><span>75k</span><span>0</span></div><div class="chart-plot"><div class="transaction-column" tabindex="0" role="img" aria-label="Tháng 1: 120,000 GBP" style="--bar-height:40.000%"><span class="chart-tooltip">120,000 GBP</span><div class="transaction-bar-space"><div class="transaction-bar"></div></div><span class="transaction-month">T1</span></div><div class="transaction-column" tabindex="0" role="img" aria-label="Tháng 2: 145,000 GBP" style="--bar-height:48.333%"><span class="chart-tooltip">145,000 GBP</span><div class="transaction-bar-space"><div class="transaction-bar"></div></div><span class="transaction-month">T2</span></div><div class="transaction-column" tabindex="0" role="img" aria-label="Tháng 3: 190,000 GBP" style="--bar-height:63.333%"><span class="chart-tooltip">190,000 GBP</span><div class="transaction-bar-space"><div class="transaction-bar"></div></div><span class="transaction-month">T3</span></div><div class="transaction-column" tabindex="0" role="img" aria-label="Tháng 4: 160,000 GBP" style="--bar-height:53.333%"><span class="chart-tooltip">160,000 GBP</span><div class="transaction-bar-space"><div class="transaction-bar"></div></div><span class="transaction-month">T4</span></div><div class="transaction-column" tabindex="0" role="img" aria-label="Tháng 5: 210,000 GBP" style="--bar-height:70.000%"><span class="chart-tooltip">210,000 GBP</span><div class="transaction-bar-space"><div class="transaction-bar"></div></div><span class="transaction-month">T5</span></div><div class="transaction-column" tabindex="0" role="img" aria-label="Tháng 6: 260,000 GBP" style="--bar-height:86.667%"><span class="chart-tooltip">260,000 GBP</span><div class="transaction-bar-space"><div class="transaction-bar"></div></div><span class="transaction-month">T6</span></div><div class="transaction-column" tabindex="0" role="img" aria-label="Tháng 7: 230,000 GBP" style="--bar-height:76.667%"><span class="chart-tooltip">230,000 GBP</span><div class="transaction-bar-space"><div class="transaction-bar"></div></div><span class="transaction-month">T7</span></div><div class="transaction-column" tabindex="0" role="img" aria-label="Tháng 8: 180,000 GBP" style="--bar-height:60.000%"><span class="chart-tooltip">180,000 GBP</span><div class="transaction-bar-space"><div class="transaction-bar"></div></div><span class="transaction-month">T8</span></div><div class="transaction-column" tabindex="0" role="img" aria-label="Tháng 9: 220,000 GBP" style="--bar-height:73.333%"><span class="chart-tooltip">220,000 GBP</span><div class="transaction-bar-space"><div class="transaction-bar"></div></div><span class="transaction-month">T9</span></div><div class="transaction-column" tabindex="0" role="img" aria-label="Tháng 10: 275,000 GBP" style="--bar-height:91.667%"><span class="chart-tooltip">275,000 GBP</span><div class="transaction-bar-space"><div class="transaction-bar"></div></div><span class="transaction-month">T10</span></div></div></div>
+        <div class="panel-footnote"><span>Di chuột hoặc dùng Tab để xem giá trị</span><span>Dữ liệu minh họa · 10 tháng</span></div>
+      </section>
+      <section class="dashboard-panel" id="system-status" aria-labelledby="system-title"><div class="panel-heading"><div><h2 id="system-title">Trạng thái hệ thống</h2><p>DWH, xử lý sự kiện và mô hình</p></div><span class="panel-tag">5 dịch vụ</span></div><div class="service-list"><div class="service-row"><span class="service-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg></span><div class="service-copy"><strong>PostgreSQL DWH</strong><small>Star Schema · cổng 5433</small></div><span class="service-status" role="img" aria-label="HEALTHY" title="HEALTHY"></span></div><div class="service-row"><span class="service-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#workflow"/></svg></span><div class="service-copy"><strong>Kafka Broker</strong><small>retail.orders.event · retail.inventory.event</small></div><span class="service-status" role="img" aria-label="STREAMING" title="STREAMING"></span></div><div class="service-row"><span class="service-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#boxes"/></svg></span><div class="service-copy"><strong>Autoencoder</strong><small>Latent space 3D · Silhouette 0.3214</small></div><span class="service-status" role="img" aria-label="CONVERGED" title="CONVERGED"></span></div><div class="service-row"><span class="service-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#map"/></svg></span><div class="service-copy"><strong>Spatial Haversine</strong><small>HN ↔ DN: 605.9 km · DN ↔ SG: 606.0 km</small></div><span class="service-status" role="img" aria-label="ROUTING" title="ROUTING"></span></div><div class="service-row"><span class="service-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#shield"/></svg></span><div class="service-copy"><strong>Pipeline security</strong><small>HMAC-SHA256 · Secure Staging</small></div><span class="service-status" role="img" aria-label="SECURED" title="SECURED"></span></div></div></section>
     </div>
-  </section>
-
-  <!-- Main Content -->
-  <main class="shell" style="padding-bottom: 5rem;">
-    <!-- 4-Pillars Advanced Tech Status Bar -->
-    <div class="card-box" style="margin-bottom: 1.5rem; padding: 0.875rem 1.25rem; background: var(--ink); color: #ffffff;">
-      <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:1rem;">
-        <div style="display:flex; align-items:center; gap:0.5rem;">
-          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#22c55e; box-shadow:0 0 8px #22c55e;"></span>
-          <span style="font-weight:700; font-size:0.8125rem; letter-spacing:0.02em;">VÒNG ĐỜI DỮ LIỆU &amp; MÔ HÌNH (DATAOPS &amp; MLOPS STACK):</span>
-        </div>
-        <div style="display:flex; flex-wrap:wrap; gap:1.25rem; font-size:0.75rem; color:rgba(255,255,255,0.85);">
-          <span><strong>📥 Ingestion Profiling:</strong> 96.2% Clean</span>
-          <span><strong>⚡ Kafka Broker:</strong> 42.8 msg/s (<15ms)</span>
-          <span><strong>🧠 Active Serving:</strong> v2.0-autoencoder (Sil: 0.321)</span>
-          <span><strong>🌐 Data Activation:</strong> CRM API / Webhook Ready</span>
-        </div>
-      </div>
+    <div class="dashboard-panels">
+      <section class="dashboard-panel" id="branch-section" aria-labelledby="branch-title"><div class="panel-heading"><div><h2 id="branch-title">Hiệu quả theo chi nhánh</h2><p>Giá trị bán hàng, tỷ trọng và tồn kho</p></div><span class="panel-tag">3 chi nhánh</span></div><div class="branch-table-wrap"><table class="branch-table"><caption class="sr-only">Giá trị giao dịch và tồn kho của Hà Nội, Sài Gòn và Đà Nẵng</caption><thead><tr><th scope="col">Chi nhánh</th><th scope="col">Giá trị giao dịch</th><th scope="col">Tỷ trọng</th><th scope="col">Tồn kho</th></tr></thead><tbody><tr><td><span class="branch-name"><span class="branch-code">HN</span>Hà Nội</span></td><td>829,125 £</td><td><span class="branch-share">45%<span class="branch-share-track"><i style="--share:45%"></i></span></span></td><td>650 SP</td></tr><tr><td><span class="branch-name"><span class="branch-code">SG</span>Sài Gòn</span></td><td>589,600 £</td><td><span class="branch-share">32%<span class="branch-share-track"><i style="--share:32%"></i></span></span></td><td>420 SP</td></tr><tr><td><span class="branch-name"><span class="branch-code">DN</span>Đà Nẵng</span></td><td>423,775 £</td><td><span class="branch-share">23%<span class="branch-share-track"><i style="--share:23%"></i></span></span></td><td>180 SP</td></tr></tbody></table></div></section>
+      <section class="dashboard-panel" aria-labelledby="actions-title"><div class="panel-heading"><div><h2 id="actions-title">Thao tác nhanh</h2><p>Tiếp tục công việc trong workspace</p></div></div><div class="quick-actions"><a class="quick-action" href="operations.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#upload"/></svg><span><strong>Nạp &amp; kiểm tra dữ liệu</strong><small>CSV, SQL và JSON từ các chi nhánh</small></span><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#arrow-right"/></svg></a><a class="quick-action" href="etl-monitor.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#workflow"/></svg><span><strong>Điều phối pipeline</strong><small>Theo dõi ETL và luồng sự kiện Kafka</small></span><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#arrow-right"/></svg></a><a class="quick-action" href="customer-segments.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#users"/></svg><span><strong>Khám phá phân khúc</strong><small>Tinh chỉnh mô hình và hồ sơ khách hàng</small></span><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#arrow-right"/></svg></a></div></section>
     </div>
-
-    <!-- 4 Core KPI Cards -->
-    <div class="kpi-grid">
-      <!-- KPI 1 -->
-      <div class="kpi-card">
-        <div class="kpi-top">
-          <span class="kpi-label">Chất Lượng Dữ Liệu (Quality Score)</span>
-          <div class="kpi-icon">🛡️</div>
-        </div>
-        <div class="kpi-val" id="kpi-quality">96.2%</div>
-        <div class="kpi-sub" style="color:var(--success);">Data Profiler: 948/1000 dòng hợp lệ</div>
-      </div>
-
-      <!-- KPI 2 -->
-      <div class="kpi-card">
-        <div class="kpi-top">
-          <span class="kpi-label">Thông Lượng Kafka Stream</span>
-          <div class="kpi-icon">⚡</div>
-        </div>
-        <div class="kpi-val" id="kpi-stream">42.8 <span style="font-size:1rem; font-weight:400; color:var(--muted);">msg/s</span></div>
-        <div class="kpi-sub" style="color:var(--success);">Độ trễ xử lý trượt &lt; 15ms</div>
-      </div>
-
-      <!-- KPI 3 -->
-      <div class="kpi-card">
-        <div class="kpi-top">
-          <span class="kpi-label">Mô Hình Đang Phục Vụ (Serving)</span>
-          <div class="kpi-icon">🧠</div>
-        </div>
-        <div class="kpi-val" style="font-size:1.5rem;" id="kpi-model">v2.0-autoencoder</div>
-        <div class="kpi-sub">Silhouette: <strong>0.3214</strong> (MSE: 0.0120)</div>
-      </div>
-
-      <!-- KPI 4 -->
-      <div class="kpi-card">
-        <div class="kpi-top">
-          <span class="kpi-label">FactSales DWH Aggregates</span>
-          <div class="kpi-icon">£</div>
-        </div>
-        <div class="kpi-val" id="kpi-revenue">1,842,500 £</div>
-        <div class="kpi-sub" style="color:var(--success);">30,000 giao dịch (Đối soát 100% khớp)</div>
-      </div>
-    </div>
-
-    <!-- Charts Row -->
-    <div class="dashboard-row-2">
-      <!-- Main Chart: Monthly Revenue -->
-      <div class="chart-box">
-        <div class="chart-header">
-          <div>
-            <h2 class="chart-title">Xu Hướng Doanh Số Bán Lẻ Theo Tháng (FactSales)</h2>
-            <div style="font-size:0.75rem; color:var(--muted);">Dữ liệu tổng hợp từ nguồn UCI kết hợp đơn bán trực tiếp tại chi nhánh</div>
-          </div>
-          <span class="status-pill info">Chuẩn DimDate</span>
-        </div>
-
-        <!-- Custom SVG Bar Chart -->
-        <div class="svg-chart-wrap" id="revenue-bar-chart">
-          <div class="bar-col">
-            <span style="font-size:0.65rem; color:var(--muted);">120k</span>
-            <div class="bar-fill" style="height: 45%;"></div>
-            <span class="bar-label">T1</span>
-          </div>
-          <div class="bar-col">
-            <span style="font-size:0.65rem; color:var(--muted);">145k</span>
-            <div class="bar-fill" style="height: 55%;"></div>
-            <span class="bar-label">T2</span>
-          </div>
-          <div class="bar-col">
-            <span style="font-size:0.65rem; color:var(--muted);">190k</span>
-            <div class="bar-fill" style="height: 70%;"></div>
-            <span class="bar-label">T3</span>
-          </div>
-          <div class="bar-col">
-            <span style="font-size:0.65rem; color:var(--muted);">160k</span>
-            <div class="bar-fill" style="height: 60%;"></div>
-            <span class="bar-label">T4</span>
-          </div>
-          <div class="bar-col">
-            <span style="font-size:0.65rem; color:var(--muted);">210k</span>
-            <div class="bar-fill" style="height: 80%;"></div>
-            <span class="bar-label">T5</span>
-          </div>
-          <div class="bar-col">
-            <span style="font-size:0.65rem; color:var(--muted);">260k</span>
-            <div class="bar-fill" style="height: 95%; background:var(--accent);"></div>
-            <span class="bar-label" style="font-weight:700; color:var(--foreground);">T6</span>
-          </div>
-          <div class="bar-col">
-            <span style="font-size:0.65rem; color:var(--muted);">230k</span>
-            <div class="bar-fill" style="height: 85%;"></div>
-            <span class="bar-label">T7</span>
-          </div>
-          <div class="bar-col">
-            <span style="font-size:0.65rem; color:var(--muted);">180k</span>
-            <div class="bar-fill" style="height: 68%;"></div>
-            <span class="bar-label">T8</span>
-          </div>
-          <div class="bar-col">
-            <span style="font-size:0.65rem; color:var(--muted);">220k</span>
-            <div class="bar-fill" style="height: 82%;"></div>
-            <span class="bar-label">T9</span>
-          </div>
-          <div class="bar-col">
-            <span style="font-size:0.65rem; color:var(--muted);">275k</span>
-            <div class="bar-fill" style="height: 100%; background:var(--accent-from);"></div>
-            <span class="bar-label" style="font-weight:700; color:var(--accent);">T10</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Infrastructure Health -->
-      <div class="chart-box">
-        <div class="chart-header">
-          <h2 class="chart-title">Trạng Thái Hạ Tầng &amp; 4 Trụ Cột</h2>
-          <span class="status-pill success">100% Healthy</span>
-        </div>
-
-        <div class="health-list">
-          <div class="health-item">
-            <div>
-              <div style="font-weight:600;">PostgreSQL DWH (Star Schema)</div>
-              <div style="font-size:0.6875rem; color:var(--muted);">Cổng 5433 • retail_dwh_db</div>
-            </div>
-            <span class="status-pill success">HEALTHY</span>
-          </div>
-
-          <div class="health-item">
-            <div>
-              <div style="font-weight:600;">Apache Kafka Broker (Pillar 1)</div>
-              <div style="font-size:0.6875rem; color:var(--muted);">Topics: retail.orders.event, retail.inventory.event</div>
-            </div>
-            <span class="status-pill success">STREAMING</span>
-          </div>
-
-          <div class="health-item">
-            <div>
-              <div style="font-weight:600;">Deep Learning Autoencoder (Pillar 2)</div>
-              <div style="font-size:0.6875rem; color:var(--muted);">Latent Space 3D • Silhouette Score = 0.3214</div>
-            </div>
-            <span class="status-pill success">CONVERGED</span>
-          </div>
-
-          <div class="health-item">
-            <div>
-              <div style="font-weight:600;">Spatial Haversine Routing (Pillar 3)</div>
-              <div style="font-size:0.6875rem; color:var(--muted);">HN &leftrightarrow; DN (605.9 km) • DN &leftrightarrow; SG (606.0 km)</div>
-            </div>
-            <span class="status-pill success">ROUTING</span>
-          </div>
-
-          <div class="health-item">
-            <div>
-              <div style="font-weight:600;">HMAC-SHA256 Pipeline Security (Pillar 4)</div>
-              <div style="font-size:0.6875rem; color:var(--muted);">Secure Staging Lake • Tamper Detection</div>
-            </div>
-            <span class="status-pill success">SECURED</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom Row: Branch Contribution & Recent DWH Snapshots -->
-    <div class="dashboard-row-2">
-      <!-- Branch Revenue Breakdown -->
-      <div class="card-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-          <h3 style="font-size:1.125rem; font-weight:600;">Cơ Cấu Doanh Số &amp; Tồn Kho 3 Chi Nhánh</h3>
-          <span style="font-size:0.75rem; color:var(--muted);">Bảng DimBranch</span>
-        </div>
-
-        <div style="display:flex; flex-direction:column; gap:1rem;">
-          <div>
-            <div style="display:flex; justify-content:space-between; font-size:0.8125rem; margin-bottom:0.25rem;">
-              <span>Chi nhánh Hà Nội (HN)</span>
-              <strong>45% (829,125 £) • Tồn: 650 SP</strong>
-            </div>
-            <div style="height:8px; background:var(--surface); border-radius:999px; overflow:hidden;">
-              <div style="height:100%; width:45%; background:var(--accent-from);"></div>
-            </div>
-          </div>
-
-          <div>
-            <div style="display:flex; justify-content:space-between; font-size:0.8125rem; margin-bottom:0.25rem;">
-              <span>Chi nhánh Sài Gòn (SG)</span>
-              <strong>32% (589,600 £) • Tồn: 420 SP</strong>
-            </div>
-            <div style="height:8px; background:var(--surface); border-radius:999px; overflow:hidden;">
-              <div style="height:100%; width:32%; background:var(--accent);"></div>
-            </div>
-          </div>
-
-          <div>
-            <div style="display:flex; justify-content:space-between; font-size:0.8125rem; margin-bottom:0.25rem;">
-              <span>Chi nhánh Đà Nẵng (DN)</span>
-              <strong>23% (423,775 £) • Tồn: 180 SP</strong>
-            </div>
-            <div style="height:8px; background:var(--surface); border-radius:999px; overflow:hidden;">
-              <div style="height:100%; width:23%; background:var(--muted);"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="card-box" style="display:flex; flex-direction:column; justify-content:space-between;">
-        <div>
-          <h3 style="font-size:1.125rem; font-weight:600; margin-bottom:0.5rem;">Phím Tắt Quản Trị DataOps &amp; MLOps</h3>
-          <p style="font-size:0.8125rem; color:var(--muted); margin-bottom:1rem;">Truy cập nhanh các phân hệ chuyên sâu để vận hành vòng đời dữ liệu và thuật toán.</p>
-        </div>
-
-        <div style="display:flex; flex-direction:column; gap:0.5rem;">
-          <a href="operations.html" class="pill-btn variant-light" style="justify-content:space-between;">
-            <span>📥 Nạp &amp; Profiling Dữ Liệu Nguồn (Validation)</span>
-            <span>&rarr;</span>
-          </a>
-          <a href="etl-monitor.html" class="pill-btn variant-light" style="justify-content:space-between;">
-            <span>⚡ Điều Phối Microservices &amp; Kafka Control</span>
-            <span>&rarr;</span>
-          </a>
-          <a href="customer-segments.html" class="pill-btn variant-light" style="justify-content:space-between;">
-            <span>🧠 MLOps Registry &amp; Tinh Chỉnh Siêu Tham Số</span>
-            <span>&rarr;</span>
-          </a>
-        </div>
-      </div>
-    </div>
+    <div class="dashboard-bottom-note"><span>RetailPulse · Data Warehouse &amp; Data Mining</span><a href="customer-segments.html?ui=workspace-20261018-ux1">Model Registry &amp; Tuning <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#arrow-up-right"/></svg></a></div>
   </main>
-
   <script type="module">
     import { initClock } from './js/clock.js';
     import { showToast } from './js/app.js';
@@ -324,5 +70,6 @@
       }, 600);
     });
   </script>
+  <script type="module" src="js/sidebar.js?ui=workspace-20261018-ux1"></script>
 </body>
 </html>

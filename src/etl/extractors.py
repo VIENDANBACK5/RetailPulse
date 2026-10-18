@@ -4,7 +4,7 @@ import time
 import requests
 import pandas as pd
 from sqlalchemy import text
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any
 
 if sys.platform == "win32":
     try:

@@ -8,8 +8,6 @@ Kiểm thử toàn diện các tính năng mới:
 
 import sys
 import os
-import json
-import pandas as pd
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if PROJECT_ROOT not in sys.path:

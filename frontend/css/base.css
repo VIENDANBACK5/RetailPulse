@@ -13,11 +13,8 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Adaptive Grid media queries */
-@media (max-width: 1920px) { html { font-size: 0.833333vw; } }
-@media (max-width: 1440px) { html { font-size: 1.111111vw; } }
-@media (max-width: 1024px) { html { font-size: 1.5625vw; } }
-@media (max-width: 640px)  { html { font-size: 4.444444vw; } }
+/* Keep readable type across breakpoints; component layouts do the adapting. */
+html { text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
 
 body {
   background: var(--background);
@@ -26,6 +23,12 @@ body {
   overflow-x: hidden;
   line-height: 1.5;
 }
+
+input, select, textarea { font: inherit; color: inherit; }
+h1, h2, h3, h4 { color: inherit; text-wrap: balance; }
+p { text-wrap: pretty; }
+svg { flex-shrink: 0; }
+[hidden] { display: none !important; }
 
 body.dark-mode {
   background: var(--ink);

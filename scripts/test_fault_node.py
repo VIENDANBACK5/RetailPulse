@@ -7,7 +7,6 @@ Script kiểm thử kịch bản chịu lỗi mất kết nối (Fault Tolerance
 
 import os
 import sys
-import time
 
 if sys.platform == "win32":
     try:

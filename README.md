@@ -315,8 +315,10 @@ docker ps
 python scripts/load_multistore_to_dwh.py
 
 # 4. Chạy HTTP server phục vụ giao diện Web DataOps
-python -m http.server 5173
+python scripts/serve_frontend.py
 ```
+
+Server giao diện luôn phục vụ đúng thư mục dự án và tắt cache trình duyệt để các trang HTML, CSS và icon cập nhật ngay khi chỉnh sửa.
 
 Truy cập hệ thống tại:
 * **Giao diện Web DataOps Portal:** [http://localhost:5173/frontend/index.html](http://localhost:5173/frontend/index.html)

@@ -4,33 +4,33 @@
    ========================================================================== */
 :root {
   /* Color Palette */
-  --background: #ffffff;
-  --foreground: #111111;
-  --ink: #0a0a0a;
-  --ink-soft: #161616;
-  --ink-card: #121212;
-  --muted: #8d8d8d;
-  --subtle: #b6b6b6;
-  --line: #e6e5e2;
+  --background: #f7f8fa;
+  --foreground: #263247;
+  --ink: #182538;
+  --ink-soft: #1f2e43;
+  --ink-card: #223148;
+  --muted: #657187;
+  --subtle: #8a95a7;
+  --line: #e4e8ef;
   --line-dark: rgba(255, 255, 255, 0.12);
-  --surface: #f1f0ee;
-  --surface-2: #e3e2df;
-  --accent: #b15f2c;
-  --accent-from: #cf8047;
-  --accent-to: #97501f;
-  --accent-light: rgba(177, 95, 44, 0.12);
-  --hero-from: #ecebe9;
-  --hero-to: #c9c9c9;
+  --surface: #f2f4f7;
+  --surface-2: #d9e0e9;
+  --accent: #a9562b;
+  --accent-from: #c27846;
+  --accent-to: #a2532c;
+  --accent-light: #faf0e8;
+  --hero-from: #fcfaf7;
+  --hero-to: #eee9e2;
 
   /* Status Colors */
-  --success: #10b981;
-  --success-bg: rgba(16, 185, 129, 0.12);
-  --warning: #f59e0b;
-  --warning-bg: rgba(245, 158, 11, 0.12);
-  --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.12);
-  --info: #3b82f6;
-  --info-bg: rgba(59, 130, 246, 0.12);
+  --success: #157456;
+  --success-bg: #eaf7f0;
+  --warning: #9c6214;
+  --warning-bg: #fff5df;
+  --danger: #c03c45;
+  --danger-bg: #fff0f1;
+  --info: #3569aa;
+  --info-bg: #edf4ff;
 
   /* Cluster Segment Badges */
   --badge-vip: #cf8047;
@@ -40,15 +40,17 @@
 
   /* Geometry & Radii */
   --radius-pill: 9999px;
-  --radius-card: 2rem;
-  --radius-card-sm: 1.25rem;
-  --radius-control: 0.875rem;
+  --radius-card: 1.5rem;
+  --radius-card-sm: 1rem;
+  --radius-control: 0.625rem;
   --radius-sm: 0.5rem;
 
   /* Typography & Layout */
   --font-main: 'Onest', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --text-watermark: 13rem;
-  --container-shell: 88rem;
+  --container-shell: 86rem;
+  --shadow-card: 0 2px 5px rgba(24, 37, 56, 0.025), 0 8px 24px rgba(24, 37, 56, 0.035);
+  --shadow-focus: 0 0 0 3px rgba(169, 86, 43, 0.13);
 
   /* Spring Animations & Easings */
   --spring-snappy: cubic-bezier(0.2, 0.8, 0.2, 1);

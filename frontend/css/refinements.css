@@ -1,0 +1,217 @@
+/* RetailPulse UI refinement. Presentation only; IDs and interaction logic stay intact. */
+.ui-icon { display: inline-block; width: 1.125rem; height: 1.125rem; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; vertical-align: -0.2em; }
+.dropzone-box > div:first-of-type .ui-icon { width: 2rem; height: 2rem; }
+
+/* Shared application chrome */
+.portal-app { min-height: 100vh; }
+
+.clock-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.portal-app .clock-chip { padding-left: 0.875rem; border-left: 1px solid var(--line); }
+
+/* Readable headers and clearly separated actions */
+.portal-app .page-banner {
+  background: transparent;
+  border-bottom: 0;
+  padding-block: 2.25rem 1.75rem;
+  margin-bottom: 0;
+}
+.portal-app .page-title-wrap { flex-direction: column; align-items: stretch; gap: 1.25rem; }
+.portal-app .page-title {
+  font-size: clamp(1.7rem, 2.4vw, 2.25rem);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+  letter-spacing: -0.045em;
+  margin-block: 0.5rem 0.625rem;
+}
+.portal-app .page-subtitle { max-width: 57rem; font-size: 0.875rem; line-height: 1.75; }
+.eyebrow { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.075em; line-height: 1.65; }
+.eyebrow.tone-dark { color: var(--muted); }
+.eyebrow.tone-dark .eyebrow-dot { background: var(--accent); }
+.page-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.625rem; }
+.portal-app main.shell { padding-bottom: 3.5rem !important; }
+.portal-app main.shell > .card-box { margin-bottom: 1.5rem !important; }
+.portal-app main.shell > .card-box > div:first-child h2 { line-height: 1.45; letter-spacing: -0.025em; }
+.portal-app main.shell > .card-box > div:first-child p { max-width: 58rem; margin-top: 0.375rem; line-height: 1.7; }
+
+/* Consistent controls, status, and keyboard focus */
+.pill-btn {
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.6875rem 1.125rem;
+  gap: 0.5rem;
+  border-radius: var(--radius-control);
+  line-height: 1.45;
+  text-align: center;
+  transition: background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+.pill-btn:hover { transform: translateY(-1px); }
+.pill-btn:active { transform: translateY(0); }
+.pill-btn.btn-sm { min-height: 2.375rem; padding: 0.5625rem 0.875rem; font-size: 0.75rem; }
+.pill-btn.no-arrow { padding: 0.75rem 1.25rem; }
+.pill-btn.has-arrow { padding: 0.375rem 0.375rem 0.375rem 1.125rem; gap: 0.875rem; }
+.pill-btn.variant-dark { box-shadow: 0 2px 3px rgba(24, 37, 56, 0.1); }
+.pill-btn.variant-dark:hover { background: #293c55; }
+.pill-btn.variant-outline { background: #ffffff; border-color: #d6dce5; }
+.pill-btn.variant-outline:hover { border-color: var(--accent-from); background: #fdfaf7; }
+.pill-btn.variant-light { border: 1px solid var(--line); }
+.pill-badge { border-radius: 0.4375rem; width: 2rem; height: 2rem; }
+button:disabled, .pill-btn:disabled { opacity: 0.6; cursor: wait; transform: none; }
+.status-pill { font-size: 0.6875rem; font-weight: 600; padding: 0.3125rem 0.625rem; line-height: 1.5; }
+.cluster-badge { text-transform: none; letter-spacing: 0; line-height: 1.5; }
+.form-label { color: var(--muted); text-transform: none; font-size: 0.75rem; font-weight: 600; letter-spacing: 0; }
+.form-control { background: #ffffff; min-height: 2.75rem; border-color: #d6dce5; line-height: 1.5; }
+.form-control:hover { border-color: #aeb8c8; }
+.form-control:focus { border-color: var(--accent-from); box-shadow: var(--shadow-focus); }
+input[type="range"] { width: 100%; min-width: 0; accent-color: var(--accent); cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent-from); outline-offset: 3px; }
+.skip-link { z-index: 400; }
+
+/* Cards and data hierarchy */
+.card-box, .kpi-card, .geo-map-box { box-shadow: var(--shadow-card); }
+.card-box, .geo-map-box { padding: 1.5rem; }
+.kpi-grid { gap: 1rem; margin-bottom: 1.5rem; }
+.kpi-card { padding: 1.25rem; gap: 0.75rem; min-width: 0; position: relative; overflow: hidden; }
+.kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(24, 37, 56, 0.065); }
+.kpi-top { align-items: flex-start; gap: 0.75rem; }
+.kpi-label { font-size: 0.6875rem; text-transform: none; letter-spacing: 0; font-weight: 600; line-height: 1.5; }
+.kpi-val { color: var(--ink); font-size: clamp(1.5rem, 2.1vw, 2rem); letter-spacing: -0.05em; overflow-wrap: anywhere; }
+.kpi-icon { width: 2.25rem; height: 2.25rem; border-radius: 0.625rem; background: var(--accent-light); }
+.kpi-icon svg { width: 1.125rem; height: 1.125rem; }
+.kpi-card:nth-child(2) .kpi-icon { color: var(--info); background: var(--info-bg); }
+.kpi-card:nth-child(3) .kpi-icon { color: #7461a9; background: #f2effb; }
+.kpi-card:nth-child(4) .kpi-icon { color: var(--success); background: var(--success-bg); }
+.kpi-sub { line-height: 1.65; font-size: 0.75rem; }
+.dashboard-row-2 { gap: 1.25rem; margin-bottom: 1.5rem; }
+.dashboard-row-2 > *, .geo-map-layout > * { min-width: 0; }
+
+.health-list { gap: 0; }
+.health-item { border-radius: 0; background: transparent; padding: 0.9375rem 0; gap: 0.75rem; border-bottom: 1px solid var(--line); }
+.health-item:last-child { border-bottom: 0; padding-bottom: 0; }
+.health-item > div { min-width: 0; overflow-wrap: anywhere; }
+.health-item .status-pill { flex-shrink: 0; }
+
+/* Tables remain horizontally scrollable instead of compressing their text */
+.table-container { border-radius: 0.75rem; scrollbar-width: thin; }
+.data-table { line-height: 1.6; font-size: 0.8125rem; }
+.data-table th { background: #f8f9fb; text-transform: none; letter-spacing: 0; color: var(--muted); padding: 0.875rem 1rem; white-space: nowrap; }
+.data-table td { padding: 0.9375rem 1rem; }
+.data-table tbody tr:last-child td { border-bottom: 0; }
+.data-table tr:hover td { background: #fbfcfe; }
+.data-table td:first-child { font-weight: 500; }
+.data-table button { white-space: nowrap; }
+
+/* Ingestion, model studio, and pipeline */
+.portal-app .dropzone-box {
+  background: #fbfcfe;
+  border: 1.5px dashed #bec9d8;
+  padding: 2.5rem 1.5rem;
+  outline-offset: 4px;
+}
+.portal-app .dropzone-box:hover, .portal-app .dropzone-box.dragover { background: #fdf7f1; border-color: var(--accent-from); }
+.scorecard-metric { background: #f8fafc; padding: 1.25rem; font-variant-numeric: tabular-nums; }
+.security-key-box { line-height: 1.7; }
+.portal-app .async-stepper-wrap { gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); }
+.portal-app .async-step-pill { min-height: 6.75rem; padding: 1rem; background: #fafbfc; gap: 0.5rem; border-radius: 0.75rem; line-height: 1.5; }
+.portal-app .async-step-pill.active { box-shadow: 0 0 0 2px rgba(169, 86, 43, 0.08); background: #fdf5ed; }
+.portal-app .async-step-pill.completed { background: var(--success-bg); }
+
+.filter-chip-btn { min-height: 2.125rem; }
+.param-val-badge { background: var(--accent-light); border-radius: 0.375rem; padding: 0.1875rem 0.5rem; }
+.portal-app .code-terminal-box { background: #182538; color: #dce6f4; border: 1px solid #2d4059; line-height: 1.8; padding: 1.25rem; }
+.latent-chip { color: var(--muted); font-variant-numeric: tabular-nums; }
+.svg-map-stage { background: #f8fafc; border-style: solid; }
+.rebalance-card { background: #f8fafc; }
+#toast-container { max-width: min(26rem, calc(100vw - 2rem)); }
+.toast-msg { box-shadow: 0 12px 32px rgba(24, 37, 56, 0.18); line-height: 1.6; }
+.portal-footer { padding-block: 1.25rem 1.75rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.6875rem; }
+.portal-footer .shell { display: flex; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; }
+.portal-footer a:hover { color: var(--accent); }
+
+/* Landing page: keep the existing liquid reveal, carousel, menu, and simulator. */
+.portal-landing #home { background: #f7f4ef; border-bottom: 1px solid #e9e3db; border-radius: 0 0 1.75rem 1.75rem; }
+.portal-landing .liquid-container { opacity: 0.22; }
+.portal-landing .hero-vignette { background: linear-gradient(90deg, #fbf9f5 4%, rgba(251,249,245,.85) 50%, rgba(251,249,245,.3)); }
+.portal-landing #site-header { border-bottom: 1px solid rgba(24,37,56,.08); }
+.portal-landing .header-shell { flex-wrap: wrap; gap: 0.875rem 1.5rem; padding-block: 1.25rem; }
+.portal-landing .header-brand-inner { font-weight: 700; letter-spacing: -0.035em; }
+.portal-landing .header-brand svg { width: 1.75rem; height: 1.75rem; }
+.portal-landing .header-nav ul { gap: 1.25rem; font-size: 0.75rem; }
+.portal-landing .header-nav-item a, .portal-landing .header-nav-item button { min-height: 2.5rem; }
+.portal-landing .clock-chip { background: rgba(255,255,255,.7); border-color: #e5ded4; }
+.portal-landing .menu-btn { color: var(--ink); background: #ffffff; border-color: #dcdfe5; min-height: 2.5rem; border-radius: 0.625rem; }
+.portal-landing .hero-content { min-height: 46rem; gap: 2rem; padding-top: 10rem; padding-bottom: 5rem; }
+.portal-landing .hero-h1 { font-size: clamp(2.5rem, 4.3vw, 4rem); line-height: 1.16; letter-spacing: -0.055em; color: var(--ink); }
+.hero-summary { max-width: 36rem; color: #57647a; font-size: 1rem; line-height: 1.85; }
+.portal-landing .hero-col-left { gap: 1.5rem; }
+.portal-landing .hero-col-right { gap: 1.5rem; }
+.portal-landing .hero-carousel-card { width: 100%; max-width: 24rem; padding: 0.75rem; background: rgba(255,255,255,.94); border: 1px solid #e5ded5; box-shadow: 0 16px 40px rgba(56,44,28,.08); }
+.portal-landing .carousel-tile-left { width: 5rem; border-radius: 0.75rem; }
+.portal-landing .carousel-panel-right { background: #f5f6f8; padding: 1rem; min-height: 10.5rem; }
+.portal-landing .carousel-content-slot { min-height: 5rem; }
+.portal-landing .carousel-caption { font-size: 0.625rem; color: var(--accent); letter-spacing: 0.07em; }
+.portal-landing .carousel-title { font-size: 1rem; font-weight: 600; color: var(--ink); line-height: 1.5; margin-top: 0.5rem; }
+.portal-landing .hero-partners { width: 100%; max-width: 24rem; }
+.portal-landing .partners-grid { gap: 0.5rem; }
+.portal-landing .partner-item { padding: 0.375rem 0.625rem; background: rgba(255,255,255,.7); border: 1px solid #e5dfd7; border-radius: 0.4375rem; color: #57647a; font-size: 0.6875rem; }
+.portal-landing .hero-watermark { bottom: 1.5rem; font-size: 9rem; color: #a18c76; }
+.portal-landing .hero-status-bar { gap: 1rem; flex-wrap: wrap; line-height: 1.6; letter-spacing: 0.025em; font-size: 0.6875rem; }
+.portal-landing .about-shell { padding-block: 5rem; gap: 3rem; }
+.portal-landing .about-h2 { font-size: clamp(1.5rem, 2.8vw, 2.25rem); letter-spacing: -0.035em; line-height: 1.45; }
+.portal-landing .create-band-tile { border-radius: 1rem; height: 7rem; font-size: 1.75rem; }
+.portal-landing .portfolio-card { min-height: 22rem; border-radius: 1.25rem; }
+.portal-landing .portfolio-card:hover { transform: translateY(-4px); }
+.portal-landing .card-desc { line-height: 1.75; color: #bec9d7; }
+.portal-landing .tag-chip { font-size: 0.6875rem; border-color: rgba(255,255,255,.18); }
+.portal-landing .service-title { font-size: clamp(1.125rem, 2vw, 1.75rem); letter-spacing: -0.025em; }
+.portal-landing .stats-panel { border-radius: 1.5rem; }
+.portal-landing .stat-number-wrap { font-size: clamp(2rem, 4vw, 3.75rem); }
+.portal-landing .modal-panel { border-radius: 1.25rem; padding: 2rem; }
+.portal-landing #request-modal { background: rgba(24,37,56,.45); backdrop-filter: blur(8px); }
+.portal-landing #nav-menu { overflow-y: auto; }
+
+/* All navigation remains available on small screens. */
+@media (min-width: 1024px) {
+  .dashboard-row-2 { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); }
+}
+@media (max-width: 1200px) {
+  .portal-landing .header-nav { display: none; }
+}
+@media (max-width: 767px) {
+  .portal-app .page-banner { padding-block: 1.5rem; }
+  .portal-app .page-title { font-size: 1.625rem; }
+  .page-actions { gap: 0.5rem; }
+  .page-actions .pill-btn { flex: 1 1 10rem; }
+  .card-box, .geo-map-box { padding: 1.125rem; }
+  .data-table { min-width: 39rem; }
+
+  .portal-app main [style*="grid-template-columns"] { grid-template-columns: minmax(0, 1fr) !important; }
+  .portal-app main [style*="display:flex"], .portal-app main [style*="display: flex"] { min-width: 0; }
+  .portal-app .param-slider-wrap { gap: 0.625rem; }
+
+  .portal-landing .hero-content { min-height: auto; padding-top: 9rem; padding-bottom: 3.5rem; gap: 2.5rem; }
+  .portal-landing .hero-h1 { font-size: clamp(1.875rem, 6.7vw, 3rem); }
+  .portal-landing .hero-summary { font-size: 0.9375rem; }
+  .portal-landing .hero-watermark { font-size: 5rem; }
+  .portal-landing .hero-carousel-card, .portal-landing .hero-partners { max-width: 100%; }
+  .portal-landing .hero-status-bar { align-items: flex-start; }
+  .portal-landing .service-row { padding: 1rem 0.5rem; gap: 0.75rem; }
+  .portal-landing .modal-panel { padding: 1.25rem; }
+  .portal-landing .clock-chip { display: none; }
+  #toast-container { right: 1rem; bottom: 1rem; }
+}
+@media (max-width: 400px) {
+  .kpi-grid { grid-template-columns: minmax(0, 1fr); }
+  .portal-landing .header-shell { gap: 0.5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pill-btn:hover, .kpi-card:hover, .portal-landing .portfolio-card:hover { transform: none; }
+}

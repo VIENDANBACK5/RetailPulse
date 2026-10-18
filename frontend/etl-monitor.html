@@ -9,10 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/variables.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/base.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/components.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/pages.css?ui=workspace-20261018-ux1">
   <style>
     .async-stepper-wrap {
       display: grid;
@@ -41,34 +41,33 @@
       background: rgba(34, 197, 94, 0.08);
     }
   </style>
+  <link rel="stylesheet" href="css/refinements.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/workspace.css?ui=workspace-20261018-ux1">
+  <link rel="stylesheet" href="css/workspace-pages.css?ui=workspace-20261018-ux1">
 </head>
-<body>
+<body class="portal-app has-sidebar workspace-page pipeline-workspace">
+  <a href="#main" class="skip-link">Chuyển đến nội dung chính</a>
+
   <!-- Header -->
-  <header class="portal-header">
-    <div class="shell portal-header-shell">
-      <a href="index.html" class="brand-wrap">
-        <svg viewBox="0 0 48 48" fill="currentColor">
-          <path d="M24 2c2.2 13.8 7.9 19.6 22 22-14.1 2.4-19.8 8.2-22 22-2.2-13.8-7.9-19.6-22-22 14.1-2.4 19.8-8.2 22-22Z"/>
-        </svg>
-        <span>RetailPulse <span style="font-weight:400; font-size:0.875rem; color:var(--muted);">/ DataOps Pipeline</span></span>
-      </a>
 
-      <nav class="portal-nav-links" aria-label="Điều hướng">
-        <div class="portal-nav-item"><a href="index.html">Trang chủ</a></div>
-        <div class="portal-nav-item"><a href="dashboard.html">📊 DataOps Overview</a></div>
-        <div class="portal-nav-item"><a href="operations.html">📥 Ingestion &amp; Nodes</a></div>
-        <div class="portal-nav-item"><a href="etl-monitor.html" class="active">⚡ Pipeline &amp; Kafka</a></div>
-        <div class="portal-nav-item"><a href="customer-segments.html">🧠 MLOps &amp; Registry</a></div>
-      </nav>
-
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <span class="status-pill success" id="broker-status-pill">Kafka Broker: Online (42.8 msg/s)</span>
-        <div class="clock-chip" style="display: flex;">
-          <span id="live-time-str">9:41pm</span>
-        </div>
-      </div>
-    </div>
+  <aside class="workspace-sidebar" id="app-sidebar" aria-label="Thanh điều hướng workspace">
+    <button class="sidebar-close" id="sidebar-close" type="button" aria-label="Đóng điều hướng"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#close"/></svg></button>
+    <a class="workspace-brand" href="index.html?ui=workspace-20261018-ux1" aria-label="RetailPulse - Trang chủ"><span class="workspace-brand-mark"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#brand"/></svg></span>RetailPulse</a>
+    <div class="workspace-identity"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><div><strong>Retail Analytics</strong><small>Data Warehouse &amp; Mining</small></div></div>
+    <nav aria-label="Điều hướng chính"><div class="sidebar-label">WORKSPACE</div><div class="sidebar-nav"><a class="sidebar-link" href="dashboard.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#layout"/></svg><span>Tổng quan</span></a><a class="sidebar-link" href="operations.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><span>Dữ liệu &amp; chi nhánh</span></a><a class="sidebar-link active" href="etl-monitor.html?ui=workspace-20261018-ux1" aria-current="page"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#workflow"/></svg><span>Pipeline &amp; Kafka</span><span class="sidebar-active-dot" aria-hidden="true"></span></a><a class="sidebar-link" href="customer-segments.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#users"/></svg><span>Mô hình &amp; phân khúc</span></a></div></nav>
+    <nav class="sidebar-secondary" aria-label="Truy cập báo cáo"><div class="sidebar-label">BÁO CÁO</div><div class="sidebar-nav">
+      <a class="sidebar-link" href="dashboard.html?ui=workspace-20261018-ux1#revenue-section"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#chart"/></svg><span>Giá trị giao dịch</span></a>
+      <a class="sidebar-link" href="dashboard.html?ui=workspace-20261018-ux1#branch-section"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#package"/></svg><span>Chi nhánh &amp; tồn kho</span></a>
+      <a class="sidebar-link" href="dashboard.html?ui=workspace-20261018-ux1#system-status"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#activity"/></svg><span>Trạng thái hệ thống</span></a>
+    </div></nav>
+    <div class="sidebar-bottom"><a class="sidebar-link" href="index.html?ui=workspace-20261018-ux1"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#arrow-up-right"/></svg><span>Giới thiệu dự án</span></a><div class="sidebar-project"><span class="project-monogram">RP</span><div><strong>RetailPulse Project</strong><small>Data Warehouse &amp; Data Mining</small></div></div></div>
+  </aside>
+  <button class="sidebar-backdrop" id="sidebar-backdrop" type="button" aria-label="Đóng thanh điều hướng" tabindex="-1" hidden></button>
+  <header class="workspace-topbar">
+    <div class="workspace-breadcrumb"><button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Mở điều hướng" aria-controls="app-sidebar" aria-expanded="false"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#menu"/></svg></button><span>Workspace</span><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#chevron"/></svg><strong>Pipeline &amp; Kafka</strong></div>
+    <div class="workspace-topbar-meta"><span class="status-pill success" id="broker-status-pill">Kafka Broker: Online (42.8 msg/s)</span><div class="clock-chip"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#clock"/></svg><span id="live-time-str">--:--</span></div></div>
   </header>
+
 
   <!-- Page Banner -->
   <section class="page-banner">
@@ -77,29 +76,30 @@
         <div>
           <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
             <span class="eyebrow-dot" style="background:var(--accent);"></span>
-            <span>DataOps Microservices Orchestration • Event-Driven Control Panel</span>
+            <span>DATAOPS WORKSPACE / PIPELINE</span>
           </div>
-          <h1 class="page-title">Điều Phối Microservices &amp; Luồng Kafka</h1>
-          <p class="page-subtitle">Bảng điều khiển DataOps Control Panel: phát lệnh bất đồng bộ qua Kafka Message Broker, giám sát tiến trình microservices thời gian thực và kiểm toán HMAC-SHA256.</p>
+          <h1 class="page-title">Pipeline &amp; luồng sự kiện</h1>
+          <p class="page-subtitle">Điều phối ETL và MLOps, theo dõi tiến trình xử lý và kiểm tra nhật ký sự kiện theo từng lần chạy.</p>
         </div>
-        <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
-          <button id="btn-simulate-hetero" class="pill-btn btn-sm variant-dark">🔥 Bắn Luồng Dị Đồng 3 Chi Nhánh (HN/DN/SG &rarr; Canonical)</button>
-          <button id="btn-trigger-etl" class="pill-btn btn-sm variant-outline">⚡ Kích Hoạt Luồng ETL Toàn Trình (Kafka Async)</button>
-          <button id="btn-trigger-mlops" class="pill-btn btn-sm variant-outline">🧠 Kích Hoạt Pipeline MLOps</button>
-          <button id="btn-simulate-kafka" class="pill-btn btn-sm variant-outline">Bắn Event Đơn Lẻ</button>
+        <div class="page-actions">
+          <button id="btn-simulate-hetero" class="pill-btn btn-sm variant-dark"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#workflow"/></svg><span>Phát sự kiện 3 chi nhánh</span></button>
+          <button id="btn-trigger-etl" class="pill-btn btn-sm variant-outline"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><span>Chạy ETL</span></button>
+          <button id="btn-trigger-mlops" class="pill-btn btn-sm variant-outline"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#boxes"/></svg><span>Chạy MLOps</span></button>
+          <button id="btn-simulate-kafka" class="pill-btn btn-sm variant-outline"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#activity"/></svg><span>Phát sự kiện đơn</span></button>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Main Content -->
-  <main class="shell" style="padding-bottom: 5rem;">
+  <div class="shell"><nav class="workspace-section-nav" aria-label="Các khu vực trong trang"><span>Trong trang này</span><a href="#pipeline-progress"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#workflow"/></svg><span>Tiến trình</span></a><a href="#pipeline-adapters"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><span>Nguồn dữ liệu</span></a><a href="#pipeline-stream"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#terminal"/></svg><span>Sự kiện</span></a><a href="#pipeline-security"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#shield"/></svg><span>Bảo mật</span></a><a href="#pipeline-reconciliation"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#file"/></svg><span>Đối soát</span></a></nav></div>
+  <main id="main" class="shell workspace-content" style="padding-bottom: 5rem;">
 
     <!-- ASYNC MICROSERVICES PIPELINE STEPPER -->
-    <div class="card-box" style="margin-bottom: 2rem;">
+    <div class="card-box workspace-panel" style="margin-bottom: 2rem;" id="pipeline-progress">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem; flex-wrap:wrap; gap:1rem;">
         <div>
-          <h2 style="font-size:1.125rem; font-weight:700;">Tiến Trình Microservices Bất Đồng Bộ (Event-Driven Pipeline)</h2>
+          <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#workflow"/></svg><span>Tiến trình xử lý</span></h2>
           <div style="font-size:0.75rem; color:var(--muted);" id="pipeline-status-text">Trạng thái: Sẵn sàng nhận lệnh từ Control Panel (Idle)</div>
         </div>
         <span class="status-pill info" id="active-step-badge">Idle</span>
@@ -179,14 +179,14 @@
     </div>
 
     <!-- HETEROGENEOUS KAFKA PRODUCER ADAPTERS & CANONICAL TOPIC -->
-    <div class="card-box" style="margin-bottom: 2rem;">
+    <div class="card-box workspace-panel" style="margin-bottom: 2rem;" id="pipeline-adapters">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
         <div>
           <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
             <span class="eyebrow-dot" style="background:var(--accent);"></span>
-            <span>Heterogeneous Ingestion Architecture • Microservices Adapters</span>
+            <span>SOURCE ADAPTERS</span>
           </div>
-          <h2 style="font-size:1.25rem; font-weight:700;">Kiến Trúc Kafka Producer Adapters Độc Lập Cho Dữ Liệu Dị Đồng</h2>
+          <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#database"/></svg><span>Nguồn &amp; bộ chuyển đổi</span></h2>
           <p style="font-size:0.8125rem; color:var(--muted);">
             Mỗi chi nhánh triển khai một Kafka Producer độc lập để phân giải định dạng thô đặc thù, nạp qua MDM Engine và xuất bản cấu trúc <strong>Canonical JSON</strong> vào topic chung <code>retail.canonical.transactions</code>.
           </p>
@@ -197,9 +197,9 @@
         </div>
       </div>
 
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(18rem, 1fr)); gap:1rem;">
+      <div style="display:grid; gap:1rem" class="workspace-source-grid">
         <!-- HN Producer -->
-        <div style="padding:1.25rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--accent);">
+        <div style="padding:1.25rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--accent);" class="workspace-source-card">
           <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
             <strong style="font-size:0.875rem;">CsvBranchAdapterProducer</strong>
             <span class="status-pill success" style="font-size:0.625rem; padding:0.15rem 0.4rem;">ONLINE</span>
@@ -216,7 +216,7 @@
         </div>
 
         <!-- DN Producer -->
-        <div style="padding:1.25rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--info, #2d55ff);">
+        <div style="padding:1.25rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--info, #2d55ff);" class="workspace-source-card">
           <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
             <strong style="font-size:0.875rem;">SqlBranchAdapterProducer</strong>
             <span class="status-pill success" style="font-size:0.625rem; padding:0.15rem 0.4rem;">ONLINE</span>
@@ -233,7 +233,7 @@
         </div>
 
         <!-- SG Producer -->
-        <div style="padding:1.25rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--success);">
+        <div style="padding:1.25rem; border-radius:var(--radius-card-sm); background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--success);" class="workspace-source-card">
           <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
             <strong style="font-size:0.875rem;">RestApiBranchAdapterProducer</strong>
             <span class="status-pill success" style="font-size:0.625rem; padding:0.15rem 0.4rem;">ONLINE</span>
@@ -252,12 +252,12 @@
     </div>
 
     <!-- Live Kafka Stream Terminal & Security Posture -->
-    <div class="dashboard-row-2">
+    <div class="dashboard-row-2 pipeline-console-row">
       <!-- Live Kafka Terminal -->
-      <div class="card-box">
+      <div class="card-box workspace-panel" id="pipeline-stream">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
           <div>
-            <h2 style="font-size: 1.125rem; font-weight: 700;">Luồng Sự Kiện Thời Gian Thực (Kafka Event Stream Console)</h2>
+            <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#terminal"/></svg><span>Nhật ký sự kiện</span></h2>
             <div style="font-size: 0.75rem; color: var(--muted);">Bắt gói tin JSON từ các node chi nhánh ngay khi khách mua hàng</div>
           </div>
           <span class="status-pill info">Consumer Partition 0-2</span>
@@ -274,9 +274,9 @@
       </div>
 
       <!-- Security & Staging Architecture -->
-      <div class="card-box">
+      <div class="card-box workspace-panel" id="pipeline-security">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <h2 style="font-size: 1.125rem; font-weight: 700;">Bảo Mật Luồng Tích Hợp (Security Posture)</h2>
+          <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#shield"/></svg><span>Bảo mật &amp; kiểm soát</span></h2>
           <span class="status-pill success">Shield Active</span>
         </div>
 
@@ -317,10 +317,10 @@
     </div>
 
     <!-- Reconciliation Log Table -->
-    <div class="card-box" style="margin-bottom: 2rem;">
+    <div class="card-box workspace-panel" style="margin-bottom: 2rem;" id="pipeline-reconciliation">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
         <div>
-          <h2 style="font-size:1.25rem; font-weight:700;">Nhật Ký Đối Soát Dữ Liệu (etl_reconciliation_log)</h2>
+          <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=workspace-20261018-ux1#file"/></svg><span>Đối soát dữ liệu</span></h2>
           <div style="font-size:0.8125rem; color:var(--muted);">Kiểm toán số lượng dòng và tổng doanh thu giữa nguồn trích xuất và bảng đích FactSales</div>
         </div>
         <span class="status-pill success">100% Đối Soát Khớp Tuyệt Đối</span>
@@ -402,6 +402,8 @@
       </div>
     </div>
   </main>
+
+  <footer class="portal-footer"><div class="shell"><span>RetailPulse / Data Warehouse &amp; Data Mining</span><a href="index.html?ui=workspace-20261018-ux1">Về trang giới thiệu &rarr;</a></div></footer>
 
   <script type="module">
     import { initClock } from './js/clock.js';
@@ -519,5 +521,6 @@
       runAsyncPipeline('MLOps Huấn Luyện Lại Mô Hình', true);
     });
   </script>
+  <script type="module" src="js/sidebar.js?ui=workspace-20261018-ux1"></script>
 </body>
 </html>

@@ -1,4 +1,3 @@
-import datetime
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 

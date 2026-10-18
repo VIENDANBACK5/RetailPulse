@@ -9,15 +9,12 @@ Tất cả Producer đều nạp qua MDM Engine và đẩy vào topic chung: `re
 """
 
 import time
-import json
-from typing import Dict, List, Any, Optional
+from typing import Dict, Any, Optional
 from src.streaming.kafka_engine import broker, KafkaMessage
 from src.dataops.canonical_model import (
-    CanonicalOrder,
     parse_vietnamese_csv_record,
     parse_sql_record,
     parse_rest_json_payload,
-    auto_detect_and_canonicalize
 )
 from src.dataops.mdm_engine import mdm_manager
 
