@@ -69,3 +69,7 @@ node_modules/
 test-results/
 playwright-report/
 models/runs/
+
+.pytest_cache/
+
+*.dump
