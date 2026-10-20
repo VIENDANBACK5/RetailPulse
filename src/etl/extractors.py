@@ -1,6 +1,6 @@
 import os
+import io
 import sys
-import time
 import requests
 import pandas as pd
 from sqlalchemy import text
@@ -17,6 +17,7 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 sys.path.append(BASE_DIR)
 
 from src.utils.db_helper import get_oltp_engine, load_config
+from src.etl.contracts import validate_inventory_data
 
 
 def extract_uci_data(file_path: str = None) -> pd.DataFrame:
@@ -37,6 +38,27 @@ def extract_uci_data(file_path: str = None) -> pd.DataFrame:
     else:
         df = pd.read_excel(file_path, dtype={"Invoice": str, "StockCode": str, "Customer ID": str})
 
+    return normalize_uci_data(df)
+
+
+def read_uci_payload(payload: bytes, filename: str, source_checksum: str) -> pd.DataFrame:
+    """Parse the verified lake object, retaining each original source row."""
+    options = {"dtype": {"Invoice": str, "StockCode": str, "Customer ID": str, "Price": str, "Quantity": str}}
+    if filename.lower().endswith(".csv"):
+        df = pd.read_csv(io.BytesIO(payload), **options)
+    else:
+        sheets = pd.read_excel(io.BytesIO(payload), sheet_name=None, **options)
+        frames = []
+        for sheet, frame in sheets.items():
+            frame["source_record_id"] = [f"{source_checksum}:{sheet}:{i}" for i in range(len(frame))]
+            frames.append(frame)
+        df = pd.concat(frames, ignore_index=True)
+    if "source_record_id" not in df:
+        df["source_record_id"] = [f"{source_checksum}:{i}" for i in range(len(df))]
+    return normalize_uci_data(df)
+
+
+def normalize_uci_data(df: pd.DataFrame) -> pd.DataFrame:
     # Chuẩn hóa tên cột
     column_mapping = {
         "Invoice": "invoice_no",
@@ -49,7 +71,7 @@ def extract_uci_data(file_path: str = None) -> pd.DataFrame:
         "Country": "country"
     }
     df = df.rename(columns=column_mapping)
-    df["invoice_date"] = pd.to_datetime(df["invoice_date"])
+    # Keep source values intact; row-level validation owns date parsing.
     print(f"  + Đã trích xuất thành công {len(df):,} dòng từ file UCI.")
     return df
 
@@ -64,6 +86,7 @@ def extract_app_db_orders(since_timestamp: float = None) -> pd.DataFrame:
         query = """
             SELECT 
                 o.order_code AS invoice_no,
+                oi.id AS source_record_id,
                 p.stock_code,
                 p.name AS description,
                 oi.quantity,
@@ -91,10 +114,7 @@ def extract_app_db_orders(since_timestamp: float = None) -> pd.DataFrame:
         return df
     except Exception as e:
         print(f"⚠️ Không thể kết nối App DB ({e}). Trả về tập rỗng.")
-        return pd.DataFrame(columns=[
-            "invoice_no", "stock_code", "description", "quantity",
-            "invoice_date", "unit_price", "customer_id", "branch_code", "country", "is_cancelled"
-        ])
+        raise RuntimeError("Cannot extract App DB orders") from e
 
 
 def extract_api_inventory(branch_nodes: List[Dict[str, str]] = None) -> List[Dict[str, Any]]:
@@ -128,15 +148,19 @@ def extract_api_inventory(branch_nodes: List[Dict[str, str]] = None) -> List[Dic
     for node in branch_nodes:
         code = node["code"]
         url = node["url"]
+        response_body = None
         try:
             resp = requests.get(url, timeout=2.5)
+            response_body = resp.text
             if resp.status_code == 200:
-                data = resp.json().get("data", {})
+                envelope = resp.json()
+                data = validate_inventory_data(
+                    envelope.get("data") if isinstance(envelope, dict) else None, code)
                 results.append({
                     "branch_code": code,
                     "status": "ONLINE",
-                    "snapshot_time": data.get("snapshot_time", time.time()),
-                    "items": data.get("items", [])
+                    "snapshot_time": data["snapshot_time"],
+                    "items": data["items"]
                 })
                 print(f"  + Node {code}: ONLINE ({len(data.get('items', []))} mặt hàng)")
             else:
@@ -148,7 +172,9 @@ def extract_api_inventory(branch_nodes: List[Dict[str, str]] = None) -> List[Dic
                 "branch_code": code,
                 "status": "OFFLINE",
                 "snapshot_time": None,
-                "items": []
+                "items": [],
+                "error": f"{type(ex).__name__}: {ex}",
+                "response_body": response_body
             })
 
     return results

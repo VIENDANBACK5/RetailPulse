@@ -45,6 +45,6 @@ echo.
 echo   - Mo Swagger API: cd fastapi-base ^&^& uvicorn app.main:app --reload
 echo   - Xem Bieu do K-Means: models/elbow_silhouette_evaluation.png
 echo   - Ket qua Phan cum: models/customer_segments_*.csv
-echo   - Mo file Bao cao Power BI trong thu muc bi/
+echo   - Dashboard: http://localhost:8001/frontend/dashboard.html
 echo ===============================================================================
 pause

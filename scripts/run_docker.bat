@@ -32,13 +32,12 @@ echo.
 echo ===============================================================================
 echo   HE THONG DOCKER DA SAN SANG VA HOAT DONG!
 echo.
-echo   - FastAPI App & Swagger UI : http://localhost:8000/docs
+echo   - FastAPI App & Swagger UI : http://localhost:8001/docs
 echo   - CSDL Tac nghiep (OLTP)   : localhost:5432 / Database: retail_app_db
 echo   - Data Warehouse (DWH)     : localhost:5433 / Database: retail_dwh_db
 echo.
-echo   * Luu y cho Power BI Desktop:
-echo     Ket noi PostgreSQL vao Server: localhost:5433 ^| Database: retail_dwh_db
-echo     User: postgres ^| Password: postgres
+echo   * Dashboard: http://localhost:8001/frontend/dashboard.html
+echo   * Chuan bi SQL views: docker compose run --rm pipeline python scripts/prepare_dashboard.py
 echo.
 echo   * Xem them giao dien pgAdmin (tuy chon):
 echo     docker compose --profile tools up -d pgadmin

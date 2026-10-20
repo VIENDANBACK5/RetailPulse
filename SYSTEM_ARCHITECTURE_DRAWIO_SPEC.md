@@ -37,7 +37,7 @@
 | Tích hợp ba loại nguồn File, CSDL và API | Có dữ liệu được thu thập từ từng loại nguồn, truy ngược về bản gốc |
 | Data Lake và ETL | Lưu Raw, làm sạch, ghi nhận lỗi, chống nạp trùng và đối soát |
 | Data Warehouse | Mô hình chiều với mức chi tiết và quy tắc tổng hợp rõ ràng |
-| BI | Báo cáo bán hàng, tồn kho và phân khúc khách hàng |
+| Báo cáo frontend | Sales, Inventory, Customers qua FastAPI chỉ đọc DWH |
 | Data Mining | RFM, tiền xử lý, thực nghiệm chọn K, K-means và diễn giải cụm |
 | Độ tin cậy dữ liệu | Nhận diện nguồn mất kết nối, dữ liệu cũ và đồng bộ lại có kiểm soát |
 
@@ -59,10 +59,10 @@ Phần ứng dụng bán hàng và API mẫu chỉ cung cấp dữ liệu kiểm
 | :--- | :--- | :--- |
 | 1. Data Sources | File CSV/Excel, PostgreSQL OLTP, REST API tồn kho | Cung cấp dữ liệu lịch sử và dữ liệu demo |
 | 2. Ingestion | Python, pandas, SQLAlchemy, requests | Thu thập dữ liệu, gắn nguồn, thời điểm và mã lần chạy |
-| 3. Data Lake | Vùng Raw và Curated; local hoặc kho đối tượng khi triển khai | Giữ bản gốc và dữ liệu đã chuẩn hóa để truy vết, chạy lại |
+| 3. Data Lake | MinIO Raw, manifest và kết quả batch | Giữ đầu vào để truy vết, kiểm tra checksum và chạy lại |
 | 4. ETL và Data Quality | Python: kiểm tra, biến đổi, ánh xạ dimension, nạp và đối soát | Tạo dữ liệu nhất quán, xử lý lỗi nguồn và chống nạp trùng |
 | 5. Data Warehouse | PostgreSQL riêng, Star Schema | Lưu dữ liệu phân tích bán hàng, tồn kho và kết quả phân cụm |
-| 6. BI và Data Mining | Power BI dự kiến; RFM và K-means bằng scikit-learn | Phân tích, đánh giá cụm và đưa gợi ý chăm sóc |
+| 6. Frontend và Data Mining | Frontend + FastAPI, đọc SQL views; RFM và K-means bằng scikit-learn | Phân tích, đánh giá cụm và đưa gợi ý chăm sóc |
 
 ### 2.2. Sơ đồ luồng dữ liệu tổng quan — thiết kế mục tiêu
 
@@ -76,50 +76,38 @@ flowchart TD
     INGEST["2. INGESTION PYTHON<br/>Đọc file / SELECT SQL / HTTP GET<br/>Gắn source, batch_id, thời điểm"]
     RAW[("3. DATA LAKE RAW<br/>Bản gốc + bản trích xuất + JSON + metadata")]
     ETL["4. ETL VÀ DATA QUALITY<br/>Làm sạch, phân loại, chống trùng, nạp"]
-    CURATED[("DATA LAKE CURATED<br/>Dữ liệu chuẩn hóa — cần hoàn thiện")]
     AUDIT[("Rejected + nhật ký đối soát")]
     DWH[("5. POSTGRESQL DWH<br/>Fact + Dimension")]
-    REPORT["6A. BI bán hàng và tồn kho<br/>Power BI — dự kiến"]
+    REPORT["6A. Báo cáo bán hàng và tồn kho<br/>Frontend + API chỉ đọc"]
     RFM["6B. DATA MINING<br/>RFM → log1p → StandardScaler<br/>Thử K → K-means → diễn giải cụm"]
     SEG[("customer_segment_snapshot")]
-    CUSTOMER_BI["BI khách hàng<br/>Hồ sơ cụm + gợi ý chăm sóc — dự kiến"]
+    CUSTOMER_BI["Frontend khách hàng<br/>Hồ sơ cụm + gợi ý chăm sóc"]
     FILE --> INGEST
     OLTP --> INGEST
     API --> INGEST
     INGEST --> RAW --> ETL
-    ETL --> CURATED
     ETL --> DWH
     ETL -.-> AUDIT
     DWH --> REPORT
     DWH --> RFM --> SEG --> CUSTOMER_BI
 ```
 
-**Ranh giới hiện trạng:** đây là sơ đồ mục tiêu. Pipeline hiện tại đọc file từ local Raw, nhưng xử lý DB/API trực tiếp rồi nạp DWH; chưa có bước lưu đầy đủ bản trích xuất DB/API vào Raw trong pipeline chính. Curated cũng cần có đầu ra thực tế. Phần BI chưa có file báo cáo tìm thấy trong repo. Chỉ được trình bày toàn bộ luồng là đã hoạt động sau khi hoàn thiện và kiểm chứng.
+**Ranh giới hiện trạng (20/10/2026):** MinIO Raw → ETL/đối soát → PostgreSQL DWH → API chỉ đọc → frontend đã chạy với dữ liệu thực. Không có Curated Zone hoặc công cụ báo cáo riêng. Airflow local đã tích hợp, xem [hướng dẫn chạy DAG](docs/AIRFLOW_GUIDE.md). Các studio cũ mô phỏng trên trình duyệt không phải bằng chứng vận hành hạ tầng tương ứng.
 
-### 2.3. Đối chiếu với luồng tám giai đoạn có Debezium, MinIO, Airflow và Superset
+### 2.3. Phạm vi điều phối tiếp theo
 
-| Giai đoạn tham khảo | Phương án cho đề tài | Hiện trạng |
-| :--- | :--- | :--- |
-| 1. Sources: API, Files, PostgreSQL | Giữ ba loại nguồn | Có mã/cấu hình |
-| 2. CDC bằng Debezium | Tùy yêu cầu; bổ sung trên nhánh PostgreSQL nếu cần bắt thay đổi | Chưa có Debezium; truy vấn SQL hiện tại chưa phải CDC qua log |
-| 3. Ingestion bằng Python | Giữ các extractor Python | Có mã |
-| 4. Raw trên MinIO | Hiện dùng thư mục local; MinIO là lựa chọn để đáp ứng phương án kho đối tượng S3 trong đề cương | Chưa có MinIO; lưu Raw DB/API cần hoàn thiện |
-| 5. ETL (1) do Airflow điều phối | Raw → làm sạch → DWH | Có ETL Python; chưa có Airflow/DAG |
-| 6. Warehouse trên PostgreSQL | DWH tách OLTP | Có cấu hình và DDL |
-| 7. ETL (2) do Airflow điều phối | Nếu cần: DWH → bảng tổng hợp/data mart phục vụ BI | Chưa có pipeline riêng; chưa có Airflow/DAG |
-| 8. BI bằng Apache Superset | Đề cương hiện chọn Power BI; có thể đổi nếu giảng viên yêu cầu | Chưa có Superset; chưa tìm thấy file Power BI |
+Airflow điều phối ingestion/ETL và mining bằng các job Python hiện có. Tách nhập UCI lịch sử theo yêu cầu, đồng bộ App/API theo lịch và mining sau dữ liệu bán hàng phù hợp. Frontend tiếp tục đọc DWH qua API, không cần job điều khiển trình duyệt hoặc triển khai Superset.
 
-Airflow điều phối các tác vụ Python/SQL và phụ thuộc giữa chúng; logic biến đổi nằm trong các tác vụ. BI có thể đọc trực tiếp DWH, nên ETL (2) chỉ cần tách khi có bảng tổng hợp hoặc data mart cụ thể. Pipeline ML là nhánh khai phá riêng, có thể dùng cùng bộ điều phối nhưng không đồng nghĩa với ETL (2).
-
-Nếu giảng viên bắt buộc đúng bộ công nghệ tham khảo, phải bổ sung cấu hình và minh chứng thực thi trước khi ghi nhận đã triển khai. Debezium chỉ nằm trên nhánh CSDL; File/API có cách thu thập riêng.
+Đã chặn fallback CSV ngầm khi mining gặp lỗi DWH, định danh từng lần huấn luyện, dùng tháng lịch cho RFM và retry theo manifest/checkpoint ổn định. Xem [hướng dẫn triển khai hiện tại](docs/TECH_STACK_IMPLEMENTATION_GUIDE.md). Debezium/Kafka thực nằm ngoài phạm vi hiện tại, không phải điều kiện bắt buộc để tích hợp Airflow.
 
 ### 2.4. Thành phần triển khai hiện có trong Docker Compose
 
 | Thành phần | Container | Cổng host → container | Vai trò |
 | :--- | :--- | :--- | :--- |
-| OLTP PostgreSQL | `retail-oltp-db` | `5432 → 5432` | Dữ liệu ứng dụng mẫu |
+| OLTP PostgreSQL | `retail-oltp-db` | `5542 → 5432` | Dữ liệu ứng dụng mẫu |
 | DWH PostgreSQL | `retail-dwh-db` | `5433 → 5432` | Kho phân tích |
-| FastAPI | `retail-fastapi-app` | `8001 → 8000` | API tác nghiệp và tồn kho |
+| FastAPI | `retail-fastapi-app` | `8001 → 8000` | API tác nghiệp, tồn kho, analytics và phục vụ frontend |
+| MinIO | Service `minio` trong `compose.lake.yml` | `9000 → 9000`, `9001 → 9001` | S3 API và Console; Raw, manifest, kết quả batch |
 | Python runner | `retail-pipeline-runner` | Không công bố cổng | Chạy ETL và khai phá theo lệnh |
 | pgAdmin, tùy chọn | `retail-pgadmin` | `5050 → 80` | Kiểm tra CSDL |
 
@@ -137,26 +125,29 @@ Kết nối từ máy host vào DWH dùng `localhost:5433`; kết nối giữa c
 | API tồn kho HN/DN/SG | Kiểm tra snapshot và lỗi nguồn | Lưu JSON, thời điểm chụp và trạng thái thu thập |
 | Dữ liệu tổng hợp theo cấu trúc UCI | Kiểm thử khi chưa có dữ liệu thực | Gắn nhãn mô phỏng; không dùng để tuyên bố kết quả trên bộ UCI thực |
 
-`src/utils/data_downloader.py` hiện tạo dữ liệu tổng hợp khi chưa có CSV; tên file theo cấu trúc UCI không chứng minh nội dung được tải từ UCI. Trước thực nghiệm chính cần xác minh xuất xứ dữ liệu, số dòng và khoảng thời gian. Quy mô trong báo cáo phải lấy từ dữ liệu thực sự sử dụng.
+`scripts/import_uci.py` nhập workbook UCI gốc và lưu thông tin xuất xứ/checksum. Chế độ demo cần chọn rõ ràng; không tự thay dữ liệu thực bằng dữ liệu tổng hợp khi nguồn lỗi. Workbook thực đã dùng có 1.067.371 dòng đầu vào. Quy mô báo cáo phải lấy từ batch thực tế.
 
 Không trộn hành vi demo vào thực nghiệm lịch sử. Không cộng GBP và VND trực tiếp. Không tự gán chi nhánh Việt Nam cho lịch sử UCI. Chuẩn hóa đa tiền tệ chỉ đưa vào khi có nguồn tỷ giá, ngày hiệu lực và quy tắc quy đổi rõ ràng.
 
-### 3.2. Tổ chức Data Lake mục tiêu
+### 3.2. Tổ chức Data Lake hiện tại
 
 ```text
-data_lake/
-  raw/
-    uci/<ingestion_date>/<batch_id>/
-    app_db/<ingestion_date>/<batch_id>/
-    api_inventory/<ingestion_date>/<batch_id>/
-  curated/
-    sales/<batch_id>/
-    inventory/<batch_id>/
+MinIO bucket retailpulse-raw/
+  raw/source=uci/ingest_date=YYYY-MM-DD/batch_id=BATCH-.../
+    online_retail_II.xlsx
+    manifest.json
+  raw/source=app/ingest_date=YYYY-MM-DD/batch_id=BATCH-.../
+    orders.csv
+    manifest.json
+  raw/source=api/ingest_date=YYYY-MM-DD/batch_id=BATCH-.../
+    inventory.json
+    manifest.json
+  runs/BATCH-....json
 ```
 
-Đây là cách phân vùng cần hoàn thiện; cấu hình hiện tại mới định nghĩa các thư mục nguồn local. Với MinIO, có thể giữ cấu trúc tương tự dưới dạng object prefix.
+Manifest lưu source, batch_id, ingested_at, object key, kích thước, SHA-256, backend, bucket, mode và record_count khi biết. File UCI local là đầu vào tiếp nhận; khi dùng cấu hình lake, ETL đưa lên MinIO rồi đọc lại để xử lý. API record_count là số node phản hồi, khác số SKU sau biến đổi. Kết quả batch ghi số dòng thực, nạp mới/đã có/loại và đối soát.
 
-Metadata mỗi lần thu thập cần có: `source_code`, `batch_id`, `extracted_at`, đường dẫn đầu vào, số bản ghi, checksum khi phù hợp, nhãn thực/mô phỏng và trạng thái. Với API, phân biệt thời điểm gọi với thời điểm snapshot tại nguồn. Với file, giữ nguyên bản gốc trước khi chuẩn hóa.
+Xem [hướng dẫn kiểm chứng MinIO](docs/MINIO_DEMO_GUIDE.md) cho URL, tài khoản local và batch đã chạy. Đây là lưu giữ Raw và kiểm tra nội dung ở lớp ứng dụng, chưa phải Object Lock hoặc chính sách backup production.
 
 <a id="mo-hinh-dwh"></a>
 ## 4. Mô hình kho dữ liệu
@@ -240,9 +231,9 @@ Cardinality thể hiện một dimension có thể được nhiều dòng fact t
 - Doanh số mua và giá trị hủy/hoàn trình bày riêng; chỉ dùng tên “doanh thu thuần” khi có định nghĩa và đối soát bù trừ.
 - Tồn kho là chỉ tiêu bán cộng: lấy snapshot phù hợp cho từng chi nhánh/sản phẩm, không cộng nhiều ngày thành tổng tồn.
 - Khách thiếu mã có thể dùng bản ghi dimension vãng lai cho BI bán hàng; loại các bản ghi này khỏi RFM để không coi nhiều người là một khách.
-- Thiết kế cần định danh dòng nguồn ổn định. Hash nội dung hiện tại có thể gộp nhầm các dòng hợp lệ giống nhau; chưa đủ căn cứ tuyên bố chống trùng hoàn chỉnh.
+- Dòng nguồn dùng định danh ổn định: App theo order_items.id; UCI theo checksum workbook + sheet + dòng. Workbook thay đổi cần chính sách thay thế dataset để tránh nhập hai phiên bản.
 - DDL tiền hiện dùng `DOUBLE PRECISION`; để đáp ứng đối soát theo đề cương cần thống nhất kiểu thập phân, quy tắc làm tròn và ngưỡng sai số.
-- Cửa sổ RFM và cấu hình lần chạy cần được lưu để tái lập. DDL phân cụm hiện chưa có trường riêng cho đầu/cuối cửa sổ; đây là phần cần bổ sung hoặc lưu trong metadata mô hình.
+- Snapshot đã lưu window_start/window_end; metadata mỗi run lưu ngày tham chiếu, cấu hình, checksum RFM, metrics và phiên bản thư viện trong models/runs.
 
 <a id="luong-xu-ly"></a>
 ## 5. Các luồng xử lý chi tiết
@@ -270,7 +261,7 @@ flowchart LR
     RAW --> NEXT["ETL"]
 ```
 
-**Hiện trạng:** extractor đã có; lưu Raw đầy đủ từ DB/API và metadata chưa hoàn thiện. Không đặt Kafka, VPN hoặc Debezium vào luồng cốt lõi nếu chưa triển khai.
+**Hiện trạng 20/10/2026:** cả workbook UCI, CSV từ OLTP và JSON API đã được lưu MinIO cùng manifest. ETL đọc lại và kiểm tra checksum/kích thước; replay từ manifest đã được kiểm chứng. Kafka, VPN và Debezium không thuộc luồng cốt lõi hiện tại.
 
 ### 5.2. Luồng 2 — ETL, nạp kho và đối soát
 
@@ -282,7 +273,7 @@ flowchart LR
 3. Tách dòng bị loại, lưu dấu vết để truy về Raw. Dòng thiếu khách vẫn có thể dùng cho BI bán hàng khi hợp lệ.
 4. Tính `date_key`, `total_amount`; tra cứu hoặc nạp dimension; bảo đảm khóa ngoại.
 5. Nạp fact bằng định danh nguồn ổn định và cơ chế chống trùng/upsert phù hợp với loại dữ liệu.
-6. Lưu đầu ra Curated và thông tin lần chạy theo thiết kế.
+6. Ghi audit trong DWH và kết quả batch trong MinIO `runs/`; không lưu thêm Curated.
 7. Đối chiếu số dòng và tiền theo nguồn, kỳ, tiền tệ bằng số liệu truy vấn từ đích. Ghi trạng thái thành công, không đầy đủ hoặc lỗi; công bố dữ liệu khi đáp ứng tiêu chí.
 
 Đối soát số dòng phải phân biệt **dòng nạp mới**, **dòng đã tồn tại**, **dòng cập nhật**, **dòng bị loại** và **dòng chưa xử lý**, theo các nhóm loại trừ nhau. Không so tổng đầu vào chỉ với dòng nạp mới khi chạy lại. Đối soát tiền so tập giao dịch hợp lệ trong đầu vào với cùng tập khóa ở DWH, không so tổng nguồn với riêng phần nạp mới.
@@ -295,7 +286,6 @@ flowchart TD
     SPLIT -- "Hợp lệ" --> DIM["Tra cứu / nạp Dimension"]
     DIM --> LOAD["Nạp Fact<br/>Chống trùng / upsert"]
     LOAD --> DWH[("PostgreSQL DWH")]
-    CHECK --> CURATED[("Curated — cần hoàn thiện")]
     DWH --> AUDIT["Truy vấn đích và đối soát<br/>Theo nguồn / kỳ / tiền tệ"]
     REJECT -.-> AUDIT
     RAW -.-> AUDIT
@@ -304,7 +294,7 @@ flowchart TD
     STATUS -- "Không" --> WARN["Ghi lỗi hoặc dữ liệu không đầy đủ<br/>Chưa công bố như dữ liệu hoàn chỉnh"]
 ```
 
-**Hiện trạng:** đã có transformer, loader và `reconcile_batch`; số đếm và tổng tiền từ loader cần kiểm tra lại bằng truy vấn đích. Pipeline hiện bắt lỗi từng nguồn và vẫn in hoàn tất; cần có trạng thái tổng hợp để phân biệt thành công đầy đủ với chạy thiếu nguồn.
+**Hiện trạng:** ETL đã đối soát bằng truy vấn đích, phân biệt dòng mới/đã có/loại; CLI trả trạng thái FULL_SUCCESS/PARTIAL/FAILED và exit code không thành công khi không đạt FULL_SUCCESS. Replay App và UCI đã MATCHED, không nạp mới dòng đã có. Mining cũng đã bỏ fallback ngầm khi DWH lỗi; lỗi phát sinh làm task thất bại.
 
 #### 5.2.1. Xử lý API mất kết nối và dữ liệu cũ
 
@@ -312,25 +302,23 @@ flowchart TD
 
 1. Gọi từng endpoint API; lỗi kết nối/HTTP/timeout được ghi kèm chi nhánh và thời điểm thử.
 2. Tiếp tục thu thập nguồn còn hoạt động; đánh dấu batch không đầy đủ nếu thiếu chi nhánh.
-3. Với nguồn lỗi, giữ snapshot thành công gần nhất tại mốc chụp gốc; hiển thị cảnh báo dữ liệu cũ. Nếu chưa có snapshot, hiển thị chưa có dữ liệu.
-4. Trạng thái lần gọi lỗi cần lưu riêng hoặc mô hình hóa rõ ràng; không đổi thời điểm snapshot cũ thành thời điểm hiện tại.
-5. BI phân biệt tồn bằng 0 thực sự, dữ liệu cũ và chưa có dữ liệu. Sau phục hồi, thu thập lại và kiểm tra không nạp trùng cùng snapshot.
+3. Với nguồn lỗi, nạp dòng ALL_PRODUCTS có tồn NULL và trạng thái OFFLINE. Không dùng giá trị tồn bằng 0 hoặc số cũ như thể vừa thu thập thành công.
+4. Snapshot trước vẫn lưu trong DWH để truy vết; view hiện tại chọn batch mới nhất của từng chi nhánh.
+5. Frontend phân biệt offline, stale, NULL và tồn 0. Airflow đánh dấu PARTIAL là thất bại; sau phục hồi trigger run mới để thu thập lại.
 
 ```mermaid
 flowchart TD
     CALL["Gọi API từng chi nhánh"] --> OK{"Thu thập thành công?"}
-    OK -- "Có" --> NEW["Lưu Raw và snapshot mới<br/>Giữ thời điểm chụp tại nguồn"]
-    OK -- "Không" --> ERR["Ghi lỗi nguồn và trạng thái OFFLINE"]
-    ERR --> OLD{"Có snapshot thành công trước đó?"}
-    OLD -- "Có" --> STALE["Giữ snapshot gốc<br/>BI báo dữ liệu cũ + thời điểm"]
-    OLD -- "Không" --> MISSING["BI báo chưa có dữ liệu"]
-    ERR --> CONT["Tiếp tục nguồn khác<br/>Batch không đầy đủ"]
-    NEW --> BI["Báo cáo tồn kho"]
-    STALE --> BI
-    MISSING --> BI
+    OK -- "Có" --> NEW["Lưu Raw và snapshot ONLINE"]
+    OK -- "Không" --> ERR["Lưu Raw, OFFLINE và tồn NULL"]
+    NEW --> DWH["Nạp snapshot vào DWH"]
+    ERR --> DWH
+    DWH --> UI["Frontend chọn batch mới nhất, hiển thị trạng thái"]
+    ERR --> FAIL["Airflow Failed: nguồn không đầy đủ"]
+    FAIL --> RESTORE["Khôi phục nguồn, trigger run mới"]
 ```
 
-**Khoảng cách hiện tại:** transformer đang tạo dòng `ALL_PRODUCTS` với `stock_on_hand = 0` khi offline; chưa thực hiện thiết kế giữ snapshot cũ và trạng thái riêng. `scripts/test_fault_node.py` chủ yếu in kết quả, chưa có assertion chứng minh đầy đủ dữ liệu DWH và BI. Sơ đồ trên là hành vi cần hoàn thiện, không phải xác nhận đã nghiệm thu.
+Đã có kiểm thử SQL cho offline/zero, replay snapshot và chọn dữ liệu mới nhất. Không coi Airflow Failed là toàn bộ dữ liệu đã rollback: các nguồn thành công vẫn có thể đã nạp.
 
 ### 5.3. Luồng 3 — Khai phá khách hàng bằng RFM và K-means
 
@@ -365,14 +353,14 @@ flowchart TD
     SELECT --> MODEL["Lưu mô hình + tiền xử lý + metadata"]
     SELECT --> PROFILE["Hồ sơ cụm<br/>RFM gốc và gợi ý chăm sóc"]
     PROFILE --> SNAP[("customer_segment_snapshot")]
-    SNAP --> BI["BI phân khúc khách hàng — dự kiến"]
+    SNAP --> BI["Frontend phân khúc khách hàng qua API"]
 ```
 
-**Hiện trạng:** pipeline chính đã có trích RFM, log1p, scaling, thử K, K-means và xuất kết quả. Cần bổ sung lọc cửa sổ rõ ràng, metadata, kiểm tra độ ổn định và rà soát tên cụm. Extractor hiện lấy `T` từ ngày mua hợp lệ muộn nhất cộng một ngày; cấu hình cửa sổ 12 tháng chưa đồng nghĩa đã được áp dụng trong truy vấn. `scripts/run_all.bat` truyền `--k 4`, nên không chứng minh đã thực nghiệm chọn K.
+**Hiện trạng:** đã có trích RFM từ DWH theo tháng lịch, log1p, scaling, thử K=2..6, K-means và công bố snapshot atomic. Run ID/version và artifact riêng giúp truy vết; lỗi DWH làm job thất bại. Pipeline thử K nhưng cấu hình mặc định vẫn là K=4; lựa chọn cuối cần giải thích theo kết quả thực nghiệm.
 
 Silhouette thể hiện độ gắn kết và tách biệt, không phải accuracy. Nhãn “At Risk” theo RFM chỉ là diễn giải khách lâu chưa quay lại, không phải xác suất churn. Không khẳng định hiệu quả kinh doanh nếu chưa có thử nghiệm nghiệp vụ.
 
-Khi DWH lỗi, code có fallback đọc CSV hoặc xuất CSV. Fallback chỉ phục vụ kiểm thử offline; không coi là đã chạy thành công luồng DWH đầu cuối. Khóa khách trong CSV phải được ánh xạ về dimension trước khi nạp lại kết quả.
+Mining hiện không fallback khi DWH lỗi. Nếu bàn giao dữ liệu/model giữa các máy, giữ định danh nguồn + mã khách và ánh xạ customer_key về warehouse đích; train và sử dụng model đã train là hai chế độ khác nhau.
 
 ### 5.4. Luồng 4 — BI và hỗ trợ quyết định
 
@@ -393,7 +381,7 @@ Luồng 4 trong phiên bản này là báo cáo và sử dụng kết quả khai
 4. Kiểm tra chỉ số và bộ lọc bằng truy vấn SQL đối chứng.
 5. Diễn giải kết quả và gợi ý chăm sóc thủ công; chưa tự gửi email, Zalo, SMS hoặc voucher.
 
-**Hiện trạng:** Power BI là đầu ra dự kiến; chưa tìm thấy file `.pbix`, `.pbit` hoặc `.pbip` trong repo tại thời điểm đối chiếu. Giao diện web của dự án chưa tự thay thế sản phẩm BI theo đề cương.
+**Hiện trạng 20/10/2026:** ba báo cáo frontend gọi API chỉ đọc warehouse. Xem `docs/DASHBOARD_GUIDE.md` về bộ lọc, định nghĩa chỉ số và nghiệm thu.
 
 <a id="trinh-dien"></a>
 ## 6. Kịch bản trình diễn và nghiệm thu
@@ -411,37 +399,35 @@ Luồng 4 trong phiên bản này là báo cáo và sử dụng kết quả khai
 
 Kịch bản lỗi endpoint chỉ minh họa mất khả năng truy cập nguồn; không đủ để tuyên bố đã kiểm chứng khả năng chịu lỗi của một cụm phân tán. Không dùng thông báo “PASS” hoặc “hoàn tất” trên console thay cho đối chiếu dữ liệu thực tế.
 
-Bộ bàn giao dự kiến gồm mã nguồn/cấu hình, DDL và ERD, dữ liệu có xuất xứ, nhật ký thu thập/ETL, bảng đối soát, thực nghiệm chọn K, mô hình và metadata, file BI, hướng dẫn chạy và báo cáo giới hạn.
+Bộ bàn giao dự kiến gồm mã nguồn/cấu hình, DDL và ERD, dữ liệu có xuất xứ, nhật ký thu thập/ETL, bảng đối soát, thực nghiệm chọn K, mô hình và metadata, dashboard frontend, hướng dẫn chạy và báo cáo giới hạn.
 
 <a id="hien-trang"></a>
 ## 7. Hiện trạng và công việc cần hoàn thiện
 
-Bảng này phản ánh kiểm tra mã nguồn, chưa thay thế chạy kiểm thử hoặc xác nhận dịch vụ đang hoạt động.
+Trạng thái kiểm tra ngày 20/10/2026; kết quả từng batch nằm trong MinIO và DWH audit.
 
-| Thành phần | Trạng thái | Công việc trước nghiệm thu |
+| Thành phần | Trạng thái | Công việc tiếp theo |
 | :--- | :--- | :--- |
-| Extractor File/DB/API | Có mã | Chạy với đủ nguồn; kiểm tra dữ liệu và lưu Raw DB/API |
-| Data Lake | Có cấu hình local | Phân vùng, metadata, bản gốc và Curated; triển khai kho đối tượng nếu theo phương án S3 |
-| Transformer/loader | Có mã | Rà soát định danh dòng nguồn, xử lý thay đổi và chống trùng snapshot |
-| Đối soát ETL | Có mã, cần hoàn thiện | Truy vấn đích; phân biệt nạp mới/đã có/cập nhật; thống nhất phép tính tiền |
-| PostgreSQL DWH | Có Compose và DDL | Kiểm tra khởi tạo, khóa ngoại, truy vấn và số liệu |
-| RFM–K-means | Có pipeline | Xác minh dữ liệu thực, cửa sổ, chọn K, ổn định cụm và tái lập |
-| BI Power BI | Dự kiến | Tạo file báo cáo, bộ lọc và SQL đối chứng |
-| API mất kết nối | Có bắt lỗi | Bỏ cách dùng tồn 0 để biểu diễn thiếu dữ liệu; lưu trạng thái nguồn và kiểm tra phục hồi |
-| Kết quả fallback | Có trong code | Ghi rõ offline; không báo là hoàn tất luồng DWH |
-| MinIO / Airflow / Debezium / Superset | Chưa thấy triển khai | Bổ sung khi có yêu cầu; chưa gắn nhãn đã chạy |
+| Extractor File/DB/API và MinIO | Đã chạy đủ ba nguồn, Raw + manifest + replay | Kiểm tra phục hồi và tái lập trên môi trường sạch |
+| ETL và đối soát | Đã chạy, phân biệt mới/đã có/loại và trạng thái batch | Bổ sung kiểm chứng lỗi trong luồng điều phối |
+| PostgreSQL DWH | Có dữ liệu lịch sử và demo, tiền tệ tách riêng | Đối chứng KPI và tiêu chí nghiệp vụ |
+| RFM–K-means | Warehouse-only, tháng lịch, artifact riêng, snapshot atomic | Tiếp tục thực nghiệm và giải thích chọn K |
+| Dashboard frontend | Sales/Inventory/Customers từ API warehouse | Hoàn thiện lượng bán/hoàn, tỷ trọng Monetary theo cụm |
+| Nguồn tồn kho lỗi/cũ | Có trạng thái offline/stale và phân biệt NULL với 0 | Kiểm chứng phục hồi cùng DAG khi triển khai |
+| Airflow | Đã tích hợp LocalExecutor và metadata riêng | Bật lịch khi cần; lưu minh chứng DAG, retry và lỗi/khôi phục |
+| Power BI / Superset / Debezium | Không thuộc phạm vi hiện tại | Không là điều kiện nghiệm thu theo phạm vi nhóm đã chọn |
 
-Ưu tiên hoàn thiện: xuất xứ dữ liệu và Raw → ETL/DWH và đối soát → thực nghiệm phân cụm → BI → thử lỗi và phục hồi. Tài liệu này không tự thay đổi các module còn thiếu.
+Phạm vi nhóm lựa chọn không tự thay thế yêu cầu bổ sung riêng của giảng viên. Xem đề cương cập nhật và hướng dẫn triển khai để phân biệt phần đã làm với tiêu chí cần hoàn thiện.
 
 <a id="huong-phat-trien"></a>
 ## 8. Hướng phát triển
 
 ### 8.1. Hạ tầng và điều phối
 
-- **MinIO:** triển khai Data Lake dạng kho đối tượng tương thích S3 thay cho thư mục local, nếu theo phương án đề cương.
-- **Airflow:** điều phối ingestion, ETL, đối soát, khai phá và làm mới bảng phục vụ BI; cần có DAG và minh chứng chạy.
+- **MinIO:** đã triển khai Raw trên S3 API local; tiếp tục bổ sung backup/phân quyền khi có yêu cầu vận hành.
+- **Airflow:** đã tích hợp bốn DAG với pool ghi chung, retry, timeout và log; xem `compose.airflow.yml` và hướng dẫn Airflow.
 - **Debezium:** CDC trên nhánh PostgreSQL khi cần đồng bộ thay đổi; cần xử lý insert/update/delete và định danh sự kiện.
-- **Apache Superset:** lựa chọn BI khi yêu cầu học phần thay đổi; cần dashboard thực tế và đối chiếu SQL.
+- **Công cụ báo cáo riêng:** Power BI và Superset không thuộc phạm vi hiện tại; dùng dashboard frontend + FastAPI + SQL views.
 - **Kafka, VPN/SSH, HMAC:** chỉ đưa vào sơ đồ mở rộng theo triển khai cụ thể. Broker tại `src/streaming/kafka_engine.py` hiện mô phỏng trong bộ nhớ, không phải bằng chứng đã vận hành Apache Kafka.
 
 ### 8.2. Các bài toán phân tích bổ sung

@@ -16,26 +16,26 @@ Họ và tên thành viên	Mã sinh viên	Lớp
 [Điền thành viên]	[Điền mã sinh viên]	[Điền lớp]
 [Điền thành viên]	[Điền mã sinh viên]	[Điền lớp]
 
-Hà Nội, tháng 9 năm 2026
+Hà Nội, cập nhật ngày 20 tháng 10 năm 2026
  
 1 Tổng quan và mục tiêu đề tài
 1.1 Giới thiệu
 Nhóm đề xuất xây dựng kho dữ liệu bán hàng, tích hợp dữ liệu từ cơ sở dữ liệu, API và file để phục vụ báo cáo kinh doanh và phân cụm khách hàng. Phần khai phá dữ liệu sử dụng các đặc trưng RFM và thuật toán K-means nhằm nhận diện những nhóm khách hàng có hành vi mua sắm tương đồng, từ đó đề xuất cách chăm sóc phù hợp.
-Đây là đề cương triển khai ban đầu. Các công nghệ, quy mô và tiến độ dưới đây là phương án dự kiến; tài liệu chưa trình bày kết quả thực nghiệm hoặc khẳng định hiệu quả kinh doanh đã đạt được.
+Đây là đề cương cập nhật theo phạm vi hiện tại: MinIO giữ Raw Data Lake; PostgreSQL là warehouse; frontend RetailPulse hiển thị báo cáo qua API FastAPI chỉ đọc. Báo cáo tích hợp trong frontend, không sử dụng công cụ báo cáo riêng. Luồng batch chạy bằng Python/Docker và được điều phối bởi Airflow local với các DAG cho App/API, UCI lịch sử, mining và replay manifest. Các mục tiêu nghiệm thu bên dưới không đồng nghĩa mọi chức năng đã hoàn tất; chưa khẳng định hiệu quả kinh doanh thực nghiệm.
 1.2 Lý do chọn đề tài
 Dữ liệu bán hàng phát sinh qua nhiều giao dịch và chi nhánh thường phục vụ trước hết cho tác nghiệp. Việc tổng hợp lịch sử, đối chiếu doanh thu và tìm hiểu hành vi khách hàng cần một lớp dữ liệu được làm sạch, tổ chức thống nhất. Đề tài kết hợp nội dung kho dữ liệu với một bài toán khai phá có đầu ra dễ diễn giải và có thể sử dụng trong hệ thống quản lý bán hàng.
 1.3 Mục tiêu cụ thể
 • Tích hợp ba loại nguồn dữ liệu gồm CSDL giao dịch, API tồn kho và file lịch sử bán hàng.
 • Xây dựng Data Lake lưu dữ liệu nguồn và quy trình ETL có kiểm tra chất lượng, ghi nhật ký, chống nạp trùng.
 • Thiết kế Data Warehouse theo mô hình chiều để phân tích bán hàng và tồn kho.
-• Xây dựng báo cáo Power BI và phân cụm khách hàng bằng RFM kết hợp K-means.
+• Xây dựng ba báo cáo trên frontend RetailPulse, đọc PostgreSQL DWH qua FastAPI, và phân cụm khách hàng bằng RFM kết hợp K-means.
 • Đánh giá chất lượng dữ liệu, tính đúng của báo cáo, độ tách biệt và ý nghĩa nghiệp vụ của các cụm khách hàng.
 1.4 Câu hỏi phân tích
 Doanh thu và lượng bán biến động như thế nào theo thời gian? Sản phẩm nào đóng góp nhiều vào giá trị bán hàng? Tồn kho tại các chi nhánh được cập nhật đến thời điểm nào? Có những nhóm khách hàng nào khác biệt về lần mua gần nhất, tần suất mua và tổng chi tiêu? Mỗi nhóm nên được ưu tiên chăm sóc theo hướng nào?
  
 2 Phạm vi và yêu cầu của đề tài
 2.1 Phạm vi triển khai
-Đề tài tập trung vào tích hợp dữ liệu bán lẻ, xây dựng kho dữ liệu, báo cáo BI và phân cụm khách hàng. Bộ Online Retail II là nguồn chính cho phân tích RFM và K-means. CSDL giao dịch mẫu và API tồn kho được xây dựng ở mức tối thiểu để minh họa tích hợp nhiều loại nguồn. Đề tài không đặt mục tiêu xây dựng một phần mềm quản lý bán hàng hoàn chỉnh.
+Đề tài tập trung vào tích hợp dữ liệu bán lẻ, xây dựng kho dữ liệu, báo cáo frontend và phân cụm khách hàng. Bộ Online Retail II là nguồn chính cho phân tích RFM và K-means. CSDL giao dịch mẫu và API tồn kho được xây dựng ở mức tối thiểu để minh họa tích hợp nhiều loại nguồn. Đề tài không đặt mục tiêu xây dựng một phần mềm quản lý bán hàng hoàn chỉnh.
 
 Đầu ra nghiệp vụ chính là các nhóm khách hàng có đặc trưng mua sắm tương đồng và gợi ý chăm sóc theo từng nhóm. Chức năng này chỉ hỗ trợ quyết định, chưa triển khai chiến dịch tự động hoặc đo lường tác động thực tế đến doanh thu.
 Phạm vi dữ liệu được chia rõ: lịch sử UCI dùng cho phân tích kinh doanh và thực nghiệm phân cụm; dữ liệu CSDL và API mẫu dùng để kiểm tra luồng tích hợp, cập nhật và đối soát. Các nguồn được gắn nhãn riêng, không coi dữ liệu mẫu là dữ liệu thực của doanh nghiệp.
@@ -44,10 +44,11 @@ Yêu cầu	Thành phần dự kiến
 CSDL	CSDL tác nghiệp PostgreSQL của hệ thống bán hàng.
 API	API tồn kho của các node chi nhánh, trả dữ liệu JSON.
 File	File Excel Online Retail II; giữ nguyên bản gốc.
-ETL	Python và pandas; xử lý theo lịch và cho phép chạy thủ công.
-Data Lake	Kho lưu file nguồn, JSON và bản trích xuất, phân vùng theo nguồn và ngày.
+ETL	Python và pandas; có CLI/script chạy theo batch và replay từ MinIO.
+Điều phối	Apache Airflow local điều phối lịch chạy, phụ thuộc, retry, timeout và log; DAG được bật hoặc trigger theo nhu cầu.
+Data Lake	MinIO tương thích API S3, giữ Raw, manifest SHA-256 và kết quả batch; phân vùng theo nguồn, ngày ingest và batch_id.
 Data Warehouse	PostgreSQL riêng cho dữ liệu phân tích, tổ chức fact và dimension.
-BI tool	Power BI với báo cáo kinh doanh, tồn kho và nhóm khách hàng.
+Báo cáo	Frontend RetailPulse gồm Bán hàng, Tồn kho và Phân khúc khách hàng; FastAPI truy vấn các SQL view bằng tài khoản chỉ đọc.
 ML	K-means trên đặc trưng RFM đã tiền xử lý và chuẩn hóa.
 
 Phương án đăng ký sử dụng ML không giám sát và API nội bộ do nhóm xây dựng. Nếu giảng viên yêu cầu riêng Deep Learning hoặc API bên ngoài, nhóm sẽ điều chỉnh phạm vi theo yêu cầu học phần.
@@ -68,8 +69,10 @@ UCI không có chi nhánh, tồn kho hoặc nhân viên. Dữ liệu lịch sử
  
 4 Kiến trúc và thiết kế kho dữ liệu
 4.1 Các lớp xử lý
-Luồng phân tích gồm thu thập dữ liệu từ CSDL, API và file; lưu bản gốc vào Data Lake; làm sạch tại vùng staging; nạp Data Warehouse; tạo báo cáo BI và bảng RFM; chạy phân cụm; lưu kết quả để hiển thị trên BI. Data Lake dự kiến dùng kho đối tượng tương thích S3, với vùng raw và curated cùng thông tin nguồn và lần chạy.
-ETL dự kiến chạy hằng ngày và chạy thủ công khi trình diễn. Mỗi lần chạy kiểm tra cấu trúc, số dòng, dữ liệu lỗi và tổng giá trị trước khi công bố kết quả. File nhận diện bằng mã băm và chỉ số dòng; dữ liệu API/CSDL dùng khóa nguồn, phiên bản hoặc thời điểm cập nhật. Cơ chế upsert và nhật ký xử lý giúp chạy lại không nhân đôi dữ liệu.
+Luồng phân tích: File/OLTP/API → MinIO Raw → đọc lại và kiểm tra checksum → Validate/Transform/Load/Reconcile → PostgreSQL DWH → SQL read models → FastAPI chỉ đọc → Dashboard frontend. RFM/K-means đọc DWH, ghi CustomerSegmentSnapshot trong cùng warehouse để báo cáo khách hàng sử dụng.
+MinIO giữ workbook lịch sử, CSV trích xuất từ OLTP và JSON snapshot API, cùng manifest và kết quả batch. Không duy trì Curated Zone riêng; dữ liệu sau biến đổi được chuyển trực tiếp sang bước nạp DWH. Thư mục data_lake/raw/uci local là nơi tải workbook trước lần nhập; bản Raw dùng để replay được lưu trong MinIO.
+ETL chạy bằng Python/Docker. Airflow điều phối lịch, phụ thuộc và retry; logic kiểm tra/biến đổi tiếp tục nằm trong module Python. Luồng vận hành App/API định kỳ tách khỏi nạp lịch sử UCI và chạy mining khi có thay đổi dữ liệu hoặc cấu hình. Mỗi job phải báo đúng trạng thái: lỗi ghi DWH không được coi là đã công bố kết quả thành công.
+File tĩnh được định danh bằng checksum + sheet + dòng; App dùng khóa dòng nguồn; inventory replay giữ batch/date của Raw gốc. Với phiên bản workbook thay đổi cần chính sách thay thế dataset trước khi nạp chồng. Chống ghi đè nội dung Raw hiện do ứng dụng thực hiện, chưa cấu hình S3 Object Lock.
 4.2 Mô hình dữ liệu dự kiến
 Kho dữ liệu tổ chức theo mô hình chiều, trong đó fact chứa số liệu sự kiện và dimension cung cấp ngữ cảnh phân tích [2]. Các bảng chính được xác định ở mức chi tiết sau.
 Bảng	Mức chi tiết và nội dung
@@ -104,21 +107,21 @@ Sau khi huấn luyện, mô tả mỗi cụm bằng số khách, trung vị RFM 
 6 Chức năng trình diễn và tiêu chí nghiệm thu
 6.1 Báo cáo và sản phẩm bàn giao
 Đầu ra	Nội dung dự kiến
-BI kinh doanh	Giá trị mua, hủy/hoàn, lượng bán, số đơn, sản phẩm nổi bật; bộ lọc thời gian, nguồn và tiền tệ.
-BI tồn kho	Tồn mới nhất từng chi nhánh; thời điểm cập nhật; đánh dấu node chưa lấy được dữ liệu.
-BI khách hàng	Số khách mỗi cụm, trung vị RFM, tỷ trọng giá trị mua và gợi ý chăm sóc.
-Mã nguồn và tài liệu	CSDL và API mẫu; script ETL và ML; DDL kho dữ liệu; file Power BI; hướng dẫn chạy và báo cáo thực nghiệm.
+Báo cáo kinh doanh	Giá trị mua, hủy/hoàn, lượng bán, số đơn, sản phẩm nổi bật; bộ lọc thời gian, nguồn và tiền tệ.
+Báo cáo tồn kho	Tồn mới nhất từng chi nhánh; thời điểm cập nhật; đánh dấu node chưa lấy được dữ liệu.
+Báo cáo khách hàng	Số khách mỗi cụm, trung vị RFM, tỷ trọng giá trị mua và gợi ý chăm sóc.
+Mã nguồn và tài liệu	CSDL và API mẫu; script ETL và ML; DDL kho dữ liệu; frontend dashboard và API; cấu hình/DAG Airflow và minh chứng thực thi; hướng dẫn chạy và báo cáo thực nghiệm.
 Minh chứng	Nhật ký ETL, bảng đối soát, kết quả thử các K, cấu hình mô hình và ảnh trình diễn.
 
 6.2 Tiêu chí kiểm tra
 • Có dữ liệu được thu thập thực tế từ đủ ba loại nguồn CSDL, API và file; truy ngược được đến bản gốc trong Data Lake.
 • Nạp lại cùng đầu vào không tăng sai số dòng và tổng tiền. Các dòng bị loại có lý do, số lượng và vị trí lưu để kiểm tra.
 • Tổng giá trị hợp lệ trước và sau ETL khớp theo nguồn, kỳ và tiền tệ; phép tính tiền dùng kiểu số thập phân và quy tắc làm tròn thống nhất.
-• Bộ lọc BI trả kết quả khớp truy vấn SQL đối chứng; tồn kho hiển thị đúng mốc chụp và dữ liệu cũ được nhận diện.
+• Bộ lọc dashboard trả kết quả khớp truy vấn SQL đối chứng; tồn kho hiển thị đúng mốc chụp và dữ liệu cũ được nhận diện.
 • Mỗi khách đủ điều kiện có một nhãn trong một lần phân tích; có bảng so sánh K, mô tả cụm và giới hạn mô hình.
 • Thử mất kết nối một node: báo trạng thái không đầy đủ, không coi dữ liệu thiếu là tồn bằng 0; khi phục hồi, đồng bộ không trùng.
 6.3 Kịch bản trình diễn
-Tạo đơn và xác nhận thanh toán trên ứng dụng; kiểm tra tồn kho chi nhánh thay đổi theo quy tắc nghiệp vụ. Thu thập dữ liệu CSDL, gọi API và đọc file; chạy ETL, kiểm tra nhật ký và đối soát. Mở BI để xem dữ liệu mới của môi trường demo. Tiếp đó chạy hoặc tải kết quả phân cụm lịch sử UCI, giải thích các cụm và gợi ý chăm sóc. Chạy lại ETL để chứng minh chống trùng và mô phỏng lỗi một node để kiểm tra phục hồi.
+Tạo đơn và xác nhận thanh toán trên ứng dụng; kiểm tra tồn kho chi nhánh thay đổi theo quy tắc nghiệp vụ. Thu thập dữ liệu CSDL, gọi API và đọc file; chạy ETL, kiểm tra nhật ký và đối soát. Mở dashboard frontend để xem dữ liệu mới của môi trường demo. Các thao tác trên trang studio mô phỏng chưa ghi warehouse và phải được phân biệt với luồng Python/Airflow thực. Tiếp đó chạy hoặc tải kết quả phân cụm lịch sử UCI, giải thích các cụm và gợi ý chăm sóc. Chạy lại ETL để chứng minh chống trùng và mô phỏng lỗi một node để kiểm tra phục hồi.
  
 7 Kế hoạch triển khai và rủi ro
 7.1 Tiến độ dự kiến trong tám tuần
@@ -129,12 +132,12 @@ Tuần	Công việc trọng tâm	Đầu ra
 3	Dựng dữ liệu demo và thu thập đủ ba loại nguồn	Dữ liệu raw và nhật ký
 4	Làm sạch, nạp kho dữ liệu, chống trùng và đối soát	Pipeline ETL chạy được
 5	Lập bảng RFM, chuẩn hóa và thử K-means	Bảng so sánh K và mô hình
-6	Xây báo cáo BI và diễn giải cụm	Các trang báo cáo
-7	Tích hợp, thử lỗi node và kiểm tra số liệu	Biên bản kiểm tra
+6	Xây báo cáo frontend và diễn giải cụm	Các trang báo cáo
+7	Hoàn thiện hợp đồng trạng thái job, tích hợp Airflow, thử lỗi node và kiểm tra số liệu	Biên bản kiểm tra
 8	Hoàn thiện báo cáo, mã nguồn và luyện trình diễn	Bộ sản phẩm nộp
 
 7.2 Tổ chức công việc
-Phân chia theo bốn nhóm việc: khảo sát và chuẩn bị nguồn dữ liệu; Data Lake và ETL; thiết kế kho dữ liệu và BI; phân cụm và đánh giá. Tên người phụ trách được cập nhật sau khi nhóm thống nhất. Mỗi người cần hiểu luồng dữ liệu tổng thể; các quy tắc xử lý và công thức phải được rà soát chéo.
+Phân chia theo bốn nhóm việc: khảo sát và chuẩn bị nguồn dữ liệu; Data Lake và ETL; thiết kế kho dữ liệu và dashboard; phân cụm và đánh giá. Tên người phụ trách được cập nhật sau khi nhóm thống nhất. Mỗi người cần hiểu luồng dữ liệu tổng thể; các quy tắc xử lý và công thức phải được rà soát chéo.
 7.3 Rủi ro và biện pháp
 Rủi ro	Biện pháp dự kiến
 Dữ liệu thiếu hoặc không thống nhất	Khảo sát sớm, lập quy tắc xử lý, giữ bản gốc và đối soát.
@@ -151,9 +154,9 @@ Giá trị của đề tài được đánh giá qua tính đúng của dữ li�
 Thành phần	Lựa chọn ban đầu
 Ứng dụng và API	Dịch vụ API mẫu trả JSON và giao diện tối thiểu để tạo giao dịch kiểm thử.
 CSDL và kho dữ liệu	PostgreSQL; tách CSDL tác nghiệp khỏi CSDL phân tích.
-Data Lake	Kho đối tượng tương thích S3 cho dữ liệu raw và curated.
-ETL và ML	Python, pandas, scikit-learn; lập lịch theo lô.
-BI và môi trường demo	Power BI Desktop; Docker Compose cho các dịch vụ phù hợp.
+Data Lake	MinIO local, API tương thích S3; vùng Raw và metadata; không duy trì Curated riêng.
+ETL và ML	Python, pandas, scikit-learn; batch CLI và DAG Airflow local đã tích hợp.
+Báo cáo và môi trường demo	Frontend HTML/CSS/JavaScript + FastAPI đọc PostgreSQL DWH; Docker Compose cho hạ tầng.
 
 8.3 Tài liệu tham khảo
 [1] Chen, D. (2012). Online Retail II. UCI Machine Learning Repository. DOI 10.24432/C5CG6D.

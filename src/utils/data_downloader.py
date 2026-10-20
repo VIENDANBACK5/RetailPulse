@@ -2,6 +2,7 @@ import os
 import sys
 import random
 import datetime
+import json
 import pandas as pd
 
 if sys.platform == "win32":
@@ -17,7 +18,7 @@ UCI_CSV_PATH = os.path.join(UCI_DIR, "online_retail_II.csv")
 
 
 def ensure_directories():
-    for sub in ["raw/uci", "raw/app_db", "raw/api_inventory", "curated"]:
+    for sub in ["raw/uci", "raw/app_db", "raw/api_inventory"]:
         p = os.path.join(BASE_DIR, "data_lake", sub)
         os.makedirs(p, exist_ok=True)
     os.makedirs(os.path.join(BASE_DIR, "models"), exist_ok=True)
@@ -120,6 +121,8 @@ def prepare_uci_data():
 
     print("🌐 File dữ liệu UCI chưa có. Đang khởi tạo bộ dữ liệu tiêu chuẩn...")
     generate_synthetic_uci_dataset(UCI_CSV_PATH, n_records=30000)
+    with open(UCI_CSV_PATH + ".metadata.json", "w", encoding="utf-8") as file:
+        json.dump({"data_mode": "synthetic", "generator": "retailpulse-demo"}, file)
     return UCI_CSV_PATH
 
 

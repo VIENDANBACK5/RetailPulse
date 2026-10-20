@@ -55,7 +55,7 @@ def run_fault_simulation():
     print("\n✅ ĐÁNH GIÁ NGHIỆM THU:")
     print("  • Pipeline ETL không bị crash/ngừng hoạt động khi 1 node sập.")
     print("  • Dữ liệu chi nhánh lỗi được gắn cờ node_status = 'OFFLINE'.")
-    print("  • Dashboard Power BI hiển thị trạng thái thiếu dữ liệu (Incomplete Data),")
+    print("  • Dashboard frontend hiển thị trạng thái thiếu dữ liệu (Incomplete Data),")
     print("    tuyệt đối không hiển thị tồn kho = 0 gây hiểu lầm kinh doanh.")
     print("=" * 75 + "\n")
 

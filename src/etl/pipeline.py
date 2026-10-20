@@ -1,150 +1,106 @@
-import os
+"""Source -> verified Raw lake -> transformations -> PostgreSQL."""
+import argparse
+import datetime
+import io
+import json
+from pathlib import Path
 import sys
 import time
 import uuid
-import datetime
-import argparse
-
-if sys.platform == "win32":
-    try:
-        sys.stdout.reconfigure(encoding="utf-8")
-        sys.stderr.reconfigure(encoding="utf-8")
-    except Exception:
-        pass
-
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
-sys.path.append(BASE_DIR)
-
+from decimal import Decimal
+BASE_DIR = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(BASE_DIR))
+import pandas as pd
+from src.storage.lake import RawLake
 from src.utils.db_helper import get_dwh_engine, init_dwh_schema, populate_dim_date
-from src.utils.data_downloader import prepare_uci_data
-from src.etl.extractors import extract_uci_data, extract_app_db_orders, extract_api_inventory
+from src.etl.ingestion import ingest_source
+from src.etl.extractors import read_uci_payload
 from src.etl.transformers import transform_sales_data, transform_inventory_snapshots
 from src.etl.loaders import load_fact_sales, load_fact_inventory, load_rejected_records
 from src.etl.quality_check import reconcile_batch
+from src.etl.contracts import utc_instant
 
 
-def run_etl_pipeline(sources: list = None):
-    """
-    Hàm điều phối toàn bộ đường ống ETL đa nguồn:
-    1. Chuẩn bị schema DWH và bảng DimDate
-    2. Nạp dữ liệu Lịch sử Online Retail II (File)
-    3. Nạp dữ liệu Bán hàng Mới từ App DB (PostgreSQL)
-    4. Nạp dữ liệu Chụp Tồn kho Chi nhánh qua API (FastAPI)
-    5. Đối soát kiểm toán số dòng và tổng tiền
-    """
-    if sources is None:
-        sources = ["uci", "app", "api"]
-
-    batch_id = f"BATCH-{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:4].upper()}"
-    print(f"\n🚀 [ETL ENGINE] KHỞI ĐỘNG ĐƯỜNG ỐNG ETL ĐA NGUỒN - MÃ PHIÊN: {batch_id}")
-    print("=" * 70)
-    start_time = time.time()
-
-    dwh_engine = get_dwh_engine()
-
-    # 1. Đảm bảo DWH và DimDate đã sẵn sàng
-    try:
-        init_dwh_schema(dwh_engine)
-        populate_dim_date(dwh_engine)
-    except Exception as e:
-        print(f"⚠️ Cảnh báo khởi tạo DWH: {e}")
-
-    # 2. Xử lý Nguồn 1: File Lịch sử Online Retail II
-    if "uci" in sources:
-        print("\n--- [XỬ LÝ NGUỒN 1: FILE ONLINE RETAIL II (UCI)] ---")
+def run_etl_pipeline(sources=None, *, uci_file=None, demo=False, manifests=None, batch_id=None):
+    sources = list(sources if sources is not None else ['uci', 'app', 'api'])
+    if any(source not in ('uci', 'app', 'api') for source in sources):
+        raise ValueError('Unknown ETL source')
+    batch_id = batch_id or f'BATCH-{datetime.datetime.now(datetime.timezone.utc):%Y%m%d-%H%M%S}-{uuid.uuid4().hex[:8]}'
+    started = time.monotonic()
+    lake = RawLake()
+    engine = get_dwh_engine()
+    result = {'batch_id': batch_id, 'lake_backend': lake.backend, 'sources': {}, 'status': 'FAILED'}
+    init_dwh_schema(engine)
+    populate_dim_date(engine)
+    replay = {}
+    for key in manifests or []:
+        manifest, payload = lake.read_raw(key)
+        if manifest['source'] in replay:
+            raise ValueError('Only one manifest per source may be replayed')
+        replay[manifest['source']] = (key, manifest, payload)
+    if manifests:
+        sources = list(replay)
+    for source in sources:
+        entry = {'status': 'FAILED'}
+        result['sources'][source] = entry
         try:
-            prepare_uci_data()
-            raw_uci_df = extract_uci_data()
-            valid_uci_df, rejected_uci_df = transform_sales_data(raw_uci_df, source_code="UCI_HISTORICAL")
-            
-            # Nạp Fact và Rejected
-            inserted_count, dwh_amount = load_fact_sales(dwh_engine, valid_uci_df, batch_id)
-            load_rejected_records(dwh_engine, rejected_uci_df, batch_id, source_code="UCI_HISTORICAL")
-            
-            # Đối soát số liệu
-            source_amount = float(valid_uci_df["total_amount"].sum()) if not valid_uci_df.empty else 0.0
-            reconcile_batch(
-                engine=dwh_engine,
-                batch_id=batch_id,
-                source_code="UCI_HISTORICAL",
-                source_records_count=len(raw_uci_df),
-                dwh_records_inserted=inserted_count,
-                rejected_records_count=len(rejected_uci_df),
-                source_total_amount=source_amount,
-                dwh_total_amount=dwh_amount
-            )
-        except Exception as ex:
-            print(f"❌ Lỗi khi xử lý nguồn UCI: {ex}")
-
-    failed_sources = []
-    success_sources = []
-
-    # 3. Xử lý Nguồn 2: CSDL Tác nghiệp Bán hàng (App DB)
-    if "app" in sources:
-        print("\n--- [XỬ LÝ NGUỒN 2: CSDL TÁC NGHIỆP BÁN HÀNG (APP DB)] ---")
-        try:
-            raw_app_df = extract_app_db_orders()
-            if not raw_app_df.empty:
-                # Lưu bản gốc thô vào Data Lake (tuân thủ nguyên tắc Data Lake Landing Layer)
-                app_lake_dir = os.path.join(BASE_DIR, "data_lake", "raw", "app_db")
-                os.makedirs(app_lake_dir, exist_ok=True)
-                lake_file = os.path.join(app_lake_dir, f"orders_{batch_id}.csv")
-                raw_app_df.to_csv(lake_file, index=False)
-                print(f"  💾 Đã lưu trữ bản sao thô vào Data Lake: {lake_file}")
-
-                valid_app_df, rejected_app_df = transform_sales_data(raw_app_df, source_code="APP_OPERATIONAL")
-                inserted_count, dwh_amount = load_fact_sales(dwh_engine, valid_app_df, batch_id)
-                load_rejected_records(dwh_engine, rejected_app_df, batch_id, source_code="APP_OPERATIONAL")
-                
-                source_amount = float(valid_app_df["total_amount"].sum()) if not valid_app_df.empty else 0.0
-                reconcile_batch(
-                    engine=dwh_engine,
-                    batch_id=batch_id,
-                    source_code="APP_OPERATIONAL",
-                    source_records_count=len(raw_app_df),
-                    dwh_records_inserted=inserted_count,
-                    rejected_records_count=len(rejected_app_df),
-                    source_total_amount=source_amount,
-                    dwh_total_amount=dwh_amount
-                )
-                success_sources.append("app")
+            if source in replay:
+                key, manifest, payload = replay[source]
             else:
-                print("ℹ️ Chưa có đơn hàng mới nào từ App DB.")
-                success_sources.append("app")
-        except Exception as ex:
-            print(f"❌ Lỗi khi xử lý nguồn App DB: {ex}")
-            failed_sources.append("app")
+                key = ingest_source(lake, source, batch_id, uci_file=uci_file, demo=demo)
+                manifest, payload = lake.read_raw(key)
+            entry.update({'manifest_key': key, 'raw_uri': lake.uri(manifest['object_key']),
+                          'sha256': manifest['sha256'], 'data_mode': manifest['data_mode']})
+            print(f"Raw verified: {entry['raw_uri']}", flush=True)
+            observed_at = utc_instant(manifest.get('collected_at', manifest['ingested_at']))
+            if source == 'api':
+                snapshots = json.loads(payload)
+                frame = transform_inventory_snapshots(snapshots, observed_at=observed_at)
+                entry['records_loaded'] = load_fact_inventory(engine, frame, manifest['batch_id'])
+                entry['offline_nodes'] = frame.loc[frame.node_status != 'ONLINE', 'branch_code'].unique().tolist()
+                entry['status'] = 'PARTIAL' if entry['offline_nodes'] else 'SUCCESS'
+                continue
+            if source == 'uci':
+                frame = read_uci_payload(payload, manifest['object_key'], manifest['sha256'])
+            else:
+                frame = pd.read_csv(io.BytesIO(payload), dtype={'customer_id': str, 'source_record_id': str,
+                    'invoice_no': str, 'stock_code': str, 'unit_price': str, 'quantity': str})
+            source_code = 'UCI_HISTORICAL' if source == 'uci' else 'APP_OPERATIONAL'
+            valid, rejected = transform_sales_data(frame, source_code)
+            valid['source_observed_at'] = observed_at
+            stats = load_fact_sales(engine, valid, batch_id, return_stats=True)
+            load_rejected_records(engine, rejected, batch_id, source_code)
+            check = reconcile_batch(engine, batch_id, source_code, len(frame), stats['inserted_count'], len(rejected),
+                (sum(valid['total_amount'], Decimal('0.00')) if not valid.empty else Decimal('0.00'))
+                    - stats['superseded_source_amount'],
+                stats['matched_amount'], dwh_records_existing=stats['existing_count'],
+                superseded_records_count=stats['superseded_count'])
+            entry.update(stats)
+            entry.update({'input_count': len(frame), 'rejected_count': len(rejected),
+                          'reconciliation': check['status'],
+                          'status': 'SUCCESS' if check['status'] == 'MATCHED' else 'FAILED'})
+        except Exception as error:
+            entry['error'] = f'{type(error).__name__}: {error}'
+            print(f"Source {source} FAILED: {entry['error']}", flush=True)
+    states = [entry['status'] for entry in result['sources'].values()]
+    result['status'] = 'FULL_SUCCESS' if states and all(s == 'SUCCESS' for s in states) else (
+        'PARTIAL' if any(s in ('SUCCESS', 'PARTIAL') for s in states) else 'FAILED')
+    result['elapsed_seconds'] = round(time.monotonic() - started, 3)
+    result['finished_at'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    result['result_uri'] = lake.uri(f'runs/{batch_id}.json')
+    lake.write_run_result(batch_id, result)
+    print(json.dumps(result, ensure_ascii=False, indent=2, default=str), flush=True)
+    return result
 
-    # 4. Xử lý Nguồn 3: API Tồn kho 3 Chi nhánh (FastAPI)
-    if "api" in sources:
-        print("\n--- [XỬ LÝ NGUỒN 3: API TỒN KHO CÁC CHI NHÁNH (JSON)] ---")
-        try:
-            inventory_snapshots = extract_api_inventory()
-            
-            # Lưu bản gốc thô JSON vào Data Lake
-            import json
-            api_lake_dir = os.path.join(BASE_DIR, "data_lake", "raw", "inventory_api")
-            os.makedirs(api_lake_dir, exist_ok=True)
-            lake_json = os.path.join(api_lake_dir, f"inventory_{batch_id}.json")
-            with open(lake_json, "w", encoding="utf-8") as f:
-                json.dump(inventory_snapshots, f, ensure_ascii=False, indent=2, default=str)
-            print(f"  💾 Đã lưu trữ JSON snapshot thô vào Data Lake: {lake_json}")
 
-            inv_df = transform_inventory_snapshots(inventory_snapshots, source_code="APP_OPERATIONAL")
-            load_fact_inventory(dwh_engine, inv_df, batch_id)
-            success_sources.append("api")
-        except Exception as ex:
-            print(f"❌ Lỗi khi xử lý nguồn API Tồn kho: {ex}")
-            failed_sources.append("api")
-
-    elapsed = time.time() - start_time
-    batch_status = "FULL_SUCCESS" if not failed_sources else ("PARTIAL" if success_sources else "FAILED")
-    print(f"\n🎉 [HOÀN TẤT ĐƯỜNG ỐNG ETL] Mã phiên: {batch_id} | Trạng thái: {batch_status} | Thời gian: {elapsed:.2f}s")
-    print("=" * 70)
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Chạy đường ống ETL Kho dữ liệu bán hàng")
-    parser.add_argument("--sources", nargs="+", default=["uci", "app", "api"], help="Các nguồn cần nạp: uci app api")
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--sources', nargs='+', default=['uci', 'app', 'api'])
+    parser.add_argument('--uci-file')
+    parser.add_argument('--demo', action='store_true')
+    parser.add_argument('--manifest', action='append', help='Replay verified lake manifests')
+    parser.add_argument('--batch-id')
     args = parser.parse_args()
-    run_etl_pipeline(args.sources)
+    outcome = run_etl_pipeline(args.sources, uci_file=args.uci_file, demo=args.demo,
+                               manifests=args.manifest, batch_id=args.batch_id)
+    sys.exit(0 if outcome['status'] == 'FULL_SUCCESS' else 1)

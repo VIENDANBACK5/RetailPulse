@@ -37,7 +37,7 @@
         <mxCell id="bi" parent="1" style="rounded=0;html=1;fillColor=#EFFBF0;strokeColor=#22BF55;strokeWidth=1.6;" value="" vertex="1">
           <mxGeometry height="155" width="1580" x="60" y="1250" as="geometry" />
         </mxCell>
-        <mxCell id="bi-title" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=20;fontStyle=1;fontColor=#1C2639;spacingLeft=0;" value="POWER BI&amp;nbsp;" vertex="1">
+        <mxCell id="bi-title" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=20;fontStyle=1;fontColor=#1C2639;spacingLeft=0;" value="FRONTEND ANALYTICS / READ-ONLY FASTAPI" vertex="1">
           <mxGeometry height="30" width="1536" x="82" y="1260" as="geometry" />
         </mxCell>
         <mxCell id="file" parent="1" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fillColor=#FFF8EF;strokeColor=#FF9E18;strokeWidth=1.5;fontFamily=Arial;align=center;verticalAlign=middle;spacing=5;" value="&lt;span style=&quot;font-size:18px;color:#1C2639&quot;&gt;&lt;b&gt;Historical Files&lt;/b&gt;&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;font-size:16px;color:#1C2639&quot;&gt;CSV / Excel · historical transactions&lt;/span&gt;" vertex="1">

@@ -61,3 +61,11 @@ data_lake/raw/uci/online_retail_II.xlsx
 data_lake/raw/uci/*.zip
 data_lake/raw/uci/*.csv
 !data_lake/raw/multi_store/*
+data_lake/raw/uci/*.metadata.json
+data_lake/raw/source=*/
+data_lake/runs/
+data_lake/raw/uci/*.download
+node_modules/
+test-results/
+playwright-report/
+models/runs/

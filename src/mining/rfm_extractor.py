@@ -38,30 +38,21 @@ def extract_rfm_from_dwh(
     if engine is None:
         engine = get_dwh_engine()
 
-    # 1. Xác định mốc thời gian cửa sổ khảo sát (12 tháng gần nhất)
+    if window_months <= 0:
+        raise ValueError("window_months must be positive")
     if window_end is None:
-        try:
-            with engine.connect() as conn:
-                max_res = conn.execute(
-                    text("""
-                        SELECT MAX(dd.full_date) 
-                        FROM fact_sales fs
-                        JOIN dim_date dd ON fs.date_key = dd.date_key
-                        JOIN dim_source ds ON fs.source_key = ds.source_key
-                        WHERE ds.source_code = :src 
-                          AND fs.is_cancelled = FALSE 
-                          AND fs.total_amount > 0
-                    """),
-                    {"src": source_code}
-                ).scalar()
-                if max_res:
-                    window_end = max_res
-        except Exception:
-            pass
-
-    # Nếu không truy vấn được từ DWH, dùng mốc max của tập UCI Online Retail II
-    if window_end is None:
-        window_end = datetime.date(2011, 12, 9)
+        with engine.connect() as conn:
+            window_end = conn.execute(text("""
+                SELECT MAX(dd.full_date) FROM fact_sales fs
+                JOIN dim_date dd ON fs.date_key=dd.date_key
+                JOIN dim_source ds ON fs.source_key=ds.source_key
+                JOIN dim_customer dc ON fs.customer_key=dc.customer_key
+                WHERE ds.source_code=:src AND fs.is_cancelled=FALSE
+                  AND fs.quantity>0 AND fs.total_amount>0
+                  AND dc.customer_code NOT LIKE 'GUEST%'
+            """), {"src": source_code}).scalar()
+        if window_end is None:
+            raise ValueError(f"No eligible warehouse purchases for {source_code}")
 
     if isinstance(window_end, str):
         window_end = pd.to_datetime(window_end).date()
@@ -69,10 +60,12 @@ def extract_rfm_from_dwh(
         window_end = window_end.date()
 
     if window_start is None:
-        window_start = window_end - datetime.timedelta(days=int(window_months * 30.5))
+        window_start = (pd.Timestamp(window_end) + pd.Timedelta(days=1) - pd.DateOffset(months=window_months)).date()
     elif isinstance(window_start, str):
         window_start = pd.to_datetime(window_start).date()
 
+    if window_start > window_end:
+        raise ValueError("window_start must not be after window_end")
     reference_date = window_end + datetime.timedelta(days=1)
 
     print(f"🔍 [Data Mining - RFM] Trích xuất RFM từ FactSales ({source_code})...")
@@ -98,31 +91,9 @@ def extract_rfm_from_dwh(
           AND dc.customer_code NOT LIKE 'GUEST%'
     """)
 
-    try:
-        with engine.connect() as conn:
-            df = pd.read_sql(query, conn, params={
-                "src": source_code,
-                "w_start": window_start,
-                "w_end": window_end
-            })
-    except Exception as ex:
-        print(f"⚠️ Lỗi kết nối DWH ({ex}). Đang sử dụng fallback từ file raw/curated...")
-        # Fallback đọc từ file curated/raw để test offline
-        csv_path = os.path.join(BASE_DIR, "data_lake", "raw", "uci", "online_retail_II.csv")
-        raw_df = pd.read_csv(csv_path)
-        raw_df = raw_df.dropna(subset=["Customer ID"])
-        raw_df = raw_df[(raw_df["Quantity"] > 0) & (raw_df["Price"] > 0) & (~raw_df["Invoice"].astype(str).str.startswith("C"))]
-        
-        raw_df["inv_date"] = pd.to_datetime(raw_df["InvoiceDate"]).dt.date
-        # Lọc đúng cửa sổ 12 tháng
-        raw_df = raw_df[(raw_df["inv_date"] >= window_start) & (raw_df["inv_date"] <= window_end)]
-
-        df = pd.DataFrame({
-            "customer_key": raw_df["Customer ID"].astype(int),
-            "customer_code": raw_df["Customer ID"].astype(str).str.replace(".0", "", regex=False),
-            "invoice_date": raw_df["inv_date"],
-            "invoice_no": raw_df["Invoice"].astype(str),
-            "total_amount": raw_df["Quantity"] * raw_df["Price"]
+    with engine.connect() as conn:
+        df = pd.read_sql(query, conn, params={
+            "src": source_code, "w_start": window_start, "w_end": window_end
         })
 
     if df.empty:

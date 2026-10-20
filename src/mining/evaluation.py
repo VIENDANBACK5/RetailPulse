@@ -15,7 +15,7 @@ sys.path.append(BASE_DIR)
 from src.mining.clustering import preprocess_rfm
 
 
-def evaluate_k_selection(rfm_df: pd.DataFrame, k_range: range = range(2, 7), random_state: int = 42) -> Dict[str, Any]:
+def evaluate_k_selection(rfm_df: pd.DataFrame, k_range: range = range(2, 7), random_state: int = 42, output_dir=None) -> Dict[str, Any]:
     """
     Thực nghiệm quét các giá trị K từ 2 đến 6 để tìm K tối ưu (Tuân thủ đề cương 5.2):
     - Tính toán Inertia (Elbow Method / SSE)
@@ -77,7 +77,7 @@ def evaluate_k_selection(rfm_df: pd.DataFrame, k_range: range = range(2, 7), ran
     print("=" * 90 + "\n")
 
     # Lưu bảng so sánh thực nghiệm ra file phục vụ báo cáo minh chứng
-    models_dir = os.path.join(BASE_DIR, "models")
+    models_dir = output_dir or os.path.join(BASE_DIR, "models")
     os.makedirs(models_dir, exist_ok=True)
     summary_df = pd.DataFrame(k_summary)
     csv_path = os.path.join(models_dir, "k_comparison_summary.csv")

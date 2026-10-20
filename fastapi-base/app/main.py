@@ -1,8 +1,13 @@
 import logging
+import json
+import os
+from pathlib import Path
 
 from fastapi.exceptions import ValidationException
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from fastapi_sqlalchemy import DBSessionMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
@@ -49,13 +54,20 @@ def get_application() -> FastAPI:
     )
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_origins=json.loads(settings.BACKEND_CORS_ORIGINS),
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
     application.add_middleware(DBSessionMiddleware, db_url=settings.DATABASE_URL)
     application.include_router(router, prefix=settings.API_PREFIX)
+    portal = Path(os.getenv("PORTAL_DIR", str(Path(__file__).resolve().parents[2] / "frontend")))
+    if portal.is_dir():
+        application.mount("/frontend", StaticFiles(directory=portal, html=True), name="portal")
+
+        @application.get("/", include_in_schema=False)
+        def portal_home():
+            return RedirectResponse("/frontend/dashboard.html")
     application.add_exception_handler(CustomException, custom_error_handler)
     application.add_exception_handler(ValidationException, validation_exception_handler)
     application.add_exception_handler(Exception, fastapi_error_handler)

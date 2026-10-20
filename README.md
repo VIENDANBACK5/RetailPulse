@@ -1,4 +1,9 @@
 # RetailPulse — Enterprise DataOps & MLOps Platform
+
+**Báo cáo tích hợp frontend:** [hướng dẫn MinIO → ETL → Warehouse → Dashboard](docs/DASHBOARD_GUIDE.md). Mở `http://localhost:8001/frontend/dashboard.html` để xem ba báo cáo đọc dữ liệu warehouse thật. App/API dùng dữ liệu mô phỏng; UCI là workbook lịch sử gốc. Không còn phụ thuộc ứng dụng BI Desktop.
+
+**Điều phối Airflow:** `./scripts/run_airflow.ps1` → `http://localhost:18082`; [hướng dẫn DAG, retry và kiểm chứng](docs/AIRFLOW_GUIDE.md). Metadata riêng, MinIO Raw → ETL → DWH và mining chạy bằng job thực. Các studio Kafka/MLOps trên trình duyệt vẫn là mô phỏng.
+
 ## Hệ Thống Kho Dữ Liệu Bán Lẻ Đa Chi Nhánh & Nền Tảng Phân Cụm Khách Hàng Nâng Cao
 > **HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG (PTIT)**  
 > **Môn học:** Kho dữ liệu và Khai phá dữ liệu (Data Warehouse & Data Mining)  
@@ -84,7 +89,7 @@ flowchart TD
     subgraph StorageAndServing ["6. DATA WAREHOUSE & DATAOPS PORTAL"]
         DWH[("PostgreSQL DWH<br/>Star Schema FactSales / FactInventory")]
         PORTAL["Web DataOps / MLOps Portal<br/>(Profiling • Model Registry • CRM Webhook)"]
-        DL["Data Lake<br/>data_lake/raw/ & data_lake/curated/"]
+        DL["Data Lake<br/>MinIO S3 Raw + manifest + batch result"]
     end
 
     HN --> VPN1 --> P_HN
@@ -233,7 +238,7 @@ BTL_DATA_MINING/
 │   │   │   ├── branch_sg_sales.json    # Olist E-Commerce Style (REST API JSON, EUR)
 │   │   │   └── dim_stores_kaggle_benchmark.json # Store metadata, geolocations, VPN subnets
 │   │   └── secure_staging/             # Vùng đệm cách ly nạp giao dịch đã ký số HMAC
-│   └── curated/                        # Dữ liệu sạch đã qua Data Profiling
+│   └── runs/                           # Kết quả batch khi dùng backend local
 ├── fastapi-base/                       # Microservice backend tác nghiệp
 │   ├── app/ (api, core, models, schemas, services)
 │   └── seed_data.py                    # Nạp dữ liệu ban đầu
@@ -323,7 +328,7 @@ Server giao diện luôn phục vụ đúng thư mục dự án và tắt cache 
 Truy cập hệ thống tại:
 * **Giao diện Web DataOps Portal:** [http://localhost:5173/frontend/index.html](http://localhost:5173/frontend/index.html)
 * **Swagger API Backend:** [http://localhost:8001/docs](http://localhost:8001/docs)
-* **Kết nối DWH qua Power BI / DBeaver:** `localhost:5433` | Database: `retail_dwh_db` | User: `postgres` | Password: `postgres`
+* **Kết nối DWH qua DBeaver:** `localhost:5433` | Database: `retail_dwh_db` | User: `postgres` | Password: `postgres`
 
 ---
 
@@ -363,7 +368,7 @@ ALL TESTS COMPLETED SUCCESSFULLY!
 | Trang Web | Đường dẫn | Chức năng nổi bật |
 | :--- | :--- | :--- |
 | **Studio Landing** | [`frontend/index.html`](http://localhost:5173/frontend/index.html) | Giới thiệu đồ án, tổng quan kiến trúc 4 tầng, thông số kỹ thuật cốt lõi và định vị thương hiệu hệ thống |
-| **DataOps Overview** | [`frontend/dashboard.html`](http://localhost:5173/frontend/dashboard.html) | Dashboard tổng quan chỉ số chất lượng dữ liệu (Data Quality 98.2%), bảng đối soát SLA và sơ đồ topo thời gian thực |
+| **Báo cáo kinh doanh** | [`frontend/dashboard.html`](http://localhost:8001/frontend/dashboard.html) | Bán hàng theo tiền tệ/ngày/nguồn/chi nhánh; tồn kho mới nhất; phân khúc RFM và danh sách khách; đối soát ETL. Đọc warehouse qua API chỉ đọc. |
 | **Ingestion & MDM Studio** | [`frontend/operations.html`](http://localhost:5173/frontend/operations.html) | **Data Profiling:** Kéo thả file CSV kiểm tra lỗi tức thì.<br/>**MDM Studio:** Tra cứu SKU chéo chi nhánh (`SG-HYDRA-750` $\to$ `PRD-001`) và quy đổi tiền tệ sang GBP.<br/>**Network Security:** Giám sát Subnet VPN và SSH Reverse Tunnel của 3 node |
 | **Pipeline & Kafka Console** | [`frontend/etl-monitor.html`](http://localhost:5173/frontend/etl-monitor.html) | **Async Stepper:** Mô phỏng tiến trình microservices 6 bước qua Kafka trigger.<br/>**Heterogeneous Simulator:** Bấm nút *"🔥 Bắn Luồng Dị Đồng 3 Chi Nhánh"* để xem Kafka bắt gói tin và chuẩn hóa sang Canonical JSON thời gian thực |
 | **MLOps & Model Registry** | [`frontend/customer-segments.html`](http://localhost:5173/frontend/customer-segments.html) | **Model Registry:** So sánh các phiên bản mô hình, xem điểm Silhouette & Inertia, bấm *"Promote to Production"*.<br/>**Hyperparameter Tuning:** Điều chỉnh số cụm $K$ và trọng số RFM để huấn luyện lại.<br/>**Data Activation:** Tạo Endpoint REST API & Webhook động cấp phát cho CRM |

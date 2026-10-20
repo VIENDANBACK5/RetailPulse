@@ -43,8 +43,11 @@ def init_dwh_schema(engine: Engine = None):
         with open(sql_path, "r", encoding="utf-8") as f:
             sql_content = f.read()
         with engine.begin() as conn:
+            conn.execute(text("SELECT pg_advisory_xact_lock(72400, 1)"))
             # Tách và thực thi các câu lệnh SQL
             conn.execute(text(sql_content))
+            from src.utils.dwh_migrations import migrate_money
+            migrate_money(conn)
         print("✅ Đã khởi tạo schema Star Schema trong Data Warehouse thành công!")
 
 

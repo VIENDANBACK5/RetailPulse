@@ -10,117 +10,124 @@ def generate_row_hash(source_code: str, invoice_no: str, stock_code: str, quanti
 
 
 def transform_sales_data(df: pd.DataFrame, source_code: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    Làm sạch, chuẩn hóa và gắn nhãn nghiệp vụ cho dữ liệu bán hàng:
-    - Nhận diện đơn hủy: is_cancelled = True khi Quantity < 0 hoặc Invoice bắt đầu bằng 'C'
-    - Tách biệt bản ghi không hợp lệ (đơn giá <= 0, thiếu mã hàng) vào rejected_df
-    - Tính total_amount, date_key và record_hash (chống nạp trùng)
-    - Trả về (valid_df, rejected_df)
-    """
+    """Validate individual source rows before coercion; keep rejected values intact."""
+    from decimal import Decimal
+    from src.etl.contracts import decimal_value, money, PRICE_STEP
     if df.empty:
         return pd.DataFrame(), pd.DataFrame()
+    raw = df.copy().reset_index(drop=True)
+    df = raw.copy()
+    for column in ("invoice_no", "stock_code", "quantity", "unit_price", "invoice_date",
+                   "description", "customer_id", "country"):
+        if column not in df:
+            df[column] = None
+    rules = {}
+    for column, label in (("invoice_no", "Invoice"), ("stock_code", "StockCode")):
+        values = df[column].astype("string").str.strip()
+        rules[f"Missing or invalid {label}"] = (values.isna() | values.str.lower().isin(
+            ["", "nan", "none", "null", "<na>"]) | values.str.len().gt(100)).fillna(True)
+        df[column] = values
+    def quantity_or_none(value):
+        try:
+            number = decimal_value(value)
+            if number == 0 or not -2147483647 <= number <= 2147483647 or number != number.to_integral_value():
+                return None
+            return int(number)
+        except ValueError:
+            return None
+    quantity = df["quantity"].map(quantity_or_none)
+    rules["Quantity must be a nonzero 32-bit integer"] = quantity.isna()
 
-    print(f"🔄 [ETL - Transform] Đang làm sạch và chuẩn hóa {len(df):,} bản ghi bán hàng ({source_code})...")
-    df = df.copy()
-
-    # 1. Điền giá trị mặc định
-    if "branch_code" not in df.columns:
-        df["branch_code"] = "UNKNOWN"
-    df["branch_code"] = df["branch_code"].fillna("UNKNOWN")
-
-    df["invoice_no"] = df["invoice_no"].astype(str).str.strip()
-    df["stock_code"] = df["stock_code"].astype(str).str.strip()
-    df["description"] = df["description"].fillna("Sản phẩm không có mô tả").astype(str)
-    df["quantity"] = pd.to_numeric(df["quantity"], errors="coerce").fillna(0).astype(int)
-    df["unit_price"] = pd.to_numeric(df["unit_price"], errors="coerce").fillna(0.0).astype(float)
-
-    # 2. Nhận diện đơn hủy/hoàn
-    is_cancel_mask = (df["quantity"] < 0) | (df["invoice_no"].str.startswith("C", na=False))
-    df["is_cancelled"] = is_cancel_mask
-
-    # 3. Phân loại dòng lỗi (Rejection Rules)
-    # Lỗi: Đơn giá <= 0 (trong trường hợp không phải đơn hủy điều chỉnh) hoặc thiếu mã sản phẩm
-    invalid_price_mask = (df["unit_price"] <= 0)
-    invalid_stock_mask = (df["stock_code"] == "") | (df["stock_code"].str.upper() == "NAN")
-
-    reject_mask = invalid_price_mask | invalid_stock_mask
-    rejected_df = df[reject_mask].copy()
-    valid_df = df[~reject_mask].copy()
-
-    # Gán lý do từ chối
-    if not rejected_df.empty:
-        reasons = []
-        for _, row in rejected_df.iterrows():
-            r_list = []
-            if row["unit_price"] <= 0:
-                r_list.append("Unit Price <= 0")
-            if row["stock_code"] in ["", "NAN"]:
-                r_list.append("Missing StockCode")
-            reasons.append("; ".join(r_list))
-        rejected_df["rejection_reason"] = reasons
-
-    # 4. Tính toán các chỉ số cho dòng hợp lệ
-    if not valid_df.empty:
-        valid_df["invoice_date"] = pd.to_datetime(valid_df["invoice_date"])
-        valid_df["date_key"] = valid_df["invoice_date"].dt.strftime("%Y%m%d").astype(int)
-        
-        # Với đơn hủy, total_amount sẽ âm phản ánh đúng dòng tiền hoàn trả
-        valid_df["total_amount"] = (valid_df["quantity"] * valid_df["unit_price"]).round(2)
-
-        # Xử lý khách hàng vãng lai
-        guest_code = f"GUEST_{source_code}"
-        valid_df["customer_code"] = valid_df["customer_id"].fillna(guest_code)
-        valid_df["customer_code"] = valid_df["customer_code"].astype(str).str.replace(".0", "", regex=False).str.strip()
-        valid_df.loc[valid_df["customer_code"].isin(["None", "nan", ""], ), "customer_code"] = guest_code
-
-        # Sinh mã băm chống trùng lặp (Idempotent Key)
-        hashes = [
-            generate_row_hash(source_code, row["invoice_no"], row["stock_code"], row["quantity"], row["unit_price"], row["date_key"])
-            for _, row in valid_df.iterrows()
-        ]
-        valid_df["record_hash"] = hashes
-        valid_df["source_code"] = source_code
-
-    print(f"  + Hợp lệ: {len(valid_df):,} dòng | Bị loại (Rejected): {len(rejected_df):,} dòng")
-    return valid_df, rejected_df
+    def price_or_none(value):
+        try:
+            price = decimal_value(value)
+            if price <= 0 or price >= Decimal("1e20") or price != price.quantize(PRICE_STEP):
+                return None
+            return price
+        except (ValueError, ArithmeticError):
+            return None
+    prices = df["unit_price"].map(price_or_none)
+    rules["Unit Price must be positive, finite, with at most 4 decimals"] = prices.isna()
+    dates = pd.to_datetime(df["invoice_date"], errors="coerce", format="mixed", utc=True)
+    rules["Invalid InvoiceDate or outside calendar 2008-2027"] = dates.isna() | ~dates.dt.year.between(2008, 2027)
+    flags = df.get("is_cancelled", pd.Series(False, index=df.index)).astype("string").str.lower().str.strip()
+    rules["Invalid is_cancelled flag"] = ~(flags.isna() | flags.isin(["true", "false", "1", "0"]))
+    if source_code == "APP_OPERATIONAL" and "source_record_id" not in df:
+        df["source_record_id"] = None
+    if "source_record_id" in df:
+        identity = df["source_record_id"].astype("string").str.strip()
+        rules["Missing source row identity"] = identity.isna() | identity.eq("")
+    reject = pd.Series(False, index=df.index)
+    for mask in rules.values():
+        reject |= mask.fillna(True)
+    # Amount overflow is a row rejection too, not a database failure for the whole file.
+    amounts = pd.Series(None, index=df.index, dtype=object)
+    amounts.loc[~reject] = [money(price * int(qty))
+                            for price, qty in zip(prices.loc[~reject], quantity.loc[~reject])]
+    rules["Total amount exceeds NUMERIC(24,2)"] = amounts.map(
+        lambda value: isinstance(value, Decimal) and abs(value) >= Decimal("1e22"))
+    reject |= rules["Total amount exceeds NUMERIC(24,2)"]
+    rejected = raw.loc[reject].copy()
+    failures = pd.DataFrame(rules).fillna(True).loc[reject]
+    rejected["rejection_reason"] = ["; ".join(reason for reason, failed in zip(failures.columns, row) if failed)
+                                     for row in failures.itertuples(index=False, name=None)]
+    valid = df.loc[~reject].copy()
+    if valid.empty:
+        return valid, rejected
+    valid["quantity"] = quantity.loc[~reject].astype(int)
+    valid["unit_price"] = prices.loc[~reject]
+    valid["invoice_date"] = dates.loc[~reject]
+    valid["date_key"] = valid["invoice_date"].dt.strftime("%Y%m%d").astype(int)
+    valid["is_cancelled"] = (valid["quantity"].lt(0) | valid["invoice_no"].str.upper().str.startswith("C") |
+                             flags.loc[~reject].isin(["true", "1"]))
+    valid["total_amount"] = amounts.loc[~reject]
+    valid.loc[valid["is_cancelled"], "total_amount"] = valid.loc[valid["is_cancelled"], "total_amount"].map(lambda v: -abs(v))
+    valid["branch_code"] = valid.get("branch_code", pd.Series("UNKNOWN", index=valid.index)).fillna("UNKNOWN")
+    valid["description"] = valid["description"].fillna("Sản phẩm không có mô tả").astype(str)
+    guest = f"GUEST_{source_code}"
+    customers = valid["customer_id"].astype("string").str.strip().str.replace(r"\.0$", "", regex=True)
+    valid["customer_code"] = customers.mask(customers.isna() | customers.str.lower().isin(
+        ["none", "nan", "null", "", "<na>"]), guest)
+    if "source_record_id" in valid:
+        valid["record_hash"] = [hashlib.sha256(f"{source_code}|row={value}".encode()).hexdigest()
+                                for value in valid["source_record_id"].astype(str)]
+    else:
+        valid["record_hash"] = [generate_row_hash(source_code, row.invoice_no, row.stock_code,
+            row.quantity, row.unit_price, row.date_key) for row in valid.itertuples(index=False)]
+    valid["source_code"] = source_code
+    print(f"Sales validation: {len(valid):,} valid / {len(rejected):,} rejected", flush=True)
+    return valid, rejected
 
 
-def transform_inventory_snapshots(snapshots: List[Dict[str, Any]], source_code: str = "APP_OPERATIONAL") -> pd.DataFrame:
-    """
-    Chuyển đổi dữ liệu JSON từ API tồn kho các chi nhánh sang DataFrame chuẩn bị nạp FactInventorySnapshot.
-    """
-    records = []
-    current_date = datetime.date.today()
-    date_key = int(current_date.strftime("%Y%m%d"))
-
+def transform_inventory_snapshots(snapshots: List[Dict[str, Any]], source_code: str = "APP_OPERATIONAL",
+                                  *, observed_at=None) -> pd.DataFrame:
+    """Validate Raw again on replay, retaining empty and offline branch observations."""
+    from src.etl.contracts import validate_inventory_data, utc_instant
+    if not isinstance(snapshots, list) or not snapshots:
+        raise ValueError("Inventory Raw must contain branch observations")
+    observed = utc_instant(observed_at or datetime.datetime.now(datetime.timezone.utc))
+    records, branches = [], set()
     for node in snapshots:
-        branch_code = node.get("branch_code", "UNKNOWN")
-        status = node.get("status", "OFFLINE")
-        raw_time = node.get("snapshot_time")
-        snapshot_time = datetime.datetime.fromtimestamp(raw_time) if raw_time else None
-
-        if status == "ONLINE" and node.get("items"):
-            for item in node["items"]:
-                records.append({
-                    "date_key": date_key,
-                    "branch_code": branch_code,
-                    "stock_code": item.get("stock_code"),
-                    "stock_on_hand": item.get("stock_on_hand", 0),
-                    "snapshot_time": snapshot_time or datetime.datetime.now(),
-                    "node_status": "ONLINE",
-                    "source_code": source_code
-                })
+        if not isinstance(node, dict) or node.get("branch_code") not in ("HN", "DN", "SG"):
+            raise ValueError("Invalid inventory branch")
+        branch = node["branch_code"]
+        if branch in branches:
+            raise ValueError("Duplicate inventory branch")
+        branches.add(branch)
+        status = node.get("status")
+        if status == "ONLINE":
+            validate_inventory_data(node, branch)
+            snapshot_time = datetime.datetime.fromtimestamp(node["snapshot_time"], datetime.timezone.utc)
+            # A successful empty list is an ONLINE branch marker, never OFFLINE.
+            items = node["items"] or [{"stock_code": "ALL_PRODUCTS", "stock_on_hand": None}]
+        elif status == "OFFLINE":
+            snapshot_time = None
+            items = [{"stock_code": "ALL_PRODUCTS", "stock_on_hand": None}]
         else:
-            # Node mất kết nối: Tuân thủ đề cương 6.2 - Không coi dữ liệu thiếu là tồn bằng 0!
-            # Ghi nhận stock_on_hand = None (NULL trong DWH) kèm trạng thái OFFLINE để Dashboard cảnh báo rõ ràng
-            records.append({
-                "date_key": date_key,
-                "branch_code": branch_code,
-                "stock_code": "ALL_PRODUCTS",
-                "stock_on_hand": None,
-                "snapshot_time": snapshot_time,
-                "node_status": "OFFLINE",
-                "source_code": source_code
-            })
-
+            raise ValueError("Invalid inventory status")
+        for item in items:
+            records.append({"date_key": int(observed.strftime("%Y%m%d")), "branch_code": branch,
+                "stock_code": item["stock_code"].strip(), "stock_on_hand": item["stock_on_hand"],
+                "snapshot_time": snapshot_time, "source_observed_at": observed,
+                "node_status": status, "source_code": source_code})
     return pd.DataFrame(records)

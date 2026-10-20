@@ -1,0 +1,12 @@
+.git
+.venv
+**/__pycache__
+.pytest_cache
+.env
+.env.*
+!*.example
+data_lake
+models
+node_modules
+test-results
+playwright-report

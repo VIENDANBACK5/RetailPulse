@@ -26,6 +26,10 @@ def export_segments_to_dwh(
 
     print(f"📤 [Data Mining - Export] Đang lưu {len(result_df):,} bản ghi phân cụm vào CustomerSegmentSnapshot...")
 
+    if result_df.empty or result_df["customer_key"].duplicated().any():
+        raise ValueError("Snapshot must contain unique customers and must not be empty")
+    if len(model_version) > 50:
+        raise ValueError("model_version exceeds warehouse column length")
     records = []
     for _, row in result_df.iterrows():
         records.append({
@@ -64,18 +68,14 @@ def export_segments_to_dwh(
     chunk_size = 1500
     total_saved = 0
 
-    try:
-        with engine.begin() as conn:
-            for i in range(0, len(records), chunk_size):
-                chunk = records[i:i + chunk_size]
-                conn.execute(sql, chunk)
-                total_saved += len(chunk)
-
-        print(f"✅ Đã xuất thành công {total_saved:,} phân khúc khách hàng vào DWH (Phiên bản: {model_version})!")
-        return total_saved
-    except Exception as ex:
-        print(f"⚠️ Cảnh báo khi xuất về DWH ({ex}). Lưu ra file CSV fallback...")
-        csv_fallback = f"models/customer_segments_{analysis_date}_{model_version}.csv"
-        result_df.to_csv(csv_fallback, index=False)
-        print(f"📁 Đã lưu fallback tại: {csv_fallback}")
-        return len(result_df)
+    # Replace the complete snapshot atomically. Removed customers cannot linger on retry.
+    with engine.begin() as conn:
+        conn.execute(text("""DELETE FROM customer_segment_snapshot
+            WHERE analysis_date=:day AND model_version=:version"""),
+            {"day": analysis_date, "version": model_version})
+        for i in range(0, len(records), chunk_size):
+            chunk = records[i:i + chunk_size]
+            conn.execute(sql, chunk)
+            total_saved += len(chunk)
+    print(f"Published {total_saved:,} customer segments: {model_version}")
+    return total_saved

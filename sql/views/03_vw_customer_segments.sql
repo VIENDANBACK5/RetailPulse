@@ -2,7 +2,7 @@
 -- HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG (PTIT)
 -- BÀI TẬP LỚN: KHO DỮ LIỆU VÀ KHAI PHÁ DỮ LIỆU
 -- VIEW 3: DỮ LIỆU PHÂN KHÚC KHÁCH HÀNG (CUSTOMER RFM SEGMENTATION)
--- Phục vụ Power BI: Số khách mỗi cụm, trung vị RFM, tỷ trọng doanh thu, gợi ý chăm sóc
+-- Phục vụ dashboard: Số khách mỗi cụm, trung vị RFM, tỷ trọng doanh thu, gợi ý chăm sóc
 -- ===============================================================================
 
 CREATE OR REPLACE VIEW vw_bi_customer_segments AS
@@ -40,3 +40,17 @@ SELECT
     css.created_at
 FROM customer_segment_snapshot css
 JOIN dim_customer dc ON css.customer_key = dc.customer_key;
+
+CREATE OR REPLACE VIEW vw_bi_customer_segments_latest AS
+WITH latest_run AS (
+    SELECT analysis_date, model_version
+    FROM customer_segment_snapshot
+    GROUP BY analysis_date, model_version
+    ORDER BY analysis_date DESC, MAX(created_at) DESC, model_version
+    LIMIT 1
+)
+SELECT segments.*, ds.source_code, ds.currency
+FROM vw_bi_customer_segments segments
+JOIN latest_run run USING (analysis_date, model_version)
+JOIN dim_customer dc USING (customer_key)
+JOIN dim_source ds ON ds.source_key = dc.source_key;

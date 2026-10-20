@@ -2,7 +2,7 @@
 -- HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG (PTIT)
 -- BÀI TẬP LỚN: KHO DỮ LIỆU VÀ KHAI PHÁ DỮ LIỆU
 -- VIEW 1: DỮ LIỆU BÁO CÁO BÁN HÀNG ĐA KÊNH (SALES ANALYTICS)
--- Phục vụ Power BI: Doanh số mua, Hủy/hoàn, Doanh thu thuần, Số đơn, Top sản phẩm
+-- Phục vụ dashboard: Doanh số mua, Hủy/hoàn, Doanh thu thuần, Số đơn, Top sản phẩm
 -- ===============================================================================
 
 CREATE OR REPLACE VIEW vw_bi_sales_analytics AS
@@ -15,7 +15,7 @@ SELECT
     dd.quarter,
     dd.month,
     dd.month_name,
-    dd.day,
+    dd.day_of_month AS day,
     dd.day_of_week,
     dd.is_weekend,
     
@@ -49,11 +49,12 @@ SELECT
     
     -- Phân loại nghiệp vụ chuẩn đề cương 4.3: Tách riêng Gross Sales và Refund
     CASE WHEN fs.is_cancelled = FALSE THEN fs.total_amount ELSE 0.0 END AS gross_sales_amount,
-    CASE WHEN fs.is_cancelled = TRUE THEN fs.total_amount ELSE 0.0 END AS refund_amount,
-    CASE WHEN fs.is_cancelled = FALSE THEN fs.total_amount ELSE -fs.total_amount END AS net_sales_amount,
+    CASE WHEN fs.is_cancelled = TRUE THEN ABS(fs.total_amount) ELSE 0.0 END AS refund_amount,
+    CASE WHEN fs.is_cancelled = TRUE THEN -ABS(fs.total_amount) ELSE fs.total_amount END AS net_sales_amount,
     
     fs.batch_id,
-    fs.loaded_at
+    fs.loaded_at,
+    TO_CHAR(dd.full_date, 'YYYY-MM') AS year_month
 FROM fact_sales fs
 JOIN dim_date dd ON fs.date_key = dd.date_key
 JOIN dim_customer dc ON fs.customer_key = dc.customer_key

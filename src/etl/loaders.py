@@ -82,81 +82,78 @@ def sync_dim_customers(engine: Engine, df: pd.DataFrame, source_key: int) -> Dic
     return cust_map
 
 
-def load_fact_sales(engine: Engine, valid_df: pd.DataFrame, batch_id: str) -> Tuple[int, float]:
-    """
-    Nạp dữ liệu vào FactSales với cơ chế Idempotent chống nạp trùng (ON CONFLICT DO NOTHING qua record_hash).
-    Trả về: (số dòng nạp thành công, tổng tiền nạp)
-    """
+def load_fact_sales(engine: Engine, valid_df: pd.DataFrame, batch_id: str, return_stats=False):
+    """Upsert observed source versions; stale replay rows are explicitly superseded."""
+    from decimal import Decimal
+    from psycopg2.extras import execute_values
+    from src.etl.contracts import utc_instant
+    stats = {'inserted_count': 0, 'existing_count': 0, 'matched_count': 0,
+             'matched_amount': Decimal('0.00'), 'superseded_count': 0,
+             'superseded_source_amount': Decimal('0.00')}
     if valid_df.empty:
-        return 0, 0.0
-
-    print(f"📤 [ETL - Load] Đang nạp {len(valid_df):,} bản ghi vào FactSales (Batch: {batch_id})...")
+        return stats if return_stats else (0, Decimal('0.00'))
+    if valid_df['record_hash'].duplicated().any():
+        raise ValueError('Duplicate source row identities in one input batch')
     source_map, branch_map = get_dimension_lookups(engine)
-
-    source_code = valid_df["source_code"].iloc[0]
-    source_key = source_map.get(source_code, 1)
-
-    # Đồng bộ Dim
+    source_code = valid_df['source_code'].iloc[0]
+    source_key = source_map[source_code]
+    mutable = source_code == 'APP_OPERATIONAL'
+    if mutable and 'source_observed_at' not in valid_df:
+        raise ValueError('App source requires the original source_observed_at')
     prod_map = sync_dim_products(engine, valid_df, source_key)
     cust_map = sync_dim_customers(engine, valid_df, source_key)
-
-    # Chuẩn bị dữ liệu Fact
-    fact_rows = []
-    default_branch_key = branch_map.get("UNKNOWN", 1)
-
-    for _, row in valid_df.iterrows():
-        b_key = branch_map.get(row["branch_code"], default_branch_key)
-        p_key = prod_map.get(row["stock_code"])
-        c_key = cust_map.get(row["customer_code"])
-
-        if p_key and c_key:
-            fact_rows.append({
-                "date_key": int(row["date_key"]),
-                "customer_key": int(c_key),
-                "product_key": int(p_key),
-                "branch_key": int(b_key),
-                "source_key": int(source_key),
-                "invoice_no": str(row["invoice_no"]),
-                "quantity": int(row["quantity"]),
-                "unit_price": float(row["unit_price"]),
-                "total_amount": float(row["total_amount"]),
-                "is_cancelled": bool(row["is_cancelled"]),
-                "record_hash": str(row["record_hash"]),
-                "batch_id": str(batch_id)
-            })
-
-    # Nạp theo lô (Chunk loading) để tối ưu hiệu năng
-    inserted_count = 0
-    chunk_size = 2000
-
-    insert_sql = text("""
-        INSERT INTO fact_sales (
-            date_key, customer_key, product_key, branch_key, source_key,
-            invoice_no, quantity, unit_price, total_amount, is_cancelled, record_hash, batch_id
-        ) VALUES (
-            :date_key, :customer_key, :product_key, :branch_key, :source_key,
-            :invoice_no, :quantity, :unit_price, :total_amount, :is_cancelled, :record_hash, :batch_id
-        )
-        ON CONFLICT (record_hash) DO NOTHING
-    """)
-
+    statement = """
+        INSERT INTO fact_sales (date_key, customer_key, product_key, branch_key, source_key,
+            invoice_no, quantity, unit_price, total_amount, is_cancelled, record_hash, batch_id, source_observed_at)
+        VALUES %s
+        ON CONFLICT (record_hash) DO UPDATE SET
+            date_key=EXCLUDED.date_key, customer_key=EXCLUDED.customer_key,
+            product_key=EXCLUDED.product_key, branch_key=EXCLUDED.branch_key,
+            invoice_no=EXCLUDED.invoice_no, quantity=EXCLUDED.quantity, unit_price=EXCLUDED.unit_price,
+            total_amount=EXCLUDED.total_amount, is_cancelled=EXCLUDED.is_cancelled,
+            batch_id=EXCLUDED.batch_id, source_observed_at=EXCLUDED.source_observed_at, loaded_at=NOW()
+        WHERE EXCLUDED.source_observed_at > COALESCE(fact_sales.source_observed_at, fact_sales.loaded_at)
+    """
     with engine.begin() as conn:
-        for i in range(0, len(fact_rows), chunk_size):
-            chunk = fact_rows[i:i + chunk_size]
-            res = conn.execute(insert_sql, chunk)
-            inserted_count += (res.rowcount if res.rowcount != -1 else len(chunk))
-
-    # Truy vấn DWH trực tiếp để đối soát số lượng và số tiền thực tế đã nạp (không dùng counter nội bộ)
-    with engine.connect() as conn:
-        audit_res = conn.execute(
-            text("SELECT COUNT(*), COALESCE(SUM(total_amount), 0.0) FROM fact_sales WHERE batch_id = :batch_id"),
-            {"batch_id": str(batch_id)}
-        ).fetchone()
-        dwh_actual_count = audit_res[0] if audit_res else inserted_count
-        dwh_actual_amount = round(float(audit_res[1]), 2) if audit_res else round(float(valid_df["total_amount"].sum()), 2)
-
-    print(f"  + Hoàn tất nạp FactSales: Đã xác nhận trong DWH {dwh_actual_count:,} bản ghi (Tổng tiền: {dwh_actual_amount:,.2f})")
-    return dwh_actual_count, dwh_actual_amount
+        # CLI replay and Airflow use the same lock, not just the Airflow pool.
+        conn.execute(text('SELECT pg_advisory_xact_lock(72401, :source)'), {'source': source_key})
+        for start in range(0, len(valid_df), 2000):
+            frame = valid_df.iloc[start:start + 2000]
+            hashes = frame['record_hash'].astype(str).tolist()
+            existing = conn.execute(text("""SELECT record_hash,
+                COALESCE(source_observed_at, loaded_at) AS observed,
+                date_key, customer_key, product_key, branch_key, source_key,
+                invoice_no, quantity, unit_price, total_amount, is_cancelled
+                FROM fact_sales WHERE record_hash = ANY(:hashes) FOR UPDATE"""), {'hashes': hashes}).all()
+            old = {row[0]: row for row in existing}
+            rows, accepted_hashes = [], []
+            for row in frame.itertuples(index=False):
+                observed = utc_instant(row.source_observed_at) if hasattr(row, 'source_observed_at') else None
+                values = (int(row.date_key), int(cust_map[row.customer_code]),
+                    int(prod_map[row.stock_code]), int(branch_map.get(row.branch_code, branch_map['UNKNOWN'])),
+                    int(source_key), str(row.invoice_no), int(row.quantity), row.unit_price,
+                    row.total_amount, bool(row.is_cancelled))
+                previous = old.get(row.record_hash)
+                if previous and mutable and observed < previous[1]:
+                    stats['superseded_count'] += 1
+                    stats['superseded_source_amount'] += row.total_amount
+                    continue
+                if previous and (not mutable or observed == previous[1]) and values != tuple(previous[2:]):
+                    raise ValueError('Conflicting contents for the same source version/immutable row')
+                accepted_hashes.append(row.record_hash)
+                stats['existing_count'] += int(previous is not None)
+                stats['inserted_count'] += int(previous is None)
+                rows.append(values + (str(row.record_hash), str(batch_id), observed))
+            if rows:
+                with conn.connection.cursor() as cursor:
+                    execute_values(cursor, statement, rows, page_size=2000)
+                count, amount = conn.execute(text(
+                    'SELECT COUNT(*), COALESCE(SUM(total_amount),0) FROM fact_sales WHERE record_hash = ANY(:hashes)'
+                ), {'hashes': accepted_hashes}).one()
+                stats['matched_count'] += count
+                stats['matched_amount'] += amount
+    print(f"FactSales: {stats}", flush=True)
+    return stats if return_stats else (stats['matched_count'], stats['matched_amount'])
 
 
 def load_fact_inventory(engine: Engine, inv_df: pd.DataFrame, batch_id: str) -> int:
@@ -170,7 +167,7 @@ def load_fact_inventory(engine: Engine, inv_df: pd.DataFrame, batch_id: str) -> 
 
     with engine.begin() as conn:
         # Lấy product map
-        prods = conn.execute(text("SELECT stock_code, product_key FROM dim_product")).fetchall()
+        prods = conn.execute(text("SELECT stock_code, product_key FROM dim_product WHERE source_key = :sk"), {"sk": source_key}).fetchall()
         prod_map = {r[0]: r[1] for r in prods}
 
         # Nếu chưa có ALL_PRODUCTS (dùng cho node offline)
@@ -184,7 +181,14 @@ def load_fact_inventory(engine: Engine, inv_df: pd.DataFrame, batch_id: str) -> 
         rows_to_insert = []
         for _, row in inv_df.iterrows():
             b_key = branch_map.get(row["branch_code"], 1)
-            p_key = prod_map.get(row["stock_code"], prod_map["ALL_PRODUCTS"])
+            if row["stock_code"] not in prod_map:
+                key = conn.execute(text("""
+                    INSERT INTO dim_product (source_key, stock_code, description)
+                    VALUES (:sk, :code, :code) ON CONFLICT (source_key, stock_code)
+                    DO UPDATE SET stock_code = EXCLUDED.stock_code RETURNING product_key
+                """), {"sk": source_key, "code": row["stock_code"]}).scalar_one()
+                prod_map[row["stock_code"]] = key
+            p_key = prod_map[row["stock_code"]]
             
             # An toàn xử lý giá trị tồn kho None khi node OFFLINE (không ép int gây crash)
             stock_raw = row["stock_on_hand"]
@@ -201,23 +205,24 @@ def load_fact_inventory(engine: Engine, inv_df: pd.DataFrame, batch_id: str) -> 
                 "stock_on_hand": stock_val,
                 "snapshot_time": snap_val,
                 "node_status": str(row["node_status"]),
-                "batch_id": str(batch_id)
+                "batch_id": str(batch_id),
+                "source_observed_at": row["source_observed_at"]
             })
 
         sql = text("""
             INSERT INTO fact_inventory_snapshot (
                 date_key, branch_key, product_key, source_key,
-                stock_on_hand, snapshot_time, node_status, batch_id
+                stock_on_hand, snapshot_time, node_status, batch_id, source_observed_at
             ) VALUES (
                 :date_key, :branch_key, :product_key, :source_key,
-                :stock_on_hand, :snapshot_time, :node_status, :batch_id
+                :stock_on_hand, :snapshot_time, :node_status, :batch_id, :source_observed_at
             )
             ON CONFLICT (date_key, branch_key, product_key, batch_id) DO NOTHING
         """)
-        conn.execute(sql, rows_to_insert)
+        inserted_count = conn.execute(sql, rows_to_insert).rowcount
 
-    print(f"  + Hoàn tất nạp FactInventorySnapshot ({len(rows_to_insert)} bản ghi).")
-    return len(rows_to_insert)
+    print(f"  + FactInventorySnapshot: {inserted_count} dòng mới / {len(rows_to_insert)} dòng đầu vào.")
+    return inserted_count
 
 
 def load_rejected_records(engine: Engine, rejected_df: pd.DataFrame, batch_id: str, source_code: str):
@@ -228,7 +233,7 @@ def load_rejected_records(engine: Engine, rejected_df: pd.DataFrame, batch_id: s
     print(f"⚠️ [ETL - Load] Ghi nhật ký {len(rejected_df):,} dòng bị loại vào etl_rejected_records...")
     records = []
     for _, row in rejected_df.iterrows():
-        raw_summary = f"Invoice:{row.get('invoice_no')}, Stock:{row.get('stock_code')}, Qty:{row.get('quantity')}, Price:{row.get('unit_price')}"
+        raw_summary = row.drop(labels=["rejection_reason"], errors="ignore").to_json(force_ascii=False, date_format="iso")
         records.append({
             "batch_id": batch_id,
             "source_code": source_code,

@@ -29,24 +29,24 @@ data_lake:
   raw_uci_dir: "data_lake/raw/uci"
   raw_app_dir: "data_lake/raw/app_db"
   raw_api_dir: "data_lake/raw/api_inventory"
-  curated_dir: "data_lake/curated"
+  # LAKE_BACKEND=s3 enables MinIO; local is an explicit development option.
 
 api_nodes:
   timeout_seconds: 3
   branches:
     - code: "HN"
       name: "Chi nhánh Hà Nội"
-      url: "http://localhost:8000/api/v1/inventory/HN"
+      url: "http://localhost:8001/api/v1/inventory/HN"
     - code: "DN"
       name: "Chi nhánh Đà Nẵng"
-      url: "http://localhost:8000/api/v1/inventory/DN"
+      url: "http://localhost:8001/api/v1/inventory/DN"
     - code: "SG"
       name: "Chi nhánh TP. Hồ Chí Minh"
-      url: "http://localhost:8000/api/v1/inventory/SG"
+      url: "http://localhost:8001/api/v1/inventory/SG"
 
 etl:
   uci_window_months: 12
-  uci_file_path: "data_lake/raw/uci/online_retail_II.csv"
+  uci_file_path: "data_lake/raw/uci/online_retail_II.xlsx"
   reconcile_tolerance: 0.01
 
 mining:

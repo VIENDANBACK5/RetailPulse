@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS dim_product (
     stock_code VARCHAR(100) NOT NULL,
     description VARCHAR(255) NOT NULL,
     category VARCHAR(100),
-    unit_price_base DOUBLE PRECISION DEFAULT 0.0,
+    unit_price_base NUMERIC(24,4) DEFAULT 0.0,
     CONSTRAINT uq_product_source_code UNIQUE (source_key, stock_code)
 );
 
@@ -65,11 +65,12 @@ CREATE TABLE IF NOT EXISTS fact_sales (
     source_key INTEGER NOT NULL REFERENCES dim_source(source_key),
     invoice_no VARCHAR(100) NOT NULL,
     quantity INTEGER NOT NULL,
-    unit_price DOUBLE PRECISION NOT NULL,
-    total_amount DOUBLE PRECISION NOT NULL,
+    unit_price NUMERIC(24,4) NOT NULL,
+    total_amount NUMERIC(24,2) NOT NULL,
     is_cancelled BOOLEAN NOT NULL DEFAULT FALSE,
     record_hash VARCHAR(64) UNIQUE NOT NULL,  -- Khóa băm SHA256 chống nạp trùng (Idempotent)
     batch_id VARCHAR(100) NOT NULL,
+    source_observed_at TIMESTAMP WITH TIME ZONE,
     loaded_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -84,6 +85,7 @@ CREATE TABLE IF NOT EXISTS fact_inventory_snapshot (
     snapshot_time TIMESTAMP WITH TIME ZONE,   -- NULL khi node OFFLINE (không gán fake timestamp)
     node_status VARCHAR(50) DEFAULT 'ONLINE', -- 'ONLINE', 'OFFLINE'
     batch_id VARCHAR(100) NOT NULL,
+    source_observed_at TIMESTAMP WITH TIME ZONE,
     loaded_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     CONSTRAINT uq_inventory_snapshot UNIQUE (date_key, branch_key, product_key, batch_id)
 );
@@ -97,7 +99,7 @@ CREATE TABLE IF NOT EXISTS customer_segment_snapshot (
     customer_key INTEGER NOT NULL REFERENCES dim_customer(customer_key),
     recency DOUBLE PRECISION NOT NULL,
     frequency INTEGER NOT NULL,
-    monetary DOUBLE PRECISION NOT NULL,
+    monetary NUMERIC(24,2) NOT NULL,
     cluster_id INTEGER NOT NULL,
     cluster_name VARCHAR(100) NOT NULL,       -- 'VIP', 'Loyal', 'Potential', 'At Risk', 'Lost'
     model_version VARCHAR(50) NOT NULL,
@@ -123,15 +125,18 @@ CREATE TABLE IF NOT EXISTS etl_reconciliation_log (
     source_code VARCHAR(50) NOT NULL,
     source_records_count INTEGER NOT NULL,
     dwh_records_inserted INTEGER NOT NULL,
+    dwh_records_existing INTEGER NOT NULL DEFAULT 0,
     rejected_records_count INTEGER NOT NULL,
-    source_total_amount DOUBLE PRECISION NOT NULL,
-    dwh_total_amount DOUBLE PRECISION NOT NULL,
-    diff_amount DOUBLE PRECISION NOT NULL,
+    source_total_amount NUMERIC(24,2) NOT NULL,
+    dwh_total_amount NUMERIC(24,2) NOT NULL,
+    diff_amount NUMERIC(24,2) NOT NULL,
     status VARCHAR(50) NOT NULL,              -- 'MATCHED', 'DISCREPANCY'
     notes TEXT
 );
 
 -- Dữ liệu hạt giống cho các Dimension mặc định
+ALTER TABLE etl_reconciliation_log ADD COLUMN IF NOT EXISTS dwh_records_existing INTEGER NOT NULL DEFAULT 0;
+
 INSERT INTO dim_source (source_key, source_code, source_name, currency)
 VALUES 
     (1, 'UCI_HISTORICAL', 'Dữ liệu Lịch sử Online Retail II (Anh Quốc)', 'GBP'),
@@ -152,6 +157,14 @@ VALUES
     (1, 1, 'GUEST_UCI', 'Khách hàng vãng lai (UCI)', 'United Kingdom'),
     (2, 2, 'GUEST_APP', 'Khách hàng vãng lai (Nội bộ)', 'Vietnam')
 ON CONFLICT (source_key, customer_code) DO NOTHING;
+
+-- Explicit seed keys must not leave SERIAL sequences behind existing rows.
+SELECT setval(pg_get_serial_sequence('dim_source', 'source_key'),
+    GREATEST(COALESCE(MAX(source_key), 1), (SELECT last_value FROM dim_source_source_key_seq)), true) FROM dim_source;
+SELECT setval(pg_get_serial_sequence('dim_branch', 'branch_key'),
+    GREATEST(COALESCE(MAX(branch_key), 1), (SELECT last_value FROM dim_branch_branch_key_seq)), true) FROM dim_branch;
+SELECT setval(pg_get_serial_sequence('dim_customer', 'customer_key'),
+    GREATEST(COALESCE(MAX(customer_key), 1), (SELECT last_value FROM dim_customer_customer_key_seq)), true) FROM dim_customer;
 
 -- Tạo Chỉ mục cho FactSales để tối ưu truy vấn BI & ML
 CREATE INDEX IF NOT EXISTS idx_fact_sales_date ON fact_sales(date_key);
@@ -181,3 +194,8 @@ EXCEPTION
     WHEN OTHERS THEN NULL;
 END $$;
 
+
+-- Version ordering is based on the original source observation, never replay time.
+ALTER TABLE fact_sales ADD COLUMN IF NOT EXISTS source_observed_at TIMESTAMPTZ;
+ALTER TABLE fact_inventory_snapshot ADD COLUMN IF NOT EXISTS source_observed_at TIMESTAMPTZ;
+ALTER TABLE etl_reconciliation_log ADD COLUMN IF NOT EXISTS superseded_records_count INTEGER NOT NULL DEFAULT 0;
