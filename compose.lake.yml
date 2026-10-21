@@ -1,0 +1,34 @@
+services:
+  minio:
+    build:
+      context: ./infra/minio
+    image: retailpulse-minio:2025-09-07
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${LAKE_ACCESS_KEY:-retailpulse}
+      MINIO_ROOT_PASSWORD: ${LAKE_SECRET_KEY:-retailpulse-local-only}
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - lake_data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+    networks:
+      - retail-network
+  pipeline:
+    environment:
+      LAKE_BACKEND: s3
+      LAKE_ENDPOINT_URL: http://minio:9000
+      LAKE_ACCESS_KEY: ${LAKE_ACCESS_KEY:-retailpulse}
+      LAKE_SECRET_KEY: ${LAKE_SECRET_KEY:-retailpulse-local-only}
+      LAKE_BUCKET: ${LAKE_BUCKET:-retailpulse-raw}
+    depends_on:
+      minio:
+        condition: service_healthy
+volumes:
+  lake_data:

@@ -5,8 +5,35 @@ import os
 from pathlib import Path
 import pandas as pd
 import requests
+import io
 from sqlalchemy import text
 from src.utils.db_helper import BASE_DIR, get_oltp_engine, load_config
+
+def normalize_uci_data(df: pd.DataFrame) -> pd.DataFrame:
+    mapping = {
+        'Invoice': 'invoice_no', 'InvoiceNo': 'invoice_no',
+        'StockCode': 'stock_code', 'Description': 'description',
+        'Quantity': 'quantity', 'InvoiceDate': 'invoice_date',
+        'Price': 'unit_price', 'UnitPrice': 'unit_price',
+        'Customer ID': 'customer_id', 'CustomerID': 'customer_id',
+        'Country': 'country'
+    }
+    return df.rename(columns=mapping)
+
+def read_uci_payload(payload: bytes, filename: str, source_checksum: str) -> pd.DataFrame:
+    options = {'dtype': {'Invoice': str, 'StockCode': str, 'Customer ID': str, 'Price': str, 'Quantity': str}}
+    if filename.lower().endswith('.csv'):
+        df = pd.read_csv(io.BytesIO(payload), **options)
+    else:
+        sheets = pd.read_excel(io.BytesIO(payload), sheet_name=None, **options)
+        frames = []
+        for sheet, frame in sheets.items():
+            frame['source_record_id'] = [f'{source_checksum}:{sheet}:{i}' for i in range(len(frame))]
+            frames.append(frame)
+        df = pd.concat(frames, ignore_index=True)
+    if 'source_record_id' not in df:
+        df['source_record_id'] = [f'{source_checksum}:{i}' for i in range(len(df))]
+    return normalize_uci_data(df)
 
 def file_checksum(path):
     digest=hashlib.sha256()

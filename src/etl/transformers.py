@@ -11,6 +11,8 @@ def generate_row_hash(source_code,*identity):
 def transform_sales_data(df,source_code):
     if df.empty: return df.copy(),df.copy()
     df=df.copy()
+    if 'source_record_id' not in df:
+        df['source_record_id'] = [f"{source_code}:row-{i}" for i in range(len(df))]
     for column in ['invoice_no','stock_code','quantity','unit_price','invoice_date','source_record_id']:
         if column not in df: df[column]=None
     reasons=pd.Series('',index=df.index)
@@ -36,10 +38,11 @@ def transform_sales_data(df,source_code):
     explicit=valid.get('is_cancelled',pd.Series(False,index=valid.index)).map(lambda x:str(x).lower() in ('true','1'))
     returns=(valid['quantity']<0)|valid['invoice_no'].str.upper().str.startswith('C')
     valid['transaction_type']=np.select([explicit,returns],['CANCELLATION','RETURN'],default='PURCHASE')
-    valid['is_cancelled']=explicit
+    valid['is_cancelled']=explicit | returns
     valid['quantity']=valid['quantity'].astype(int)
     valid.loc[valid['transaction_type']=='RETURN','quantity']=-valid.loc[valid['transaction_type']=='RETURN','quantity'].abs()
     valid['total_amount']=[(Decimal(str(q))*Decimal(str(p))).quantize(Decimal('.01'),rounding=ROUND_HALF_UP) for q,p in zip(valid['quantity'],valid['unit_price'])]
+    valid.loc[valid['is_cancelled'],'total_amount']=valid.loc[valid['is_cancelled'],'total_amount'].map(lambda v: -abs(v))
     valid['date_key']=valid['invoice_date'].dt.strftime('%Y%m%d').astype(int)
     customers=valid.get('customer_id',pd.Series(None,index=valid.index,dtype=object))
     valid['customer_code']=customers.fillna('GUEST_'+source_code).astype(str).str.replace(r'\.0$','',regex=True)

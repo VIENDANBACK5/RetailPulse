@@ -73,4 +73,13 @@ data_lake/raw/uci/official/
 data_lake/raw/uci/etl-*/
 data_lake/raw/app_db/etl-*/
 data_lake/raw/api_inventory/etl-*/
+data_lake/raw/uci/*.metadata.json
+data_lake/raw/source=*/
+data_lake/raw/uci/*.download
 models/runs/
+
+node_modules/
+test-results/
+playwright-report/
+.pytest_cache/
+*.dump
