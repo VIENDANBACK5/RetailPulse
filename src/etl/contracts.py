@@ -36,6 +36,8 @@ def validate_inventory_data(data, branch_code):
     """Reject an entire malformed branch snapshot; never invent zero stock."""
     if not isinstance(data, dict):
         raise ValueError("Inventory data must be an object")
+    if branch_code not in ("HN","DN","SG"):
+        raise ValueError("Unsupported inventory branch_code")
     if data.get("branch_code") != branch_code:
         raise ValueError("Missing or mismatched branch_code")
     if data.get("status") != "ONLINE":

@@ -1,59 +1,59 @@
-# RetailPulse: công nghệ và phạm vi triển khai
+﻿# RetailPulse: công nghệ và phạm vi đã tích hợp
 
-Cập nhật 20/10/2026. Tài liệu này thay thế kế hoạch tích hợp đồng thời bốn công cụ trước đây.
+Cập nhật 21/10/2026 sau khi nối nhánh danh vào lõi verified. Kết quả sau tích hợp nằm trong [DANH_INTEGRATION_REPORT.md](DANH_INTEGRATION_REPORT.md); các run ghi trong AIRFLOW_ACCEPTANCE.md bản cũ là lịch sử, không thay thế kiểm chứng sau merge.
 
-## 1. Luồng hiện tại
+## Luồng thống nhất
 
 ```text
-UCI workbook / PostgreSQL OLTP / REST Inventory API
-    → MinIO Raw + manifest SHA-256
-    → Validate / Transform / Load / Reconcile
-    → PostgreSQL DWH → SQL views → FastAPI chỉ đọc → dashboard frontend
-             ↕
-        RFM + K-means
+UCI chính thức / PostgreSQL OLTP DEMO / REST inventory DEMO
+    -> Python ingestion
+    -> MinIO Raw + manifest SHA256 + checkpoint (profile WithLake/WithAirflow)
+       hoặc local Raw (profile mặc định)
+    -> Đọc đúng manifest, kiểm checksum, giữ mirror local để xem lineage
+    -> Validate / Transform / Load / SQL Reconciliation
+    -> PostgreSQL DWH
+    -> BI views chuẩn tại bi/views
+    -> API điều phối 8010 + Analytics chỉ đọc 8001
+    -> Portal OLAP / Báo cáo tổng hợp / Khai phá
 
-Airflow điều phối các job collect / load / mining / chuẩn bị views / kiểm tra dashboard.
+Airflow: collect -> load -> prepare views -> verify
+Historical: download -> collect -> load -> mining auto-K -> prepare -> verify
+Replay: manifest có sẵn -> load, không thu thập lại nguồn
 ```
 
-| Thành phần | Trạng thái | Vai trò |
-| --- | --- | --- |
-| MinIO | Đã tích hợp | Raw, manifest, checkpoint định danh đầu vào và kết quả batch; tương thích S3 API |
-| ETL / PostgreSQL DWH | Đã tích hợp | Kiểm tra, chuẩn hóa, chống nạp trùng và đối soát dữ liệu đa nguồn |
-| Frontend + FastAPI | Đã tích hợp | Sales / Inventory / Customers đọc warehouse |
-| RFM + K-means | Đã tích hợp | Train bằng UCI trong DWH; lỗi DWH làm job thất bại, artifact theo từng run |
-| Airflow 3.3.1 | Đã tích hợp | LocalExecutor, metadata PostgreSQL riêng, bốn DAG thực |
-| Curated Zone | Không thuộc thiết kế | Dữ liệu sau xử lý được nạp vào DWH |
-| Power BI / Superset | Không thuộc phạm vi | Frontend đảm nhiệm báo cáo |
-| Debezium / Kafka thực | Ngoài phạm vi hiện tại | OLTP thu thập bằng batch; studio mô phỏng không phải CDC thực |
+| Thành phần | Vai trò và trạng thái |
+|---|---|
+| MinIO | Đã nối thật vào collect/load/replay; manifest và kết quả có checksum, S3 errors không fallback |
+| Local Raw | Vẫn hỗ trợ startup mặc định; mirror của S3 giúp UI và lineage đọc thống nhất Windows/container |
+| Airflow | 4 DAG thực, LocalExecutor, pool ghi tuần tự, retry đúng lỗi, mặc định paused |
+| DWH / ETL | Stable source identity, signed KPI, đối soát theo nguồn/tiền tệ, chống stale replay của OLTP |
+| Analytics | API 8001 dùng tài khoản SELECT-only, view đúng schema, chỉ chọn mining run SUCCESS |
+| Portal | Cổng8010 là entrypoint chính, giữ OLAP và thêm reports.html của danh |
+| RFM / K-means | Auto-K mặc định, baseline/10seed/holdout, artifact theo run; override K phải rõ ràng |
+| Power BI | Có Semantic Model/DAX, Desktop report chưa VERIFIED; web BI là phương án demo đã chạy |
+| Debezium / Kafka / VPN | Không nằm trong luồng cốt lõi hiện tại |
 
-MinIO local dùng giao thức S3, không cần thêm AWS S3 cho phạm vi này. Airflow không thay thế ETL hoặc frontend; nó quản lý thời điểm chạy, phụ thuộc, retry và lịch sử job.
-
-## 2. Chạy và kiểm chứng
-
-- [Airflow: khởi động, DAG và thử lỗi/retry](AIRFLOW_GUIDE.md)
-- [MinIO: mở Console, xem Raw/manifest và replay](MINIO_DEMO_GUIDE.md)
-- [Dashboard: dữ liệu thực, bộ lọc và cách khởi tạo](DASHBOARD_GUIDE.md)
+## Một lệnh khởi động
 
 ```powershell
-./scripts/run_airflow.ps1
+.\START_RETAILPULSE.ps1 -WithAirflow
 ```
 
-Airflow tại http://localhost:18082, dashboard tại http://localhost:8001/frontend/dashboard.html và MinIO tại http://localhost:9001. Các DAG mặc định Paused: chủ động bật DAG cần sử dụng. Chạy historical thủ công để nhập UCI; operations đồng bộ App/API mỗi 30 phút khi bật; mining và replay chạy theo yêu cầu.
+WithAirflow tự bật MinIO. Chỉ cần MinIO: dùng -WithLake. Không có flag: local Raw, PostgreSQL và portal. Dữ liệu hiện có được giữ, không reset database.
 
-## 3. Các hợp đồng đã bổ sung để điều phối
+- Portal: http://127.0.0.1:8010/frontend/index.html
+- OLAP: http://127.0.0.1:8010/frontend/dashboard.html
+- Báo cáo danh: http://127.0.0.1:8010/frontend/reports.html
+- Analytics Swagger: http://127.0.0.1:8001/docs
+- MinIO Console: http://127.0.0.1:9001
+- Airflow: http://127.0.0.1:18082
 
-- Collect lưu checkpoint trước khi thu thập; retry qua ngày khác tái sử dụng manifest cùng run. Không tải lại để che checksum lỗi.
-- Load đọc Raw đã kiểm tra; không gọi lại nguồn trong bước xử lý.
-- ETL không đạt FULL_SUCCESS làm job thất bại. PARTIAL do nguồn offline được giữ để truy vết; khôi phục nguồn rồi tạo run mới.
-- Mining không fallback ngầm sang CSV, cửa sổ dùng tháng lịch; lưu ngày tham chiếu và khoảng dữ liệu.
-- Mỗi lần mining có version/artifact riêng trong models/runs; snapshot được thay nguyên bộ trong một transaction. Lỗi ghi không công bố dữ liệu dở dang.
-- Pool một slot tuần tự hóa job giữa các DAG. CLI chạy bên ngoài Airflow không chịu giới hạn của pool.
-- Metadata và log Airflow tách khỏi warehouse; Python dependencies của dự án tách khỏi Airflow bằng virtualenv trong image.
+DAG chỉ chạy khi trigger hoặc chủ động bật lịch. Startup kiểm tra health/auth và môi trường storage của API; không tự coi job ETL/mining đã chạy thành công.
 
-## 4. Những việc còn lại để hoàn thiện môn học
+## Lưu ý hợp đồng
 
-Airflow hoàn tất lớp điều phối, không tự chứng minh chất lượng nghiệp vụ. Tiếp tục đối chứng KPI bằng SQL, hoàn thiện lượng bán/hoàn và tỷ trọng Monetary theo cụm trên dashboard, giải thích chọn K, thử môi trường sạch và thu thập minh chứng báo cáo.
+Không gộp UCI GBP với OLTP VND. Không coi endpoint HN/DN/SG là ba máy độc lập. OFFLINE giữ last-known snapshot, EMPTY khác OFFLINE. Dữ liệu UCI chính thức được xác minh qua .provenance.json và SHA256; không dùng workbook/sidecar khác làm một lịch sử kinh doanh mới.
 
-Bạn phụ trách model có thể tiếp tục làm trên src/mining/clustering.py và evaluation.py. Giữ hợp đồng đầu vào RFM và tùy chọn output_dir để job lưu artifact riêng. Việc load model bàn giao để predict là luồng khác với train hiện có, chưa được bổ sung trong đợt Airflow này.
+Old SQL path sql/views chỉ còn compatibility pointer cho psql; Python dùng bi/views. Older differing OLTP payload bị từ chối trước upsert theo source_observed_at, không ghi đè trạng thái mới. Chạy lại input không đổi được đối soát bằng SQL, không chỉ dựa counter.
 
-[Đề cương](../decuong.txt) · [Đặc tả kiến trúc](../SYSTEM_ARCHITECTURE_DRAWIO_SPEC.md). Cấu hình Docker local này chưa phải triển khai public/production.
+Power BI không bị âm thầm loại khỏi yêu cầu trước đây: việc dùng web thay thế có minh chứng riêng, còn Desktop report vẫn là giới hạn đã công bố trong SYSTEM_LIMITATIONS.md.

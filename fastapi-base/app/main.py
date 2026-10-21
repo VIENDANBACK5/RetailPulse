@@ -1,4 +1,7 @@
 import logging
+import json
+from fastapi import Request
+from fastapi.responses import RedirectResponse
 
 from fastapi.exceptions import ValidationException
 import uvicorn
@@ -47,15 +50,30 @@ def get_application() -> FastAPI:
             "docExpansion": "none",
         },
     )
+    origins = settings.BACKEND_CORS_ORIGINS
+    if isinstance(origins, str):
+        try:
+            origins = json.loads(origins)
+        except ValueError:
+            origins = [value.strip() for value in origins.split(",") if value.strip()]
+    if not isinstance(origins, list):
+        origins = []
+    origins = list(dict.fromkeys([*origins, "http://localhost:8010", "http://127.0.0.1:8010"]))
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_origins=origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
     application.add_middleware(DBSessionMiddleware, db_url=settings.DATABASE_URL)
     application.include_router(router, prefix=settings.API_PREFIX)
+    @application.get("/frontend/{path:path}", include_in_schema=False)
+    def primary_portal(request: Request, path: str):
+        # One frontend origin; its real-run API stays on the control service.
+        hostname = request.url.hostname or "localhost"
+        return RedirectResponse(f"{request.url.scheme}://{hostname}:8010/frontend/{path}")
+
     application.add_exception_handler(CustomException, custom_error_handler)
     application.add_exception_handler(ValidationException, validation_exception_handler)
     application.add_exception_handler(Exception, fastapi_error_handler)

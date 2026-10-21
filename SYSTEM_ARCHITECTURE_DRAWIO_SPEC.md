@@ -1,3 +1,5 @@
+> Sau tích hợp nhánh danh: profile WithAirflow bật MinIO và bốn DAG thực; nguồn SQL chuẩn nằm ở bi/views, portal8010 có thêm reports.html. Bằng chứng hiện hành: [DANH_INTEGRATION_REPORT.md](docs/DANH_INTEGRATION_REPORT.md).
+
 > **C?p nh?t tri?n khai 21/10/2026:** Lu?ng c?t l?i ?? ch?y v? ki?m ch?ng; xem [ki?n tr?c th?c t?](docs/SYSTEM_ARCHITECTURE.md), [HLD v4 editable](docs/architecture/RetailPulse_HLD_v4.drawio), [b?o c?o nghi?m thu](docs/IMPLEMENTATION_REPORT.md). V3 ???c gi? ?? ??i chi?u. Power BI Desktop/report v?n BLOCKED; Semantic Model/DAX ch?a thay th? b?ng ch?ng refresh Desktop.
 
 # ĐẶC TẢ KIẾN TRÚC HỆ THỐNG VÀ LUỒNG DỮ LIỆU ĐỂ VẼ DRAW.IO

@@ -3,7 +3,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONT = ROOT / 'frontend'
-NAV = [('index.html', 'Tổng quan'), ('etl-monitor.html', 'Luồng dữ liệu'), ('dashboard.html', 'BI / OLAP'), ('customer-segments.html', 'Khai phá')]
+NAV = [('index.html', 'Tổng quan'), ('etl-monitor.html', 'Luồng dữ liệu'), ('dashboard.html', 'BI / OLAP'), ('customer-segments.html', 'Khai phá'), ('reports.html', 'Báo cáo tổng hợp')]
 
 def page(filename, title, subtitle, body, mode='home'):
     if mode == 'etl':

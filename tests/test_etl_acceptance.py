@@ -73,7 +73,7 @@ class HttpAcceptance(unittest.TestCase):
         class Handler(BaseHTTPRequestHandler):
             def do_GET(self):
                 self.send_response(200); self.end_headers()
-                self.wfile.write(json.dumps({'data':{'items':[],'snapshot_time':1609459200}}).encode())
+                self.wfile.write(json.dumps({'data':{'branch_code':'HN','status':'ONLINE','items':[],'snapshot_time':1609459200}}).encode())
             def log_message(self,*args): pass
         server=HTTPServer(('127.0.0.1',0),Handler)
         thread=threading.Thread(target=server.serve_forever,daemon=True); thread.start()

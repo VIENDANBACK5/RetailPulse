@@ -1,3 +1,5 @@
+> Cập nhật sau tích hợp nhánh danh: MinIO/Airflow/Analytics/Reports đã chạy đầu-cuối. Xem [DANH_INTEGRATION_REPORT.md](DANH_INTEGRATION_REPORT.md) cho bằng chứng mới, startup chung và 135 test khác nhau đã PASS qua hai profile. Báo cáo bên dưới giữ kết quả lần bàn giao lõi trước đó.
+
 # Báo cáo triển khai và nghiệm thu RetailPulse
 
 Ngày bàn giao: 21/10/2026. Repository: D:\CODE\bt\BTL_DATA_MINING. Commit tham chiếu 51324d8; thay đổi hiện ở working tree, không tự tạo commit. Bản kiểm kê cũ là tài liệu lịch sử. Các số dưới đây lấy từ pipeline, PostgreSQL và trình duyệt đã thực thi.

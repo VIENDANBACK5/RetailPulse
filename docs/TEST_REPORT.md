@@ -71,3 +71,6 @@ Machine-readable: [test_summary.json](../evidence/test_summary.json), [JUnit XML
 ## Ki?m ch?ng b? sung sau t?ch h?p cu?i
 
 Actual Chrome regression ch?n GBP/th?ng ?? PASS sau s?a option HTML trong dashboard v? generator. evidence/browser_verification.json l? l?n ch?y m?i nh?t, c? UI ETL th?t v? zero JavaScript errors. evidence/end_to_end.json ghi15b??c core/web PASS, Native Power BI BLOCKED ri?ng. Tr?nh chi?u HTML15slide ???c Chrome render, ki?m tra ?nh, k?ch th??c1280?720 v? keyboard navigation; evidence/presentation/render_check.json PASS. SQL v? k?t qu? mining ch?y l?i qua API c?ng ???c ??i chi?u ??y ?? trong integration evidence.
+## Nghiệm thu sau tích hợp danh
+
+Xem DANH_INTEGRATION_REPORT.md và evidence/danh_test_summary.json:122PASS mặc định,13test integration skip ở profile thường đã được chạy PASS trong bộ69test PostgreSQL riêng/MinIO thật. Đối chiếu JUnit cho135test khác nhau PASS, không cộng đúp giữa các profile. npm9PASS, Chrome reports6PASS, Chrome Airflow4PASS, core portalS3PASS. Operations6taskSUCCESS, historical6taskSUCCESS và full UCI replay3taskSUCCESS. Native Power BI vẫn BLOCKED riêng.

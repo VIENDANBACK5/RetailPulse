@@ -19,7 +19,7 @@ def job(action, source=None, upstream=None, use_conf_manifest=False):
     dag_run = context['dag_run']
     identity = f"{context['dag'].dag_id}|{dag_run.run_id}|{action}|{source or ''}"
     batch_id = 'AF-' + hashlib.sha256(identity.encode()).hexdigest()[:24]
-    if action == 'load' and not use_conf_manifest:
+    if (action == 'load' and not use_conf_manifest) or (action == 'mine' and upstream):
         batch_id = upstream['batch_id']
     command = [os.environ.get('RETAIL_PYTHON', '/opt/retail-venv/bin/python'),
                '-m', 'src.orchestration.jobs', action, '--batch-id', batch_id]
@@ -27,7 +27,7 @@ def job(action, source=None, upstream=None, use_conf_manifest=False):
         command += ['--source', source]
     if action == 'collect':
         command += ['--ingested-at', dag_run.start_date.isoformat()]
-    if action == 'mine':
+    if action == 'mine' and context['params'].get('k') is not None:
         command += ['--k', str(context['params']['k'])]
     if action == 'load':
         manifest = context['params']['manifest_key'] if use_conf_manifest else upstream['manifest_key']
@@ -41,7 +41,7 @@ def job(action, source=None, upstream=None, use_conf_manifest=False):
         if completed.returncode:
             raise RuntimeError(f'{action} failed (exit {completed.returncode}): {result}')
         # Keep XCom small: full logs/results stay in task logs, MinIO and model artifacts.
-        return {key: result[key] for key in ('manifest_key', 'batch_id', 'status', 'model_version', 'published_count') if key in result}
+        return {key: result[key] for key in ('manifest_key', 'batch_id', 'run_id', 'status', 'model_version', 'persisted_customers') if key in result}
 
 
 DEFAULTS = dict(start_date=pendulum.datetime(2026, 1, 1, tz='Asia/Ho_Chi_Minh'),
@@ -59,19 +59,19 @@ with DAG('retailpulse_operations', schedule='*/30 * * * *',
     views >> job.override(task_id='verify_dashboard')('verify')
 
 with DAG('retailpulse_historical', schedule=None,
-         params={'k': Param(4, type='integer', minimum=2, maximum=6)},
+         params={'k': Param(None, type=['null', 'integer'], minimum=2, maximum=6)},
          description='Manual UCI import, ETL, mining and dashboard verification', **DEFAULTS) as historical:
     downloaded = job.override(task_id='download_uci')('download')
     raw = job.override(task_id='collect_uci')('collect', source='uci')
     downloaded >> raw
     loaded = job.override(task_id='load_uci')('load', upstream=raw)
-    mined = job.override(task_id='mine_customers')('mine')
+    mined = job.override(task_id='mine_customers')('mine', upstream=loaded)
     loaded >> mined
     views = job.override(task_id='prepare_dashboard')('read_models')
     mined >> views >> job.override(task_id='verify_dashboard')('verify')
 
 with DAG('retailpulse_mining', schedule=None,
-         params={'k': Param(4, type='integer', minimum=2, maximum=6)},
+         params={'k': Param(None, type=['null', 'integer'], minimum=2, maximum=6)},
          description='Train from existing UCI warehouse data; publish complete snapshot atomically', **DEFAULTS) as mining:
     mined = job.override(task_id='mine_customers')('mine')
     views = job.override(task_id='prepare_dashboard')('read_models')

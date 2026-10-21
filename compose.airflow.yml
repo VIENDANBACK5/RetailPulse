@@ -41,6 +41,7 @@ x-airflow-common: &airflow-common
     - ./config:/workspace/config:ro
     - ./scripts:/workspace/scripts:ro
     - ./sql:/workspace/sql:ro
+    - ./bi:/workspace/bi:ro
     - ./tests:/workspace/tests:ro
     - ./infra/airflow:/workspace/infra/airflow:ro
     - ./data_lake:/workspace/data_lake

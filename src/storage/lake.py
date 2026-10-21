@@ -88,7 +88,7 @@ class RawLake:
                 raise ValueError('Invalid raw partition')
         return f'raw/source={source}/ingest_date={ingested_at:%Y-%m-%d}/batch_id={batch_id}'
 
-    def write_raw(self, source, batch_id, filename, payload, *, record_count=None, mode="operational", ingested_at=None, collected_at=None):
+    def write_raw(self, source, batch_id, filename, payload, *, record_count=None, mode="operational", ingested_at=None, collected_at=None, provenance=None, currency=None, metadata=None):
         # Source and batch are single partition values, never directory paths.
         for value in (source, batch_id, filename):
             if not value or "/" in value or "\\" in value or value in (".", ".."):
@@ -123,6 +123,9 @@ class RawLake:
             "collected_at": (collected_at or now).isoformat(),
             "sha256": digest, "size_bytes": len(payload), "record_count": record_count,
             "backend": self.backend, "bucket": self.bucket if self.backend == "s3" else None,
+            "provenance": provenance or ("DEMO" if source in ("app", "api") else "UNVERIFIED"),
+            "currency": currency or ("GBP" if source == "uci" else "VND"),
+            "metadata": metadata or {},
         }
         self.put(manifest_key, json.dumps(manifest, ensure_ascii=False, indent=2).encode("utf-8"), "application/json")
         return manifest_key

@@ -1,0 +1,22 @@
+{
+  "dag_id": "retailpulse_replay",
+  "run_id": "verify__1c7dde42cd194130ab26ab00e00660a0",
+  "state": "failed",
+  "tasks": [
+    {
+      "task_id": "prepare_dashboard",
+      "state": "upstream_failed",
+      "try_number": 0
+    },
+    {
+      "task_id": "verify_dashboard",
+      "state": "upstream_failed",
+      "try_number": 0
+    },
+    {
+      "task_id": "replay_manifest",
+      "state": "failed",
+      "try_number": 2
+    }
+  ]
+}

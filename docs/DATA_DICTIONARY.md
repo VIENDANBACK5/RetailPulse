@@ -119,3 +119,8 @@ Chi tiết công thức và truy vấn đối chứng: [KPI_DEFINITIONS.md](KPI_
 ## Ph? l?c to?n b? c?t trong DB ?? ch?y
 
 [DATA_DICTIONARY_SCHEMA.md](DATA_DICTIONARY_SCHEMA.md) li?t k? t?t c? c?t, ki?u, nullable, PK, FK, default v? UNIQUE c?a 15 b?ng h?p ??ng hi?n t?i, sinh t? PostgreSQL ?ang v?n h?nh.
+## Source watermark và Raw Lake sau tích hợp danh
+
+Migration sql/05_source_observation.sql thêm fact_sales.source_observed_at (TIMESTAMPTZ, nullable cho legacy). Đây là thời điểm thu thập nguồn gốc trong manifest, không phải thời điểm replay. Payload OLTP khác nội dung mà có thời điểm cũ hoặc bằng bản hiện tại bị từ chối trước upsert, rollback batch; dữ liệu hiện tại được giữ. Payload không đổi và mới hơn chỉ cần tăng watermark cho nguồn mutable APP_OPERATIONAL. UCI identity gắn checksum file bất biến nên không rewrite fact chỉ để tăng thời gian quan sát.
+
+source_manifest.metadata thêm lake_manifest_key, lake_uri, lake_sha256, source_collected_at. Raw MinIO là đầu vào authoritative của task load; bản local raw_path được giữ để portal/Windows đọc lineage. Artifact model từ /workspace/models/... được map sang mount models/... trên host rồi kiểm guard, không cho phép đọc file ngoài thư mục artifact.

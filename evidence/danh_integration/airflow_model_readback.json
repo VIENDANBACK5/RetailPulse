@@ -1,0 +1,11 @@
+{
+  "checked_at": "2026-10-21T09:06:18.868151+00:00",
+  "status": "PASS",
+  "http_status": 200,
+  "artifact_path": "/workspace/models/runs/mining-20261021T085226-d41e5857ee/result.json",
+  "sha256": "d43dbb2e9d6166e4878cfefb55fcdadc7cec82af032cecff7f517d5b9b0af403",
+  "run_id": "mining-20261021T085226-d41e5857ee",
+  "selected_k": 2,
+  "selection_mode": "PREDECLARED_RULE",
+  "persisted_customers": 4317
+}

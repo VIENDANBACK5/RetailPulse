@@ -9,11 +9,12 @@ NODES = [
     ("db", 445, 80, 310, 80, "PostgreSQL OLTP", "DEMO orders + order_items · VND", "#eff7fa"),
     ("api", 825, 80, 310, 80, "REST inventory API", "HN / DN / SG · one DEMO server", "#eff7fa"),
     ("ingest", 445, 220, 310, 70, "Python ingestion", "Source identity + manifest + status", "#eaf4ef"),
-    ("raw", 445, 340, 310, 70, "Raw storage per run", "Original extracts + checksum + replay", "#eaf4ef"),
+    ("raw", 445, 340, 310, 70, "MinIO / local Raw", "Manifest SHA256 + local lineage mirror", "#eaf4ef"),
     ("etl", 445, 460, 310, 80, "Validate / transform / load", "Upsert + exact-key SQL reconciliation", "#eaf4ef"),
     ("reject", 825, 460, 310, 80, "Rejected records", "Original row + validation reasons", "#fff1e7"),
     ("dwh", 445, 600, 310, 110, "PostgreSQL Star Schema", "Sales / Inventory facts\nDate / Customer / Product / Branch / Source", "#e9f3fa"),
-    ("registry", 65, 245, 310, 310, "Run registry and audit", "run_id / batch_id / source status\nPENDING / RUNNING / SUCCESS\nPARTIAL / FAILED\nLogs / Raw path / timestamps\nInventory source status outside fact", "#f1f1f8"),
+    ("airflow", 65, 220, 310, 145, "Airflow orchestration", "Collect / load / mine / verify\nFrozen input + retries + DAG logs\nOperations / historical / mining / replay", "#f1f1f8"),
+    ("registry", 65, 405, 310, 150, "Run registry and audit", "run_id / batch_id / source status\nPENDING / RUNNING / SUCCESS\nPARTIAL / FAILED + lineage", "#f1f1f8"),
     ("olap", 65, 790, 310, 95, "OLAP / semantic SQL", "Roll-up / drill-down / slice / dice\nPivot / drill-through / source lineage", "#eaf4ef"),
     ("mining", 445, 790, 310, 95, "RFM experiments", "Rules baseline / K2..6 / 10 seeds\nStability / profiles / future holdout", "#f2edf7"),
     ("model", 825, 790, 310, 95, "Persisted mining results", "Model + scaler + metrics + provenance\nCustomer segment snapshots by run", "#f2edf7"),
@@ -23,7 +24,8 @@ NODES = [
 EDGES = [("file", "ingest"), ("db", "ingest"), ("api", "ingest"), ("ingest", "raw"),
          ("raw", "etl"), ("etl", "reject"), ("etl", "dwh"), ("dwh", "olap"),
          ("dwh", "mining"), ("mining", "model"), ("olap", "web"), ("model", "web"),
-         ("model", "powerbi"), ("registry", "etl"), ("registry", "mining")]
+         ("model", "powerbi"), ("registry", "etl"), ("registry", "mining"),
+         ("airflow", "ingest"), ("airflow", "mining")]
 
 
 def main():
@@ -42,7 +44,7 @@ def main():
            '<text x="600" y="40" text-anchor="middle" font-family="Segoe UI,Arial" font-size="25" font-weight="bold" fill="#183f58">RETAILPULSE — IMPLEMENTED CORE ARCHITECTURE</text>']
     by_id = {n[0]: n for n in NODES}
     for i, (a, b) in enumerate(EDGES):
-        dashed = a == "registry" or b == "powerbi"
+        dashed = a in ("registry", "airflow") or b == "powerbi"
         edge = ET.SubElement(cells, "mxCell", id=f"e{i}", source=a, target=b, edge="1", parent="1",
                              style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;strokeColor=#466274;" + ("dashed=1;" if dashed else ""))
         ET.SubElement(edge, "mxGeometry", relative="1", **{"as": "geometry"})
@@ -51,7 +53,7 @@ def main():
         if abs(ay - by) < 5:
             x1, y1, x2, y2 = ax + aw, ay + ah / 2, bx, by + bh / 2
             points = f"{x1},{y1} {x2},{y2}"
-        elif a == "registry":
+        elif a in ("registry", "airflow"):
             x1, y1, x2, y2 = ax + aw, ay + ah / 2, bx, by + bh / 2
             points = f"{x1},{y1} {x1+25},{y1} {x1+25},{y2} {x2},{y2}"
         else:

@@ -12,10 +12,8 @@ def main():
     engine = get_dwh_engine()
     init_dwh_schema(engine)
     populate_dim_date(engine)
-    for path in sorted((ROOT / "bi" / "views").glob("*.sql")):
-        with engine.begin() as conn:
-            conn.execute(text(path.read_text(encoding="utf-8")))
-        print("Applied BI view:", path.name)
+    from scripts.prepare_dashboard import prepare_dashboard
+    prepare_dashboard(engine)
     with get_oltp_engine().connect() as conn:
         count = conn.execute(text("SELECT COUNT(*) FROM branches")).scalar_one()
     if count == 0:

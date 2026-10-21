@@ -54,3 +54,12 @@ Bộ kiểm thử có test PostgreSQL/HTTP thật; test module mở rộng DEMO 
 - [Kịch bản bảo vệ](docs/PRESENTATION_SCRIPT.md) · [Phản biện](docs/DEFENSE_QA.md)
 
 Bản kiểm kê SYSTEM_CURRENT_STATE_REVIEW.md và README cũ trong docs/archive là tài liệu lịch sử trước triển khai, không phản ánh trạng thái hiện tại. Trạng thái nghiệm thu cuối cùng nằm trong docs/IMPLEMENTATION_REPORT.md; không suy ra PASS từ việc file tồn tại.
+## Tích hợp nhánh danh đã được nối vào luồng chính
+
+```powershell
+.\START_RETAILPULSE.ps1 -WithAirflow
+```
+
+Profile này bật MinIO và bốn DAG Airflow thật. Airflow mặc định paused, chỉ chạy khi trigger. Không cần Airflow thì dùng -WithLake; không có flag thì local Raw như trước. Portal giữ cổng8010, thêm [Báo cáo tổng hợp](http://127.0.0.1:8010/frontend/reports.html); MinIO9001, Airflow18082.
+
+MinIO manifest được đọc/checksum trước load, replay không collect lại. Latest customer report chỉ chọn run SUCCESS, Analytics dùng tài khoản đọc. Xem [báo cáo sau tích hợp](docs/DANH_INTEGRATION_REPORT.md), [demo mới](docs/DANH_DEMO_GUIDE.md). Các kết quả test trong phần trước thuộc lần bàn giao cũ; kết quả mới đọc báo cáo tích hợp.

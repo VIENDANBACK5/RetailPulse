@@ -1,3 +1,5 @@
+> Bản ghi bên dưới thuộc lần chạy trước merge. Nghiệm thu sau tích hợp ngày 21/10/2026 đã chạy lại toàn bộ operations/historical/replay; xem [DANH_INTEGRATION_REPORT.md](DANH_INTEGRATION_REPORT.md).
+
 # Kiểm chứng tích hợp Airflow — 20/10/2026
 
 Môi trường: Docker Desktop trên Windows, Apache Airflow 3.3.1 với LocalExecutor, metadata PostgreSQL riêng. Kiểm tra qua scheduler/API thật; không chỉ chạy hàm Python hoặc `airflow dags test`.

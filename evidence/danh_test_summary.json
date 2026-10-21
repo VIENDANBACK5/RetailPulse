@@ -1,0 +1,20 @@
+{
+  "checked_at": "2026-10-21T09:04:16.972169+00:00",
+  "default": {
+    "pass": 122,
+    "skip": 13,
+    "fail": 0
+  },
+  "isolated_postgres_minio": {
+    "pass": 69,
+    "skip": 0,
+    "fail": 0
+  },
+  "skipped_default_executed_in_integration": 13,
+  "combined_unique": {
+    "PASS": 135,
+    "SKIP": 0,
+    "FAIL": 0
+  },
+  "remaining_skips": []
+}

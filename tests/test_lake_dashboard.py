@@ -12,7 +12,7 @@ from sqlalchemy import text
 from src.storage.lake import RawLake
 from src.etl.extractors import read_uci_payload
 from src.etl.transformers import transform_sales_data, transform_inventory_snapshots
-from src.etl.loaders import load_fact_sales, load_fact_inventory
+from src.etl.loaders import load_fact_sales, load_fact_inventory, load_inventory_status
 from src.etl.quality_check import reconcile_batch
 from src.utils.db_helper import get_dwh_engine, init_dwh_schema, populate_dim_date
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'fastapi-base'))
@@ -81,11 +81,22 @@ def database():
         pytest.skip("Enable RUN_LAKE_INTEGRATION with an isolated DWH_DB")
     if not os.environ.get("DWH_DB", "").startswith("retailpulse_verify"):
         raise RuntimeError("Integration tests require a separate retailpulse_verify* database")
-    engine = get_dwh_engine()
+    # Each invocation gets a fresh isolated database. Never truncate or drop a
+    # configured database: repeated test runs must not depend on historical rows.
+    from sqlalchemy import create_engine
+    from src.utils.db_helper import get_connection_url
+    base_url=get_connection_url('dwh')
+    name='retailpulse_verify_'+uuid.uuid4().hex[:16]
+    admin=create_engine(base_url.set(database='postgres'),isolation_level='AUTOCOMMIT')
+    with admin.connect() as connection:
+        connection.execute(text('CREATE DATABASE "'+name+'"'))
+    admin.dispose()
+    engine=create_engine(base_url.set(database=name))
+    print('Isolated acceptance database:',name)
     init_dwh_schema(engine)
     populate_dim_date(engine)
     with engine.begin() as connection:
-        for path in sorted((Path(__file__).resolve().parents[1] / "sql/views").glob("*.sql")):
+        for path in sorted((Path(__file__).resolve().parents[1] / "bi/views").glob("*.sql")):
             connection.execute(text(path.read_text(encoding="utf-8")))
     from scripts.prepare_dashboard import prepare_dashboard
     prepare_dashboard(engine)
@@ -111,12 +122,13 @@ def test_sales_replay_and_refund_sql(database):
          "country": "UK", "source_record_id": tag + "-refund"},
     ])
     valid, rejected = transform_sales_data(frame, "UCI_HISTORICAL")
-    first = load_fact_sales(database, valid, tag, return_stats=True)
-    replay = load_fact_sales(database, valid, tag + "-replay", return_stats=True)
-    assert first["inserted_count"] == 2
-    assert replay == {"inserted_count": 0, "existing_count": 2, "matched_count": 2, "matched_amount": 80.0,
-                      "superseded_count": 0, "superseded_source_amount": 0}
-    check = reconcile_batch(database, tag, "UCI_HISTORICAL", 2, 0, len(rejected), 80, 80, dwh_records_existing=2)
+    first = load_fact_sales(database, valid, tag)
+    replay = load_fact_sales(database, valid, tag + "-replay")
+    assert first["inserted"] == 2
+    assert replay['inserted']==replay['updated']==0
+    assert replay['unchanged']==replay['target_count']==2
+    assert replay['target_amount']==80
+    check = reconcile_batch(database, tag, "UCI_HISTORICAL", 2, 0, len(rejected), 80, 80, unchanged_count=2)
     assert check["status"] == "MATCHED"
     with database.connect() as connection:
         result = connection.execute(text("""
@@ -126,18 +138,20 @@ def test_sales_replay_and_refund_sql(database):
     assert tuple(result) == (100.0, 20.0, 80.0)
 
 
-def test_latest_offline_branch_does_not_keep_old_stock(database):
+def test_latest_offline_branch_preserves_last_known_stock(database):
     tag = uuid.uuid4().hex[:10]
-    online = transform_inventory_snapshots([{"branch_code": "HN", "status": "ONLINE",
-        "snapshot_time": 1700000000, "items": [{"stock_code": "VERIFY-P", "stock_on_hand": 8}]}])
-    offline = transform_inventory_snapshots([{"branch_code": "HN", "status": "OFFLINE",
-        "snapshot_time": None, "items": []}])
-    assert load_fact_inventory(database, online, tag + "-online") == 1
-    assert load_fact_inventory(database, online, tag + "-online") == 0
-    load_fact_inventory(database, offline, tag + "-offline")
+    online_node={"branch_code":"HN","status":"ONLINE","snapshot_time":1700000000,"items":[{"stock_code":"VERIFY-P","stock_on_hand":8}]}
+    online = transform_inventory_snapshots([online_node])
+    offline_node={"branch_code":"HN","status":"OFFLINE","snapshot_time":None,"items":[]}
+    assert transform_inventory_snapshots([offline_node]).empty
+    assert load_fact_inventory(database,online,tag+'-online')==1
+    assert load_fact_inventory(database,online,tag+'-online')==0
+    load_inventory_status(database,[online_node],tag+'-online',tag+'-online')
+    load_inventory_status(database,[offline_node],tag+'-offline',tag+'-offline')
     with database.connect() as connection:
-        rows = connection.execute(text("SELECT node_status, stock_on_hand FROM vw_bi_inventory_status WHERE branch_code='HN'")).all()
-    assert rows == [("OFFLINE", None)]
+        rows=connection.execute(text("SELECT node_status,stock_on_hand FROM vw_bi_inventory_status WHERE branch_code='HN'")).all()
+        assert rows == [('OFFLINE',8)]
+        assert connection.execute(text("SELECT count(*) FROM fact_inventory_snapshot f JOIN dim_product p USING(product_key) WHERE p.stock_code='ALL_PRODUCTS'")).scalar_one()==0
 
 
 def test_dashboard_filters_refunds_and_empty_currency(database):
@@ -154,7 +168,7 @@ def test_inventory_reporting_distinguishes_offline_and_zero(database):
     offline = service.inventory(branch='HN', health='offline')
     assert offline['summary']['offline_branches'] == 1
     assert offline['summary']['stock'] is None
-    assert offline['items'][0]['stock_on_hand'] is None
+    assert offline['items'][0]['stock_on_hand'] == 8
     assert service.inventory(branch='HN', search='not-an-existing-sku')['items'] == []
     assert service.inventory(branch='HN', search='%')['items'] == []
 
@@ -178,9 +192,10 @@ def test_customers_only_latest_run_and_pagination(database):
             VALUES(1,:code,'Verify','UK') RETURNING customer_key"""), {'code': 'VERIFY-' + tag}).scalar_one()
         for day, version, amount in [('2098-01-02','verify-old-'+tag,50),('2099-01-02','verify-new-'+tag,200)]:
             db.execute(text("""INSERT INTO customer_segment_snapshot(customer_key,analysis_date,window_start,
-                window_end,model_version,recency,frequency,monetary,cluster_id,cluster_name)
-                VALUES(:customer,:day,'2097-01-01','2097-12-31',:version,10,2,:amount,0,'Verify VIP')"""),
+                window_end,model_version,recency,frequency,monetary,cluster_id,cluster_name,run_id,source_code,currency)
+                VALUES(:customer,:day,'2097-01-01','2097-12-31',:version,10,2,:amount,0,'Verify VIP',:version,'UCI_HISTORICAL','GBP')"""),
                 {'customer':customer,'day':day,'version':version,'amount':amount})
+            db.execute(text("INSERT INTO retailpulse_runs(run_id,kind,status,finished_at,payload) VALUES(:id,'mining','SUCCESS',CAST(:day AS timestamptz),'{}'::jsonb)"),{'id':version,'day':day})
     service = Analytics(database)
     result = service.customers(search='VERIFY-'+tag,page_size=1)
     assert result['summary']['customers'] == 1
@@ -189,7 +204,7 @@ def test_customers_only_latest_run_and_pagination(database):
     assert service.customers(search='VERIFY-'+tag,page=2,page_size=1)['items'] == []
 
 
-def test_mining_snapshot_retry_removes_old_customers_and_rolls_back_failure(database):
+def test_mining_changed_cohort_retry_and_failed_publish_roll_back(database):
     from src.mining.segment_exporter import export_segments_to_dwh
     tag = uuid.uuid4().hex[:10]
     with database.begin() as db:
@@ -200,14 +215,28 @@ def test_mining_snapshot_retry_removes_old_customers_and_rolls_back_failure(data
         'monetary': [100., 200.], 'cluster_id': [0, 1], 'cluster_name': ['VIP', 'Loyal']})
     version = 'verify-atomic-' + tag
     day = '2099-02-01'
-    export_segments_to_dwh(frame, analysis_date=day, model_version=version, engine=database)
-    export_segments_to_dwh(frame.iloc[:1], analysis_date=day, model_version=version, engine=database)
+    export_segments_to_dwh(frame, analysis_date=day, model_version=version, engine=database,run_id=version)
+    with pytest.raises(RuntimeError,match="readback count"):
+        export_segments_to_dwh(frame.iloc[:1], analysis_date=day, model_version=version, engine=database,run_id=version)
     invalid = frame.copy()
     invalid['customer_key'] = -999999
     invalid = invalid.iloc[:1]
     with pytest.raises(Exception):
-        export_segments_to_dwh(invalid, analysis_date=day, model_version=version, engine=database)
+        export_segments_to_dwh(invalid, analysis_date=day, model_version=version, engine=database,run_id=version)
     with database.connect() as db:
         rows = db.execute(text('SELECT customer_key FROM customer_segment_snapshot WHERE model_version=:v'),
                           {'v': version}).scalars().all()
-    assert rows == keys[:1]
+    assert sorted(rows) == sorted(keys)
+
+
+def test_empty_inventory_is_distinct_from_offline_and_missing(database):
+    tag=uuid.uuid4().hex
+    node={'branch_code':'SG','status':'EMPTY','snapshot_time':1700000000,'items':[]}
+    assert transform_inventory_snapshots([node]).empty
+    load_inventory_status(database,[node],tag,tag)
+    result=Analytics(database).inventory(branch='SG')
+    assert result['items']==[]
+    assert result['summary']['offline_branches']==0
+    assert result['summary']['sku_locations']==0
+    assert result['branches'][0]['node_status']=='EMPTY'
+    assert result['branches'][0]['last_known_stock'] is None

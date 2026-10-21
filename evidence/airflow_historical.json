@@ -1,0 +1,37 @@
+{
+  "dag_id": "retailpulse_historical",
+  "run_id": "verify__fa617fcb921b43af800de9e68d159999",
+  "state": "success",
+  "tasks": [
+    {
+      "task_id": "download_uci",
+      "state": "success",
+      "try_number": 1
+    },
+    {
+      "task_id": "collect_uci",
+      "state": "success",
+      "try_number": 1
+    },
+    {
+      "task_id": "load_uci",
+      "state": "success",
+      "try_number": 1
+    },
+    {
+      "task_id": "mine_customers",
+      "state": "success",
+      "try_number": 1
+    },
+    {
+      "task_id": "prepare_dashboard",
+      "state": "success",
+      "try_number": 1
+    },
+    {
+      "task_id": "verify_dashboard",
+      "state": "success",
+      "try_number": 1
+    }
+  ]
+}

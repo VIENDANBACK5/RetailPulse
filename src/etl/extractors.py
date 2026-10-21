@@ -6,6 +6,7 @@ from pathlib import Path
 import pandas as pd
 import requests
 import io
+from src.etl.contracts import validate_inventory_data
 from sqlalchemy import text
 from src.utils.db_helper import BASE_DIR, get_oltp_engine, load_config
 
@@ -21,7 +22,7 @@ def normalize_uci_data(df: pd.DataFrame) -> pd.DataFrame:
     return df.rename(columns=mapping)
 
 def read_uci_payload(payload: bytes, filename: str, source_checksum: str) -> pd.DataFrame:
-    options = {'dtype': {'Invoice': str, 'StockCode': str, 'Customer ID': str, 'Price': str, 'Quantity': str}}
+    options = {'dtype': object}
     if filename.lower().endswith('.csv'):
         df = pd.read_csv(io.BytesIO(payload), **options)
     else:
@@ -93,12 +94,12 @@ def extract_api_inventory(branch_nodes=None):
         row={'branch_code':node['code'],'url':node['url'],'collected_at':pd.Timestamp.now(tz='UTC').isoformat(),'snapshot_time':None,'items':[],'provenance':'DEMO'}
         try:
             response=requests.get(node['url'],timeout=cfg.get('api_nodes',{}).get('timeout_seconds',3))
-            row.update(http_status=response.status_code,response_text=response.text)
+            row.update(http_status=response.status_code,response_text=response.text,response_body=response.text)
             response.raise_for_status()
             payload=response.json()
+            if not isinstance(payload,dict): raise ValueError('Inventory response must be an object')
             data=payload.get('data',payload)
-            if not isinstance(data,dict) or not isinstance(data.get('items'),list):
-                raise ValueError('Expected object with items list')
+            validate_inventory_data(data,node['code'])
             row.update(snapshot_time=data.get('snapshot_time'),items=data['items'])
             if row['snapshot_time'] is None: raise ValueError('Missing source snapshot timestamp')
             row['status']='ONLINE' if data['items'] else 'EMPTY'

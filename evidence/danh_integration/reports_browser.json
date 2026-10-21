@@ -1,0 +1,31 @@
+{
+  "execution": "REAL_BROWSER_REAL_DWH",
+  "checked_at": "2026-10-21T09:03:49.786644+00:00",
+  "checks": [
+    {
+      "name": "SALES_REAL_CROSS_ORIGIN_AND_REDIRECT",
+      "status": "PASS"
+    },
+    {
+      "name": "CURRENCY_FILTER",
+      "status": "PASS",
+      "rows": 29
+    },
+    {
+      "name": "ACTUAL_CSV_EXPORT",
+      "status": "PASS"
+    },
+    {
+      "name": "INVENTORY_CURRENT_AND_LAST_KNOWN",
+      "status": "PASS"
+    },
+    {
+      "name": "SUCCESSFUL_CUSTOMER_RUN",
+      "status": "PASS"
+    },
+    {
+      "name": "NO_JAVASCRIPT_RUNTIME_ERRORS",
+      "status": "PASS"
+    }
+  ]
+}

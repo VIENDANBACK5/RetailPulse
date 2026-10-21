@@ -140,3 +140,8 @@ Power BI/portal phải ghi nhận nguồn/currency, model version và run đang 
 - Hủy/hoàn UCI chỉ là điều chỉnh theo dấu/mã nguồn, không xác nhận nghiệp vụ thanh toán/hoàn tiền thực.
 
 Kết quả chạy cụ thể phải đọc từ report/evidence tương ứng; tài liệu lineage không thay thế kiểm thử thực thi.
+## Luồng MinIO / Airflow cập nhật
+
+Sau tích hợp danh, collect tạo manifest SHA256 trong MinIO; task load bắt buộc đọc đúng manifest và verify bytes trước xử lý. Pipeline không tự bỏ qua manifest hoặc collect nguồn khác. Khi không có key/checksum sai, run FAILED trước khi nạp. Local Raw mirror và source_manifest.metadata.lake_uri cho phép đối chiếu S3 object với fact trên Windows và container.
+
+Thời điểm quan sát nguồn được đóng băng cùng Raw. Replay cũ của OLTP không được ghi đè giao dịch mới; watermark bất hợp lệ làm batch FAILED rõ ràng. Parent DAG/task liên kết collect batch với ETL run_id; mining có execution run_id riêng và orchestration_batch_id. Xem DANH_INTEGRATION_REPORT.md cho các run thật sau merge.

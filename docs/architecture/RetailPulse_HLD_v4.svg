@@ -15,8 +15,10 @@
 <polyline points="220.0,885 220.0,922.5 410.0,922.5 410.0,960" fill="none" stroke="#466274" stroke-width="1.6" marker-end="url(#arrow)"/>
 <polyline points="980.0,885 980.0,922.5 410.0,922.5 410.0,960" fill="none" stroke="#466274" stroke-width="1.6" marker-end="url(#arrow)"/>
 <polyline points="980.0,885 980.0,922.5 980.0,922.5 980.0,960" fill="none" stroke="#466274" stroke-width="1.6" marker-end="url(#arrow)" stroke-dasharray="6 5"/>
-<polyline points="375,400.0 400,400.0 400,500.0 445,500.0" fill="none" stroke="#466274" stroke-width="1.6" marker-end="url(#arrow)" stroke-dasharray="6 5"/>
-<polyline points="375,400.0 400,400.0 400,837.5 445,837.5" fill="none" stroke="#466274" stroke-width="1.6" marker-end="url(#arrow)" stroke-dasharray="6 5"/>
+<polyline points="375,480.0 400,480.0 400,500.0 445,500.0" fill="none" stroke="#466274" stroke-width="1.6" marker-end="url(#arrow)" stroke-dasharray="6 5"/>
+<polyline points="375,480.0 400,480.0 400,837.5 445,837.5" fill="none" stroke="#466274" stroke-width="1.6" marker-end="url(#arrow)" stroke-dasharray="6 5"/>
+<polyline points="375,292.5 445,255.0" fill="none" stroke="#466274" stroke-width="1.6" marker-end="url(#arrow)" stroke-dasharray="6 5"/>
+<polyline points="375,292.5 400,292.5 400,837.5 445,837.5" fill="none" stroke="#466274" stroke-width="1.6" marker-end="url(#arrow)" stroke-dasharray="6 5"/>
 <rect x="65" y="80" width="310" height="80" rx="8" fill="#eff7fa" stroke="#7c9aab"/>
 <text x="220.0" y="115.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="17" font-weight="bold" fill="#183f58">UCI historical file</text>
 <text x="220.0" y="139.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">Official CSV / Excel · GBP</text>
@@ -30,8 +32,8 @@
 <text x="600.0" y="250.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="17" font-weight="bold" fill="#183f58">Python ingestion</text>
 <text x="600.0" y="274.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">Source identity + manifest + status</text>
 <rect x="445" y="340" width="310" height="70" rx="8" fill="#eaf4ef" stroke="#7c9aab"/>
-<text x="600.0" y="370.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="17" font-weight="bold" fill="#183f58">Raw storage per run</text>
-<text x="600.0" y="394.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">Original extracts + checksum + replay</text>
+<text x="600.0" y="370.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="17" font-weight="bold" fill="#183f58">MinIO / local Raw</text>
+<text x="600.0" y="394.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">Manifest SHA256 + local lineage mirror</text>
 <rect x="445" y="460" width="310" height="80" rx="8" fill="#eaf4ef" stroke="#7c9aab"/>
 <text x="600.0" y="495.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="17" font-weight="bold" fill="#183f58">Validate / transform / load</text>
 <text x="600.0" y="519.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">Upsert + exact-key SQL reconciliation</text>
@@ -42,13 +44,16 @@
 <text x="600.0" y="638.5" text-anchor="middle" font-family="Segoe UI,Arial" font-size="17" font-weight="bold" fill="#183f58">PostgreSQL Star Schema</text>
 <text x="600.0" y="662.5" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">Sales / Inventory facts</text>
 <text x="600.0" y="686.5" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">Date / Customer / Product / Branch / Source</text>
-<rect x="65" y="245" width="310" height="310" rx="8" fill="#f1f1f8" stroke="#7c9aab"/>
-<text x="220.0" y="349.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="17" font-weight="bold" fill="#183f58">Run registry and audit</text>
-<text x="220.0" y="373.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">run_id / batch_id / source status</text>
-<text x="220.0" y="397.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">PENDING / RUNNING / SUCCESS</text>
-<text x="220.0" y="421.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">PARTIAL / FAILED</text>
-<text x="220.0" y="445.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">Logs / Raw path / timestamps</text>
-<text x="220.0" y="469.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">Inventory source status outside fact</text>
+<rect x="65" y="220" width="310" height="145" rx="8" fill="#f1f1f8" stroke="#7c9aab"/>
+<text x="220.0" y="264.5" text-anchor="middle" font-family="Segoe UI,Arial" font-size="17" font-weight="bold" fill="#183f58">Airflow orchestration</text>
+<text x="220.0" y="288.5" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">Collect / load / mine / verify</text>
+<text x="220.0" y="312.5" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">Frozen input + retries + DAG logs</text>
+<text x="220.0" y="336.5" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">Operations / historical / mining / replay</text>
+<rect x="65" y="405" width="310" height="150" rx="8" fill="#f1f1f8" stroke="#7c9aab"/>
+<text x="220.0" y="452.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="17" font-weight="bold" fill="#183f58">Run registry and audit</text>
+<text x="220.0" y="476.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">run_id / batch_id / source status</text>
+<text x="220.0" y="500.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">PENDING / RUNNING / SUCCESS</text>
+<text x="220.0" y="524.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">PARTIAL / FAILED + lineage</text>
 <rect x="65" y="790" width="310" height="95" rx="8" fill="#eaf4ef" stroke="#7c9aab"/>
 <text x="220.0" y="821.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="17" font-weight="bold" fill="#183f58">OLAP / semantic SQL</text>
 <text x="220.0" y="845.0" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#35556a">Roll-up / drill-down / slice / dice</text>

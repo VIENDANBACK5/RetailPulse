@@ -23,6 +23,7 @@ def load_fact_sales(engine,valid_df,batch_id,run_id=None):
         raise ValueError('Each load must contain exactly one source and currency')
     columns=['source_record_id','invoice_no','stock_code','description','customer_code','country','branch_code','date_key','quantity','unit_price','total_amount','is_cancelled','transaction_type','currency','provenance','raw_path','record_hash','content_hash']
     stage=valid_df[columns].copy()
+    stage['source_observed_at']=pd.to_datetime(valid_df.get('source_observed_at',pd.Series(None,index=valid_df.index)),utc=True,errors='raise')
     source_code=str(valid_df['source_code'].iloc[0]); currency=str(valid_df['currency'].iloc[0])
     with engine.begin() as conn:
         conn.exec_driver_sql("SET LOCAL work_mem='128MB'")
@@ -30,7 +31,7 @@ def load_fact_sales(engine,valid_df,batch_id,run_id=None):
         if currency!=source['currency']: raise ValueError('Source currency contract mismatch')
         sk=source['source_key']
         conn.execute(text('SELECT pg_advisory_xact_lock(71234,:sk)'),dict(sk=sk))
-        conn.exec_driver_sql('''CREATE TEMP TABLE sales_stage(source_record_id TEXT,invoice_no TEXT,stock_code TEXT,description TEXT,customer_code TEXT,country TEXT,branch_code TEXT,date_key INT,quantity INT,unit_price NUMERIC(20,4),total_amount NUMERIC(20,4),is_cancelled BOOLEAN,transaction_type TEXT,currency TEXT,provenance TEXT,raw_path TEXT,record_hash TEXT,content_hash TEXT) ON COMMIT DROP''')
+        conn.exec_driver_sql('''CREATE TEMP TABLE sales_stage(source_record_id TEXT,invoice_no TEXT,stock_code TEXT,description TEXT,customer_code TEXT,country TEXT,branch_code TEXT,date_key INT,quantity INT,unit_price NUMERIC(20,4),total_amount NUMERIC(20,4),is_cancelled BOOLEAN,transaction_type TEXT,currency TEXT,provenance TEXT,raw_path TEXT,record_hash TEXT,content_hash TEXT,source_observed_at TIMESTAMPTZ) ON COMMIT DROP''')
         _copy(conn,'sales_stage',stage)
         conn.exec_driver_sql('ANALYZE sales_stage')
         conn.exec_driver_sql('''INSERT INTO dim_date(date_key,full_date,day_of_week,day_name,day_of_month,month,month_name,quarter,year,is_weekend,is_holiday)
@@ -42,7 +43,13 @@ def load_fact_sales(engine,valid_df,batch_id,run_id=None):
         conn.execute(text('''INSERT INTO dim_customer(source_key,customer_code,customer_name,country)
         SELECT DISTINCT ON(customer_code) :sk,customer_code,left('Customer '||customer_code,255),left(country,100) FROM sales_stage ORDER BY customer_code
         ON CONFLICT(source_key,customer_code) DO UPDATE SET country=EXCLUDED.country'''),dict(sk=sk))
-        params=dict(sk=sk,batch_id=batch_id,run_id=run_id or batch_id)
+        params=dict(sk=sk,batch_id=batch_id,run_id=run_id or batch_id,mutable_source=source_code=='APP_OPERATIONAL')
+        conflict=conn.execute(text('''SELECT count(*) FROM sales_stage s JOIN fact_sales f
+          ON f.source_key=:sk AND f.source_record_id=s.source_record_id
+          WHERE f.source_observed_at IS NOT NULL
+          AND (s.source_observed_at IS NULL OR s.source_observed_at<=f.source_observed_at) AND f.content_hash IS DISTINCT FROM s.content_hash'''),params).scalar_one()
+        if conflict:
+            raise ValueError('Stale or conflicting source observation would overwrite a newer transaction')
         counts=conn.execute(text('''SELECT count(*) FILTER(WHERE f.sales_key IS NULL) AS inserted,
           count(*) FILTER(WHERE f.sales_key IS NOT NULL AND f.content_hash IS DISTINCT FROM s.content_hash) AS updated,
           count(*) FILTER(WHERE f.sales_key IS NOT NULL AND f.content_hash=s.content_hash) AS unchanged
@@ -53,12 +60,12 @@ def load_fact_sales(engine,valid_df,batch_id,run_id=None):
          CASE WHEN f.sales_key IS NULL THEN 'INSERTED' WHEN f.content_hash IS DISTINCT FROM s.content_hash THEN 'UPDATED' ELSE 'UNCHANGED' END,s.raw_path
          FROM sales_stage s LEFT JOIN fact_sales f ON f.source_key=:sk AND f.source_record_id=s.source_record_id
          ON CONFLICT(batch_id,source_key,source_record_id) DO NOTHING'''),params)
-        conn.execute(text('''INSERT INTO fact_sales(date_key,customer_key,product_key,branch_key,source_key,invoice_no,quantity,unit_price,total_amount,is_cancelled,record_hash,batch_id,source_record_id,raw_path,provenance,currency,transaction_type,content_hash,run_id)
-        SELECT s.date_key,c.customer_key,p.product_key,b.branch_key,:sk,s.invoice_no,s.quantity,s.unit_price,s.total_amount,s.is_cancelled,s.record_hash,:batch_id,s.source_record_id,s.raw_path,s.provenance,s.currency,s.transaction_type,s.content_hash,:run_id
+        conn.execute(text('''INSERT INTO fact_sales(date_key,customer_key,product_key,branch_key,source_key,invoice_no,quantity,unit_price,total_amount,is_cancelled,record_hash,batch_id,source_record_id,raw_path,provenance,currency,transaction_type,content_hash,run_id,source_observed_at)
+        SELECT s.date_key,c.customer_key,p.product_key,b.branch_key,:sk,s.invoice_no,s.quantity,s.unit_price,s.total_amount,s.is_cancelled,s.record_hash,:batch_id,s.source_record_id,s.raw_path,s.provenance,s.currency,s.transaction_type,s.content_hash,:run_id,s.source_observed_at
         FROM sales_stage s JOIN dim_customer c ON c.source_key=:sk AND c.customer_code=s.customer_code
         JOIN dim_product p ON p.source_key=:sk AND p.stock_code=s.stock_code JOIN dim_branch b ON b.branch_code=s.branch_code
-        ON CONFLICT(source_key,source_record_id) DO UPDATE SET date_key=EXCLUDED.date_key,customer_key=EXCLUDED.customer_key,product_key=EXCLUDED.product_key,branch_key=EXCLUDED.branch_key,invoice_no=EXCLUDED.invoice_no,quantity=EXCLUDED.quantity,unit_price=EXCLUDED.unit_price,total_amount=EXCLUDED.total_amount,is_cancelled=EXCLUDED.is_cancelled,transaction_type=EXCLUDED.transaction_type,content_hash=EXCLUDED.content_hash,currency=EXCLUDED.currency,provenance=EXCLUDED.provenance,raw_path=EXCLUDED.raw_path,run_id=EXCLUDED.run_id,batch_id=EXCLUDED.batch_id,updated_at=now()
-        WHERE fact_sales.content_hash IS DISTINCT FROM EXCLUDED.content_hash'''),params)
+        ON CONFLICT(source_key,source_record_id) DO UPDATE SET date_key=EXCLUDED.date_key,customer_key=EXCLUDED.customer_key,product_key=EXCLUDED.product_key,branch_key=EXCLUDED.branch_key,invoice_no=EXCLUDED.invoice_no,quantity=EXCLUDED.quantity,unit_price=EXCLUDED.unit_price,total_amount=EXCLUDED.total_amount,is_cancelled=EXCLUDED.is_cancelled,transaction_type=EXCLUDED.transaction_type,content_hash=EXCLUDED.content_hash,currency=EXCLUDED.currency,provenance=EXCLUDED.provenance,raw_path=EXCLUDED.raw_path,run_id=EXCLUDED.run_id,batch_id=EXCLUDED.batch_id,updated_at=now(),source_observed_at=COALESCE(GREATEST(fact_sales.source_observed_at,EXCLUDED.source_observed_at),fact_sales.source_observed_at,EXCLUDED.source_observed_at)
+        WHERE fact_sales.content_hash IS DISTINCT FROM EXCLUDED.content_hash OR (:mutable_source AND EXCLUDED.source_observed_at IS NOT NULL AND (fact_sales.source_observed_at IS NULL OR EXCLUDED.source_observed_at>fact_sales.source_observed_at))'''),params)
         actual=conn.execute(text('''SELECT count(f.sales_key) AS target_count,COALESCE(sum(f.total_amount),0) AS target_amount,
         count(*) FILTER(WHERE f.content_hash IS DISTINCT FROM s.content_hash OR f.currency IS DISTINCT FROM s.currency
           OR f.total_amount IS DISTINCT FROM s.total_amount OR f.quantity IS DISTINCT FROM s.quantity

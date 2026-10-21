@@ -83,3 +83,6 @@ test-results/
 playwright-report/
 .pytest_cache/
 *.dump
+/data_lake/raw/lake_cache/
+/data_lake/raw/source=*/
+/data_lake/checkpoints/

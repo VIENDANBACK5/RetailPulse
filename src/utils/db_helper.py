@@ -54,6 +54,16 @@ def init_dwh_schema(engine: Engine = None):
                     with open(migration, encoding='utf-8') as stream:
                         conn.execute(text(stream.read()))
                     conn.execute(text("INSERT INTO retailpulse_schema_versions(version) VALUES('verified-contract-2') ON CONFLICT DO NOTHING"))
+        with engine.begin() as conn:
+            if not conn.execute(text("SELECT 1 FROM retailpulse_schema_versions WHERE version='source-observation-3'")).scalar():
+                with open(os.path.join(BASE_DIR,'sql','05_source_observation.sql'),encoding='utf-8') as stream:
+                    conn.execute(text(stream.read()))
+                conn.execute(text("INSERT INTO retailpulse_schema_versions(version) VALUES('source-observation-3') ON CONFLICT DO NOTHING"))
+        # Legacy float conversion is transactional; the helper is a no-op for
+        # installed NUMERIC columns and preserves existing view SELECT grants.
+        from src.utils.dwh_migrations import migrate_money
+        with engine.begin() as conn:
+            migrate_money(conn)
         print("DWH schema and verified contract initialized")
 
 

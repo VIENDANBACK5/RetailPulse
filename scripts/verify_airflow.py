@@ -15,6 +15,7 @@ def main():
     parser.add_argument('--dag', default='retailpulse_operations', choices=[
         'retailpulse_operations', 'retailpulse_historical', 'retailpulse_mining', 'retailpulse_replay'])
     parser.add_argument('--manifest')
+    parser.add_argument('--k', type=int, default=None)
     parser.add_argument('--expected', default='success', choices=['success', 'failed'])
     parser.add_argument('--timeout', type=int, default=1200)
     parser.add_argument('--output')
@@ -41,6 +42,8 @@ def main():
     run_id = 'verify__' + uuid.uuid4().hex
     try:
         conf = {'manifest_key': args.manifest} if args.manifest else {}
+        if args.k is not None:
+            conf['k'] = args.k
         run = request(path + '/dagRuns', {'dag_run_id': run_id, 'logical_date': None, 'conf': conf})
         print(f'Triggered {args.dag}: {run_id}', flush=True)
         deadline, last = time.monotonic() + args.timeout, None

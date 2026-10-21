@@ -68,13 +68,13 @@ class Analytics:
         # grouping-sets query. Distinct order identities sort tens of thousands
         # of invoices rather than a million line items. No persistent cache.
         aggregate = f"""WITH invoices AS (
-                SELECT year_month,branch_code,branch_name,source_code,invoice_no,
+                SELECT to_char(full_date,'YYYY-MM') AS year_month,branch_code,branch_name,source_code,invoice_no,
                     SUM(gross_sales_amount) AS gross,SUM(refund_amount) AS refunds,
-                    SUM(net_sales_amount) AS net,BOOL_OR(NOT is_cancelled) AS purchased,
+                    SUM(net_sales_amount) AS net,BOOL_OR(transaction_type='PURCHASE') AS purchased,
                     COUNT(*) AS line_count,MIN(full_date) AS first_date,
                     MAX(full_date) AS last_date,MAX(loaded_at) AS loaded
                 FROM vw_bi_sales_analytics WHERE {where}
-                GROUP BY year_month,branch_code,branch_name,source_code,invoice_no)
+                GROUP BY to_char(full_date,'YYYY-MM'),branch_code,branch_name,source_code,invoice_no)
                 SELECT year_month,branch_code,branch_name,
                     GROUPING(year_month) AS month_group,GROUPING(branch_code) AS branch_group,
                     ROUND(COALESCE(SUM(gross),0)::numeric,2) AS gross,
@@ -106,54 +106,63 @@ class Analytics:
             (:health IS NULL OR (:health='offline' AND node_status='OFFLINE')
             OR (:health='low' AND node_status='ONLINE' AND stock_on_hand<=10)
             OR (:health='healthy' AND node_status='ONLINE' AND stock_on_hand>10)
-            OR (:health='unknown' AND node_status='ONLINE' AND stock_on_hand IS NULL AND stock_code<>'ALL_PRODUCTS'))"""
+            OR (:health='unknown' AND (node_status IN ('UNKNOWN','INVALID','EMPTY') OR stock_on_hand IS NULL)))"""
         detail_where = where + " AND (stock_code ILIKE :search OR product_name ILIKE :search)"
         with self.snapshot() as db:
             summary = self.one(db, f"""SELECT
-                SUM(CASE WHEN stock_code='ALL_PRODUCTS' THEN 0 ELSE stock_on_hand END)
+                SUM(stock_on_hand)
                     FILTER (WHERE node_status='ONLINE') AS stock,
                 COUNT(*) FILTER (WHERE node_status='ONLINE' AND stock_on_hand<=10) AS low_locations,
                 COUNT(*) FILTER (WHERE node_status='ONLINE' AND stock_on_hand=0) AS zero_locations,
                 COUNT(DISTINCT branch_code) FILTER (WHERE node_status='OFFLINE') AS offline_branches,
                 COUNT(DISTINCT branch_code) AS branch_count,
-                COUNT(*) FILTER (WHERE node_status='ONLINE' AND stock_code<>'ALL_PRODUCTS') AS sku_locations,
+                COUNT(*) FILTER (WHERE node_status='ONLINE') AS sku_locations,
                 MAX(snapshot_time) FILTER (WHERE node_status='ONLINE') AS snapshot_time,
                 MAX(loaded_at) AS last_loaded FROM vw_bi_inventory_status WHERE {where}""", params)
-            branches = self.rows(db, f"""SELECT branch_code,branch_name,node_status,
-                SUM(CASE WHEN stock_code='ALL_PRODUCTS' AND node_status='ONLINE' THEN 0 ELSE stock_on_hand END) AS stock,
-                COUNT(*) FILTER (WHERE stock_on_hand IS NOT NULL AND stock_code<>'ALL_PRODUCTS') AS sku_count,
-                COUNT(*) FILTER (WHERE stock_on_hand<=10) AS low_locations,MAX(snapshot_time) AS snapshot_time,
-                MAX(loaded_at) AS last_loaded FROM vw_bi_inventory_status WHERE {where}
-                GROUP BY branch_code,branch_name,node_status ORDER BY branch_code""", params)
+            branch_where = """(:branch IS NULL OR branch_code=:branch) AND
+                (:health IS NULL OR (:health='offline' AND node_status='OFFLINE')
+                 OR (:health='unknown' AND node_status IN ('UNKNOWN','INVALID','EMPTY'))
+                 OR (:health='low' AND node_status='ONLINE' AND low_locations>0)
+                 OR (:health='healthy' AND node_status='ONLINE' AND stock>10))"""
+            branches = self.rows(db, f"SELECT * FROM vw_dashboard_inventory_branches WHERE {branch_where} ORDER BY source_code,branch_code", params)
+            summary['offline_branches'] = len({row['branch_code'] for row in branches if row['node_status'] == 'OFFLINE'})
+            summary['branch_count'] = len({row['branch_code'] for row in branches})
             total = self.one(db, f"SELECT COUNT(*) AS count FROM vw_bi_inventory_status WHERE {detail_where}", params)["count"]
             items = self.rows(db, f"""SELECT branch_code,stock_code,product_name,stock_on_hand,
-                node_status,inventory_health_status,snapshot_time FROM vw_bi_inventory_status WHERE {detail_where}
+                node_status,inventory_health_status,snapshot_time,data_status,last_successful_update,last_collection_at,freshness_hours FROM vw_bi_inventory_status WHERE {detail_where}
                 ORDER BY (node_status='OFFLINE') DESC,stock_on_hand ASC NULLS FIRST,branch_code,stock_code
                 LIMIT :limit OFFSET :offset""", params)
         return {"summary": summary, "branches": branches, "items": items, "total": total, "page": page, "page_size": page_size}
 
-    def customers(self, cluster=None, search="", page=1, page_size=20):
+    def customers(self, cluster=None, search="", page=1, page_size=20, run_id=None, model_version=None):
         params = {"cluster": cluster, "search": "%" + search.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%",
-                  "limit": page_size, "offset": (page-1)*page_size}
+                  "limit": page_size, "offset": (page-1)*page_size,
+                  "run_id": run_id, "model_version": model_version}
+        # Explicit versions must also belong to a successfully completed real run.
+        selected = """SELECT s.* FROM vw_bi_customer_segments s
+            JOIN retailpulse_runs r ON r.run_id=s.run_id AND r.kind='mining' AND r.status='SUCCESS'
+            WHERE (:run_id IS NULL OR s.run_id=:run_id)
+              AND (:model_version IS NULL OR s.model_version=:model_version)""" if run_id or model_version else "SELECT * FROM vw_bi_customer_segments_latest"
+        prefix = "WITH selected AS (" + selected + ") "
         where = "(:cluster IS NULL OR cluster_id=:cluster) AND customer_code ILIKE :search"
         with self.snapshot() as db:
-            run = self.rows(db, """SELECT analysis_date,window_start,window_end,model_version,
-                currency,source_code,MAX(created_at) AS trained_at FROM vw_bi_customer_segments_latest
-                GROUP BY analysis_date,window_start,window_end,model_version,currency,source_code""")
-            profiles = self.rows(db, """SELECT cluster_id,cluster_name,currency,COUNT(*) AS customers,
+            run = self.rows(db, prefix + """SELECT analysis_date,window_start,window_end,model_version,
+                run_id,currency,source_code,MAX(created_at) AS trained_at FROM selected
+                GROUP BY analysis_date,window_start,window_end,model_version,run_id,currency,source_code""", params)
+            profiles = self.rows(db, prefix + """SELECT cluster_id,cluster_name,currency,source_code,run_id,COUNT(*) AS customers,
                 PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY recency) AS recency,
                 PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY frequency) AS frequency,
                 PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY monetary) AS monetary,
                 ROUND(SUM(monetary)::numeric,2) AS total_monetary,MAX(business_action_recommendation) AS recommendation
-                FROM vw_bi_customer_segments_latest GROUP BY cluster_id,cluster_name,currency ORDER BY cluster_id""")
-            summary = self.one(db, f"""SELECT COUNT(*) AS customers,
+                FROM selected GROUP BY cluster_id,cluster_name,currency,source_code,run_id ORDER BY source_code,run_id,cluster_id""", params)
+            summary = self.one(db, prefix + f"""SELECT COUNT(*) AS customers,
                 PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY recency) AS recency,
                 PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY frequency) AS frequency,
-                PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY monetary) AS monetary,
+                CASE WHEN COUNT(DISTINCT currency)=1 THEN PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY monetary) END AS monetary,
                 CASE WHEN COUNT(DISTINCT currency)=1 THEN ROUND(SUM(monetary)::numeric,2) END AS total_monetary
-                FROM vw_bi_customer_segments_latest WHERE {where}""", params)
-            items = self.rows(db, f"""SELECT customer_code,country,cluster_id,cluster_name,
-                recency,frequency,monetary,currency FROM vw_bi_customer_segments_latest WHERE {where}
+                FROM selected WHERE {where}""", params)
+            items = self.rows(db, prefix + f"""SELECT customer_code,country,cluster_id,cluster_name,
+                recency,frequency,monetary,currency,source_code,run_id,model_version FROM selected WHERE {where}
                 ORDER BY monetary DESC,customer_key LIMIT :limit OFFSET :offset""", params)
         return {"runs": run, "profiles": profiles, "summary": summary, "items": items,
                 "total": summary["customers"], "page": page, "page_size": page_size}

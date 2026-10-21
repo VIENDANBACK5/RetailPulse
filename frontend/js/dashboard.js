@@ -81,16 +81,16 @@ function renderSales(data) {
   $('sales-context').textContent = s.row_count ? `${n(s.row_count)} dòng · ${date(s.min_date)} – ${date(s.max_date)} · Nạp gần nhất: ${date(s.last_loaded, true)}` : 'Không có giao dịch trong bộ lọc. Thử đặt lại ngày, nguồn hoặc chi nhánh.';
   $('sales-unit').textContent = c;
   cards('sales-kpis', [
-    ['Doanh số thuần', n(s.net, c === 'VND' ? 0 : 2), `${c} · Mua − hoàn/hủy`],
+    ['Doanh số thuần', n(s.net, c === 'VND' ? 0 : 2), `${c} · Mua − hoàn trả; đơn hủy loại riêng`],
     ['Doanh số mua', n(s.gross, c === 'VND' ? 0 : 2), `${c} · Chỉ dòng mua, không hủy`],
-    ['Giá trị hoàn / hủy', n(s.refunds, c === 'VND' ? 0 : 2), `${c} · Hiển thị giá trị dương`, 'refund-value'],
+    ['Giá trị hoàn trả', n(s.refunds, c === 'VND' ? 0 : 2), `${c} · Hiển thị giá trị dương`, 'refund-value'],
     ['Số đơn mua', n(s.orders), `Giá trị TB / đơn: ${fmt(s.aov)}`],
   ]);
-  $('sales-month-table').innerHTML = table(['Tháng', `Mua (${c})`, `Hoàn/hủy (${c})`, `Thuần (${c})`, 'Đơn mua'], monthly.map(row => [e(row.year_month), n(row.gross, 2), n(row.refunds, 2), n(row.net, 2), n(row.orders)]), 'Số liệu bán hàng theo tháng');
+  $('sales-month-table').innerHTML = table(['Tháng', `Mua (${c})`, `Hoàn trả (${c})`, `Thuần (${c})`, 'Đơn mua'], monthly.map(row => [e(row.year_month), n(row.gross, 2), n(row.refunds, 2), n(row.net, 2), n(row.orders)]), 'Số liệu bán hàng theo tháng');
   $('sales-chart').innerHTML = trend(monthly, c);
   const max = Math.max(1, ...products.map(row => row.gross));
   $('product-ranking').innerHTML = products.length ? products.map((row, index) => `<li><span class="rank-number">${index + 1}</span><div><div class="rank-label"><span title="${e(row.product_name)}">${e(row.product_name)}</span><strong>${e(fmt(row.gross))}</strong></div><span class="rank-code">${e(row.stock_code)}</span><span class="rank-track"><i style="width:${row.gross / max * 100}%"></i></span></div></li>`).join('') : '<li>Không có sản phẩm bán trong bộ lọc.</li>';
-  $('sales-branches').innerHTML = table(['Chi nhánh', `Mua (${c})`, `Hoàn/hủy (${c})`, `Thuần (${c})`, 'Đơn mua'], branches.map(row => [`<button class="table-drill" data-branch="${e(row.branch_code)}">${e(branchName(row.branch_code))}</button>`, n(row.gross, 2), n(row.refunds, 2), `<strong>${n(row.net, 2)}</strong>`, n(row.orders)]), 'Đóng góp theo chi nhánh');
+  $('sales-branches').innerHTML = table(['Chi nhánh', `Mua (${c})`, `Hoàn trả (${c})`, `Thuần (${c})`, 'Đơn mua'], branches.map(row => [`<button class="table-drill" data-branch="${e(row.branch_code)}">${e(branchName(row.branch_code))}</button>`, n(row.gross, 2), n(row.refunds, 2), `<strong>${n(row.net, 2)}</strong>`, n(row.orders)]), 'Đóng góp theo chi nhánh');
 }
 
 function trend(rows, currency) {
@@ -107,7 +107,7 @@ function trend(rows, currency) {
   }
   for (const [field, color] of [['gross', '#3569aa'], ['net', '#157456'], ['refunds', '#b45c58']]) svg += `<polyline fill="none" stroke="${color}" stroke-width="2.5" points="${rows.map((row, i) => `${x(i)},${y(row[field])}`).join(' ')}"/>`;
   rows.forEach((row, i) => {
-    const label = `${row.year_month}: mua ${money(row.gross, currency)}; hoàn/hủy ${money(row.refunds, currency)}; thuần ${money(row.net, currency)}. Nhấn để lọc tháng này.`;
+    const label = `${row.year_month}: mua ${money(row.gross, currency)}; hoàn trả ${money(row.refunds, currency)}; thuần ${money(row.net, currency)}. Nhấn để lọc tháng này.`;
     svg += `<circle cx="${x(i)}" cy="${y(row.net)}" r="5" fill="#157456" stroke="white" stroke-width="2" tabindex="0" role="button" data-month="${e(row.year_month)}" data-description="${e(label)}" aria-label="${e(label)}"><title>${e(label)}</title></circle>`;
     if (i % Math.max(1, Math.ceil(rows.length / 7)) === 0 || i === rows.length - 1) svg += `<text x="${x(i)}" y="${H - 10}" text-anchor="middle">${row.year_month.slice(5)}/${row.year_month.slice(2, 4)}</text>`;
   });
@@ -116,6 +116,7 @@ function trend(rows, currency) {
 
 function renderInventory(data) {
   const { summary: s, branches, items } = data;
+  const sourceLabel = row => ({ ONLINE: row.sku_count ? 'Có dữ liệu' : 'Chưa có sản phẩm', OFFLINE: 'Mất kết nối', EMPTY: 'Nguồn trả danh sách rỗng', INVALID: 'Phản hồi không hợp lệ', UNKNOWN: 'Chưa rõ trạng thái' })[row.node_status] || row.node_status;
   $('inventory-context').textContent = `${n(s.branch_count)} chi nhánh · ${n(s.sku_locations)} điểm tồn ONLINE · Đã nạp: ${date(s.last_loaded, true)}`;
   cards('inventory-kpis', [
     ['Tồn kho đã biết', n(s.stock), 'Đơn vị sản phẩm · Chỉ dữ liệu ONLINE'],
@@ -126,8 +127,8 @@ function renderInventory(data) {
   const stale = s.snapshot_time && Date.now() - new Date(s.snapshot_time).getTime() > 24 * 3600 * 1000;
   $('inventory-warning').hidden = !s.offline_branches && !stale;
   $('inventory-warning').textContent = s.offline_branches ? `${s.offline_branches} chi nhánh mất kết nối trong bộ lọc. Tổng tồn hiện tại chưa bao gồm các chi nhánh này.` : 'Snapshot đã hơn 24 giờ. Làm mới báo cáo chỉ đọc lại warehouse; hãy chạy ETL để thu thập snapshot mới.';
-  $('inventory-branches').innerHTML = branches.length ? branches.map(row => `<article class="inventory-branch"><div class="branch-card-heading"><h2>${e(branchName(row.branch_code))}</h2>${badge(row.node_status === 'ONLINE' ? (row.sku_count ? 'Có dữ liệu' : 'Chưa có sản phẩm') : 'Mất kết nối', row.node_status === 'ONLINE' ? 'good' : 'danger')}</div><strong class="branch-stock">${row.stock == null ? 'Chưa biết tồn' : n(row.stock)}${row.stock != null ? '<small> sản phẩm</small>' : ''}</strong><p>${row.node_status === 'ONLINE' ? `${n(row.sku_count)} SKU · ${n(row.low_locations)} điểm tồn thấp` : 'Không dùng số tồn của snapshot cũ'}</p><p>Snapshot: ${e(date(row.snapshot_time, true))}</p></article>`).join('') : empty('Không có chi nhánh phù hợp bộ lọc.');
-  $('inventory-table').innerHTML = table(['Sản phẩm / SKU', 'Chi nhánh', 'Tồn đã biết', 'Tình trạng', 'Mốc snapshot'], items.map(row => [`<strong>${e(row.product_name)}</strong><small class="cell-secondary">${e(row.stock_code)}</small>`, e(branchName(row.branch_code)), `<strong>${n(row.stock_on_hand)}</strong>`, badge(row.node_status === 'OFFLINE' ? 'Mất kết nối' : row.stock_code === 'ALL_PRODUCTS' ? 'Chưa có sản phẩm' : row.stock_on_hand == null ? 'Thiếu dữ liệu' : row.stock_on_hand === 0 ? 'Hết hàng' : row.stock_on_hand <= 10 ? 'Tồn thấp' : 'Bình thường', row.node_status === 'OFFLINE' || row.stock_on_hand === 0 ? 'danger' : row.stock_on_hand != null && row.stock_on_hand <= 10 ? 'warn' : 'good'), e(date(row.snapshot_time, true))]), 'Tồn kho mới nhất theo SKU và chi nhánh');
+  $('inventory-branches').innerHTML = branches.length ? branches.map(row => `<article class="inventory-branch"><div class="branch-card-heading"><h2>${e(branchName(row.branch_code))}</h2>${badge(sourceLabel(row), row.node_status === 'ONLINE' ? 'good' : 'danger')}</div><strong class="branch-stock">${row.stock == null ? 'Chưa biết tồn' : n(row.stock)}${row.stock != null ? '<small> sản phẩm</small>' : ''}</strong><p>${row.node_status === 'ONLINE' ? `${n(row.sku_count)} SKU · ${n(row.low_locations)} điểm tồn thấp` : `Tồn lần cuối: ${n(row.last_known_stock)} (snapshot lịch sử)`}</p><p>Snapshot: ${e(date(row.snapshot_time, true))}</p></article>`).join('') : empty('Không có chi nhánh phù hợp bộ lọc.');
+  $('inventory-table').innerHTML = table(['Sản phẩm / SKU', 'Chi nhánh', 'Tồn đã biết', 'Tình trạng', 'Mốc snapshot'], items.map(row => [`<strong>${e(row.product_name)}</strong><small class="cell-secondary">${e(row.stock_code)}</small>`, e(branchName(row.branch_code)), `<strong>${n(row.stock_on_hand)}</strong>`, badge(row.node_status === 'OFFLINE' ? 'Mất kết nối' : row.node_status === 'EMPTY' ? 'Nguồn rỗng' : row.node_status === 'INVALID' ? 'Dữ liệu lỗi' : row.stock_on_hand == null ? 'Thiếu dữ liệu' : row.stock_on_hand === 0 ? 'Hết hàng' : row.stock_on_hand <= 10 ? 'Tồn thấp' : 'Bình thường', row.node_status === 'OFFLINE' || row.stock_on_hand === 0 ? 'danger' : row.stock_on_hand != null && row.stock_on_hand <= 10 ? 'warn' : 'good'), e(date(row.snapshot_time, true))]), 'Tồn kho mới nhất theo SKU và chi nhánh');
   paginate('inventory', data);
 }
 
@@ -291,7 +292,7 @@ function exportData(kind) {
   const data = state.data[kind];
   if (!data || $(`${kind}-content`).hidden) return;
   let headers, rows;
-  if (kind === 'sales') { headers = ['Tháng', 'Tiền tệ', 'Doanh số mua', 'Hoàn/hủy', 'Doanh số thuần', 'Số đơn mua']; rows = data.monthly.map(r => [r.year_month, data.currency, r.gross, r.refunds, r.net, r.orders]); }
+  if (kind === 'sales') { headers = ['Tháng', 'Tiền tệ', 'Doanh số mua', 'Hoàn trả', 'Doanh số thuần', 'Số đơn mua']; rows = data.monthly.map(r => [r.year_month, data.currency, r.gross, r.refunds, r.net, r.orders]); }
   if (kind === 'inventory') { headers = ['Chi nhánh', 'SKU', 'Sản phẩm', 'Tồn đã biết', 'Trạng thái', 'Snapshot']; rows = data.items.map(r => [r.branch_code, r.stock_code, r.product_name, r.stock_on_hand, r.node_status, r.snapshot_time]); }
   if (kind === 'customers') { headers = ['Nhóm', 'Số khách', 'R trung vị', 'F trung vị', 'M trung vị', 'Tiền tệ', 'Gợi ý']; rows = data.profiles.map(r => [r.cluster_name, r.customers, r.recency, r.frequency, r.monetary, r.currency, r.recommendation]); }
   const blob = new Blob([csvText(headers, rows)], { type: 'text/csv;charset=utf-8' });

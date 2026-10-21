@@ -36,3 +36,6 @@ Ngày kiểm tra: 21/10/2026. Đối chiếu `evidence/end_to_end.json`, `eviden
 ## Kết luận nghiệm thu
 
 Lõi ETL/DWH/mining/web BI có bằng chứng vận hành thực tế. Theo Definition of Done nghiêm ngặt có Power BI Desktop/report phải kiểm chứng, **PRESENTATION_READY = FALSE** cho đến khi phần Power BI được mở, hoàn thiện và đối chiếu SQL. Web demo có thể dùng ngay theo `docs/DEMO_GUIDE.md`; không che giấu giới hạn Power BI khi trình bày.
+## Cập nhật sau tích hợp danh
+
+Airflow và MinIO đã được triển khai, chạy và nghiệm thu sau merge; không còn là phần kiến trúc dự kiến. Bốn DAG thực dùng cùng ETL/DWH, đọc đúng Raw manifest; hồ sơ dòng nguồn và local mirror vẫn bảo toàn. Reports frontend và Analytics đọc đúng schema hiện tại. Xem DANH_INTEGRATION_REPORT.md cho runID và bằng chứng. Các giới hạn dữ liệu, nhân quả, CDC, HA, native Power BI và process-local portal queue vẫn áp dụng.

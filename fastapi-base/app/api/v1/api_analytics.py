@@ -52,8 +52,10 @@ def inventory(branch: Optional[str] = Query(None, max_length=30),
 @router.get("/customers")
 @available
 def customers(cluster: Optional[int] = Query(None, ge=0), search: str = Query("", max_length=100),
-              page: int = Query(1, ge=1), page_size: int = Query(20, ge=1, le=100)):
-    return analytics.customers(cluster, search, page, page_size)
+              page: int = Query(1, ge=1), page_size: int = Query(20, ge=1, le=100),
+              run_id: Optional[str] = Query(None, max_length=128),
+              model_version: Optional[str] = Query(None, max_length=160)):
+    return analytics.customers(cluster, search, page, page_size, run_id, model_version)
 
 
 @router.get("/status")

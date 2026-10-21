@@ -4,6 +4,7 @@ from datetime import date, datetime
 from decimal import Decimal
 import csv
 import json
+import os
 from pathlib import Path
 import threading
 import sys
@@ -85,7 +86,9 @@ def home():
 
 @app.get("/api/health")
 def health():
-    return {"status": "UP", "warehouse": rows("SELECT current_database() AS database, NOW() AS checked_at")[0], "execution": "REAL"}
+    return {"status": "UP", "warehouse": rows("SELECT current_database() AS database, NOW() AS checked_at")[0],
+            "execution": "REAL", "lake_backend": os.getenv("LAKE_BACKEND", "local"),
+            "app_id": "retailpulse-control-v2", "workspace": str(ROOT), "active_run": active_job}
 
 
 @app.post("/api/runs", status_code=202)
@@ -340,6 +343,11 @@ def models():
 
 @app.get("/api/artifacts")
 def artifact(path: str):
+    # Airflow and the Windows control API share mounts, but use different roots.
+    # Translate only known project artifact mounts, then apply the normal guard.
+    normalized = path.replace('\\', '/')
+    if normalized.startswith('/workspace/models/') or normalized.startswith('/workspace/artifacts/'):
+        path = normalized[len('/workspace/'):]
     p = (ROOT / path).resolve()
     allowed = [ROOT / "models", ROOT / "artifacts"]
     if not any(p.is_relative_to(folder.resolve()) for folder in allowed) or not p.is_file() or p.suffix.lower() not in {".csv", ".json", ".png", ".txt"}:

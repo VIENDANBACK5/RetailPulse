@@ -4,8 +4,8 @@
     {
       "name": "UI_ETL_REAL_RUN",
       "status": "PASS",
-      "run_id": "etl-20261021T031825-6e7ed2c596",
-      "batch_id": "BATCH-b86bc98211634e3797b549920b9f8c47"
+      "run_id": "etl-20261021T090352-257ca2f023",
+      "batch_id": "BATCH-31b009c628b44416a827476fd1d10f34"
     },
     {
       "name": "OLAP_GBP_MONTH_CURRENCY_SELECTION",

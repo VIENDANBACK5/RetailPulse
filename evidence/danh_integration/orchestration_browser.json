@@ -1,0 +1,23 @@
+{
+  "execution": "REAL_BROWSER_REAL_AIRFLOW",
+  "checked_at": "2026-10-21T09:05:45.822516+00:00",
+  "checks": [
+    {
+      "name": "AUTHENTICATED_FOUR_DAGS",
+      "status": "PASS"
+    },
+    {
+      "name": "HISTORICAL_TASK_OVERVIEW",
+      "status": "PASS"
+    },
+    {
+      "name": "ACTUAL_SUCCESSFUL_RUN",
+      "status": "PASS",
+      "run_id": "verify__fa617fcb921b43af800de9e68d159999"
+    },
+    {
+      "name": "ACTUAL_HISTORICAL_GRAPH",
+      "status": "PASS"
+    }
+  ]
+}

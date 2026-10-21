@@ -6,7 +6,6 @@ from unittest.mock import MagicMock
 import pandas as pd
 import pytest
 
-pytestmark = pytest.mark.optional_extension
 
 from src.etl.ingestion import ingest_source
 from src.storage.lake import RawLake
@@ -64,18 +63,17 @@ def test_rfm_dwh_failure_propagates_without_local_csv():
 
 
 @pytest.mark.parametrize('end,start', [('2011-12-09','2010-12-10'), ('2021-02-28','2020-03-01')])
-def test_rfm_calendar_window_and_invoice_frequency(monkeypatch, end, start):
-    engine = MagicMock()
-    rows = pd.DataFrame({'customer_key': [1, 1], 'customer_code': ['C1', 'C1'],
-        'invoice_date': [datetime.date.fromisoformat(end)] * 2, 'invoice_no': ['A', 'A'],
-        'total_amount': [10.0, 20.0]})
-    monkeypatch.setattr('src.mining.rfm_extractor.pd.read_sql', lambda *a, **kw: rows)
-    rfm, reference, window_start, window_end = extract_rfm_from_dwh(engine=engine, window_end=end)
+def test_rfm_calendar_window_and_invoice_frequency(end, start):
+    from src.mining.rfm_extractor import calendar_window, calculate_rfm
+    window_start, window_end, reference = calendar_window(end)
     assert str(window_start) == start
+    rows = pd.DataFrame({'customer_key':[1,1],'customer_code':['C1','C1'],
+        'source_code':['TEST','TEST'],'invoice_date':[end,end],'invoice_no':['A','A'],'total_amount':[10,20]})
+    rfm=calculate_rfm(rows,reference)
     assert reference == window_end + datetime.timedelta(days=1)
-    assert rfm.iloc[0]['frequency'] == 1
-    assert rfm.iloc[0]['monetary'] == 30
-    assert rfm.iloc[0]['recency'] == 1
+    assert rfm.iloc[0]['frequency']==1
+    assert rfm.iloc[0]['monetary']==30
+    assert rfm.iloc[0]['recency']==1
 
 
 def test_export_dwh_failure_is_not_reported_as_saved():
@@ -83,32 +81,52 @@ def test_export_dwh_failure_is_not_reported_as_saved():
     engine.begin.side_effect = RuntimeError('Cannot publish')
     frame = rfm_fixture().assign(cluster_id=0, cluster_name='VIP')
     with pytest.raises(RuntimeError, match='Cannot publish'):
-        export_segments_to_dwh(frame, engine=engine)
+        export_segments_to_dwh(frame, engine=engine, run_id="unit-publish-failure")
 
 
-def test_mining_failure_has_failed_run_metadata(tmp_path, monkeypatch):
-    def fail(**kwargs):
-        raise RuntimeError('warehouse offline')
-    monkeypatch.setattr(mining, 'extract_rfm_from_dwh', fail)
-    with pytest.raises(RuntimeError, match='warehouse offline'):
-        mining.run_mining_pipeline(run_id='failed-run', artifacts_dir=tmp_path)
-    result = json.loads((tmp_path / 'failed-run/run.json').read_text())
-    assert result['status'] == 'FAILED'
-    assert 'published_count' not in result
+@pytest.fixture
+def isolated_mining(tmp_path,monkeypatch):
+    from src.runtime import runs
+    monkeypatch.setattr(runs,'RUNS_DIR',tmp_path/'registry')
+    monkeypatch.setenv('RETAILPULSE_RUN_DB_MIRROR','0')
+    monkeypatch.setattr(mining,'BASE_DIR',tmp_path)
+    return tmp_path
 
 
-def test_real_training_uses_separate_run_artifacts(tmp_path, monkeypatch):
-    monkeypatch.setattr(mining, 'extract_rfm_from_dwh', lambda **kw: (rfm_fixture(),
-        datetime.date(2021, 3, 1), datetime.date(2020, 3, 1), datetime.date(2021, 2, 28)))
-    monkeypatch.setattr(mining, 'export_segments_to_dwh', lambda frame, **kw: len(frame))
-    first = mining.run_mining_pipeline(4, run_id='first', artifacts_dir=tmp_path)
-    second = mining.run_mining_pipeline(4, run_id='second', artifacts_dir=tmp_path)
-    assert first['status'] == second['status'] == 'SUCCESS'
-    assert first['model_version'] != second['model_version']
-    for run in ('first', 'second'):
-        assert (tmp_path / run / 'rfm_scaler.pkl').exists()
-        assert (tmp_path / run / 'kmeans_k4.pkl').exists()
-        assert (tmp_path / run / 'k_comparison_summary.json').exists()
+def test_mining_failure_has_failed_run_metadata(isolated_mining, monkeypatch):
+    from src.runtime.runs import get_run
+    def fail(**kwargs): raise RuntimeError('warehouse offline')
+    monkeypatch.setattr(mining,'extract_rfm_from_dwh',fail)
+    result=mining.run_mining_pipeline(run_id='unit-failed-run',window_end='2021-02-28')
+    assert result['status']=='FAILED'
+    assert get_run('unit-failed-run')['status']=='FAILED'
+    artifact=json.loads((isolated_mining/'models/runs/unit-failed-run/failure.json').read_text())
+    assert 'warehouse offline' in artifact['error']
+    assert 'persisted_customers' not in artifact
+
+
+def test_real_training_uses_separate_run_artifacts(isolated_mining,monkeypatch):
+    # This is orchestration unit coverage: DB extraction/publication is stubbed,
+    # while preprocessing, K sweep and model serialization really execute.
+    def extract(**kwargs):
+        details={'source_code':'UCI_HISTORICAL','provenance':'OFFICIAL_UCI','currency':'GBP',
+            'available_start':'2020-03-01','available_end':'2021-02-28','transaction_count':12,
+            'source_batch_ids':[],'raw_paths':[], 'sql_python_comparison':pd.DataFrame({'match':[True]}),
+            'transactions':pd.DataFrame({'source_record_id':range(12)})}
+        return rfm_fixture(),datetime.date(2021,3,1),datetime.date(2020,3,1),datetime.date(2021,2,28),details
+    monkeypatch.setattr(mining,'extract_rfm_from_dwh',extract)
+    monkeypatch.setattr(mining,'export_segments_to_dwh',lambda frame,**kw:len(frame))
+    first=mining.run_mining_pipeline(run_id='unit-first',window_end='2021-02-28',seeds=[42,123])
+    second=mining.run_mining_pipeline(run_id='unit-second',window_end='2021-02-28',seeds=[42,123])
+    assert first['status']==second['status']=='SUCCESS'
+    assert first['selection_mode']==second['selection_mode']=='PREDECLARED_RULE'
+    assert first['model_version']!=second['model_version']
+    for run in ('unit-first','unit-second'):
+        directory=isolated_mining/'models/runs'/run
+        assert (directory/'scaler.pkl').exists()
+        assert (directory/'kmeans.pkl').exists()
+        assert (directory/'evaluation.json').exists()
+    assert first['dataset']['rfm_sha256']==second['dataset']['rfm_sha256']
 
 
 def test_partial_job_returns_nonzero(tmp_path, monkeypatch):
@@ -118,3 +136,25 @@ def test_partial_job_returns_nonzero(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, 'argv', ['jobs', 'load', '--batch-id', 'partial',
         '--manifest', 'manifest.json', '--output', str(tmp_path / 'result.json')])
     assert jobs.main() == 2
+
+
+def test_failed_job_returns_one(tmp_path,monkeypatch):
+    import sys
+    from src.orchestration import jobs
+    monkeypatch.setattr(jobs,'execute',lambda **kw:{'status':'FAILED','error':'verified input missing'})
+    monkeypatch.setattr(sys,'argv',['jobs','load','--batch-id','failed','--manifest','missing.json','--output',str(tmp_path/'failed.json')])
+    assert jobs.main()==1
+    assert json.loads((tmp_path/'failed.json').read_text())['status']=='FAILED'
+
+
+def test_mining_job_defaults_to_automatic_k_and_new_run(monkeypatch):
+    from src.orchestration import jobs
+    calls=[]
+    def mine(k_clusters=None,run_id=None,**kwargs):
+        calls.append((k_clusters,run_id))
+        return {'status':'SUCCESS','run_id':'fresh-mining-id'}
+    monkeypatch.setattr(mining,'run_mining_pipeline',mine)
+    monkeypatch.setattr('src.runtime.runs.update_run',lambda *args,**kwargs:None)
+    result=jobs.execute('mine',batch_id='scheduler-context')
+    assert result['status']=='SUCCESS'
+    assert calls==[(None,None)]

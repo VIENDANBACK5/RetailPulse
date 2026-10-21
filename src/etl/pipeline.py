@@ -2,6 +2,7 @@
 import argparse
 import datetime
 import json
+import os
 import sys
 import uuid
 from pathlib import Path
@@ -18,6 +19,26 @@ from src.etl.transformers import transform_sales_data,transform_inventory_snapsh
 from src.etl.loaders import load_fact_sales,load_fact_inventory,load_rejected_records,load_inventory_status
 from src.etl.quality_check import reconcile_batch
 
+SOURCE_CODES={'uci':'UCI_HISTORICAL','app':'APP_OPERATIONAL','api':'INVENTORY_API'}
+
+def _materialize_lake_input(lake, key):
+    """Verify object bytes before interpreting them; retain a local lineage mirror."""
+    manifest,payload=lake.read_raw(key)
+    source=manifest.get('source')
+    if source not in SOURCE_CODES:
+        raise ValueError('Unsupported manifest source')
+    directory=Path(__file__).resolve().parents[2]/'data_lake/raw/lake_cache'/manifest['sha256']
+    directory.mkdir(parents=True,exist_ok=True)
+    path=directory/Path(manifest['object_key']).name
+    if path.exists() and file_checksum(path)!=manifest['sha256']:
+        raise ValueError('Local Raw mirror checksum mismatch')
+    if not path.exists(): path.write_bytes(payload)
+    provenance=manifest.get('provenance','DEMO' if source!='uci' else 'UNVERIFIED')
+    if source=='uci':
+        path.with_suffix(path.suffix+'.provenance.json').write_text(json.dumps(
+            dict(manifest.get('metadata',{}),checksum=manifest['sha256'],provenance=provenance)),encoding='utf-8')
+    return manifest,path
+
 def _registry():
     try:
         from src.runtime import runs
@@ -25,11 +46,18 @@ def _registry():
     except ImportError: return None
 
 def run_etl_pipeline(sources=None,run_id=None,**kwargs):
+    unknown=set(kwargs)-{'batch_id','engine','oltp_engine','file_path','branch_nodes','replay_run_id','manifests','lake'}
+    if unknown: raise ValueError(f'Unsupported ETL parameters: {sorted(unknown)}')
+    explicit_sources=sources is not None
     sources=['uci','app','api'] if sources is None else list(sources)
     invalid=set(sources)-{'uci','app','api'}
     if invalid or not sources: raise ValueError('Sources must be nonempty subset of uci,app,api')
     registry=_registry()
-    run_id=run_id or (registry.create_run('etl',params={'sources':sources}) if registry else 'ETL-'+uuid.uuid4().hex)
+    input_params={'manifest_keys':kwargs['manifests']} if kwargs.get('manifests') is not None else {'sources':sources}
+    run_id=run_id or (registry.create_run('etl',params=input_params) if registry else 'ETL-'+uuid.uuid4().hex)
+    if registry:
+        try: registry.get_run(run_id)
+        except KeyError: registry.create_run('etl',params=input_params,run_id=run_id)
     batch_id=kwargs.get('batch_id') or 'BATCH-'+uuid.uuid4().hex
     report=dict(run_id=run_id,batch_id=batch_id,status='RUNNING',sources={},counts={},artifacts=[],started_at=datetime.datetime.now(datetime.timezone.utc).isoformat())
     if kwargs.get('replay_run_id'): report['replay_of']=kwargs['replay_run_id']
@@ -37,7 +65,27 @@ def run_etl_pipeline(sources=None,run_id=None,**kwargs):
         print(json.dumps(dict(stage=stage,message=message,**metrics),ensure_ascii=False,default=str),flush=True)
         if registry: registry.log_event(run_id,stage,message,**metrics)
     if registry: registry.update_run(run_id,status='RUNNING',metadata=report)
+    lake=kwargs.get('lake')
+    inputs={}
     try:
+        keys=kwargs.get('manifests')
+        if keys is not None:
+            if not isinstance(keys,(list,tuple)) or not keys or kwargs.get('replay_run_id'):
+                raise ValueError('manifests must be nonempty, and cannot be combined with replay_run_id')
+            from src.storage.lake import RawLake
+            lake=lake or RawLake()
+            for key in keys:
+                header,path=_materialize_lake_input(lake,key)
+                source=header['source']
+                if source in inputs: raise ValueError('Only one manifest per source is allowed')
+                inputs[source]=(header,path,key)
+            if explicit_sources and set(sources)!=set(inputs):
+                raise ValueError('Requested sources do not match manifest sources')
+            sources=list(inputs)
+            report['input_manifests']=list(keys)
+        elif lake is None and os.getenv('LAKE_BACKEND','local')=='s3':
+            from src.storage.lake import RawLake
+            lake=RawLake()
         engine=kwargs.get('engine') or get_dwh_engine()
         init_dwh_schema(engine)
         populate_dim_date(engine)
@@ -51,6 +99,21 @@ def run_etl_pipeline(sources=None,run_id=None,**kwargs):
         event('ingestion',f'Reading {source}',source=source)
         try:
             replay=None
+            lake_meta={}
+            observed_at=datetime.datetime.now(datetime.timezone.utc).isoformat()
+            if source not in inputs and lake is not None and not kwargs.get('replay_run_id'):
+                from src.etl.ingestion import ingest_source
+                key=ingest_source(lake,source,batch_id,uci_file=kwargs.get('file_path'),
+                    branch_nodes=kwargs.get('branch_nodes'),oltp_engine=kwargs.get('oltp_engine'))
+                header,path=_materialize_lake_input(lake,key)
+                inputs[source]=(header,path,key)
+            if source in inputs:
+                header,replay_path,key=inputs[source]
+                replay={'raw_path':str(replay_path),'checksum':header['sha256']}
+                observed_at=header.get('collected_at',header['ingested_at'])
+                lake_meta={'lake_manifest_key':key,'lake_uri':lake.uri(header['object_key']),
+                           'lake_sha256':header['sha256'],'source_collected_at':observed_at}
+                info.update(input_manifest=key,lake_uri=lake_meta['lake_uri'])
             if kwargs.get('replay_run_id'):
                 code={'uci':'UCI_HISTORICAL','app':'APP_OPERATIONAL','api':'INVENTORY_API'}[source]
                 with engine.connect() as conn:
@@ -58,18 +121,21 @@ def run_etl_pipeline(sources=None,run_id=None,**kwargs):
                 replay_path=Path(__file__).resolve().parents[2]/replay['raw_path']
                 if file_checksum(replay_path)!=replay['checksum']:
                     raise ValueError('Raw replay checksum mismatch')
+                metadata=replay.get('metadata') or {}
+                observed_at=metadata.get('source_collected_at') or replay['collected_at']
             if source in ('uci','app'):
                 code='UCI_HISTORICAL' if source=='uci' else 'APP_OPERATIONAL'
                 if source=='uci':
                     frame=extract_uci_data(replay_path if replay else kwargs.get('file_path') or prepare_uci_data())
                 elif replay:
-                    frame=pd.read_csv(replay_path,dtype={'source_record_id':str,'customer_id':str,'invoice_no':str,'stock_code':str})
+                    frame=pd.read_csv(replay_path,dtype=object)
                 else:
                     frame=extract_app_db_orders(engine=kwargs.get('oltp_engine'))
                 provenance=frame.attrs.get('provenance','DEMO' if source=='app' else 'UNVERIFIED')
-                manifest=persist_raw(engine,run_id,batch_id,code,frame,original_path=frame.attrs.get('file_path') if source=='uci' else None,provenance=provenance,currency='GBP' if source=='uci' else 'VND',status='EMPTY' if frame.empty else 'SUCCESS',metadata={'original_path':frame.attrs.get('file_path'),'date_min':str(frame['invoice_date'].min()) if len(frame) else None,'date_max':str(frame['invoice_date'].max()) if len(frame) else None,'replayed_from':kwargs.get('replay_run_id')})
+                manifest=persist_raw(engine,run_id,batch_id,code,frame,original_path=frame.attrs.get('file_path') if source=='uci' else None,provenance=provenance,currency='GBP' if source=='uci' else 'VND',status='EMPTY' if frame.empty else 'SUCCESS',metadata={'original_path':frame.attrs.get('file_path'),'date_min':str(frame['invoice_date'].min()) if len(frame) else None,'date_max':str(frame['invoice_date'].max()) if len(frame) else None,'replayed_from':kwargs.get('replay_run_id'),'source_collected_at':str(observed_at),**lake_meta})
                 report['artifacts'].append(manifest['raw_path'])
                 frame['raw_path']=manifest['raw_path']
+                frame['source_observed_at']=observed_at
                 event('raw',f'Saved {source} immutable raw',source=source,rows=len(frame),raw_path=manifest['raw_path'],provenance=provenance)
                 valid,rejected=transform_sales_data(frame,code)
                 event('transform',f'Validated {source}',source=source,valid=len(valid),rejected=len(rejected))
@@ -81,7 +147,7 @@ def run_etl_pipeline(sources=None,run_id=None,**kwargs):
                 event('reconciliation',reconciliation['status'],source=source,**counts)
             else:
                 nodes=json.loads(replay_path.read_text(encoding='utf-8')) if replay else extract_api_inventory(kwargs.get('branch_nodes'))
-                manifest=persist_raw(engine,run_id,batch_id,'INVENTORY_API',nodes,provenance='DEMO',currency='VND',status='SUCCESS' if all(n['status'] in ('ONLINE','EMPTY') for n in nodes) else 'PARTIAL',metadata={'replayed_from':kwargs.get('replay_run_id')})
+                manifest=persist_raw(engine,run_id,batch_id,'INVENTORY_API',nodes,provenance='DEMO',currency='VND',status='SUCCESS' if all(n['status'] in ('ONLINE','EMPTY') for n in nodes) else 'PARTIAL',metadata={'replayed_from':kwargs.get('replay_run_id'),'source_collected_at':str(observed_at),**lake_meta})
                 report['artifacts'].append(manifest['raw_path'])
                 inserted=0
                 for node in nodes:
@@ -102,6 +168,11 @@ def run_etl_pipeline(sources=None,run_id=None,**kwargs):
     statuses=[n['status'] for n in report['sources'].values()]
     report['status']='SUCCESS' if all(s=='SUCCESS' for s in statuses) else ('FAILED' if all(s=='FAILED' for s in statuses) else 'PARTIAL')
     report['finished_at']=datetime.datetime.now(datetime.timezone.utc).isoformat()
+    if lake is not None:
+        try:
+            report['lake_result_uri']=lake.write_run_result(run_id,report)
+        except Exception as exc:
+            report.update(status='FAILED',error=f'Lake result persistence failed: {exc}')
     output=Path(__file__).resolve().parents[2]/'data_lake/runs'/run_id/'etl_result.json'
     output.parent.mkdir(parents=True,exist_ok=True)
     output.write_text(json.dumps(report,indent=2,ensure_ascii=False,default=str),encoding='utf-8')
@@ -110,10 +181,11 @@ def run_etl_pipeline(sources=None,run_id=None,**kwargs):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser()
-    parser.add_argument('--sources',nargs='+',default=['uci','app','api'])
+    parser.add_argument('--sources',nargs='+')
+    parser.add_argument('--manifest',action='append',dest='manifests')
     parser.add_argument('--file-path')
     parser.add_argument('--replay-run-id')
     args=parser.parse_args()
-    result=run_etl_pipeline(args.sources,file_path=args.file_path,replay_run_id=args.replay_run_id)
+    result=run_etl_pipeline(args.sources,file_path=args.file_path,replay_run_id=args.replay_run_id,manifests=args.manifests)
     print(json.dumps(result,ensure_ascii=False,default=str,indent=2))
     sys.exit(0 if result['status']=='SUCCESS' else 1)

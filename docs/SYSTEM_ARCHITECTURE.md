@@ -7,7 +7,8 @@ flowchart TD
   U[UCI File chính thức · GBP] --> I[Python ingestion + source manifest]
   O[PostgreSQL OLTP · DEMO VND] --> I
   A[REST inventory HN/DN/SG · DEMO] --> I
-  I --> R[Raw bất biến theo run + checksum]
+  I --> R[MinIO Raw + manifest SHA256 / local profile + mirror]
+  AF[Airflow collect / load / mine / verify] -. task thực + retry .-> I
   R --> V[Validate / classify / transform]
   V -->|Rejected + reasons| Q[Audit artifacts]
   V --> L[Source-identity upsert + SQL reconciliation]
@@ -49,7 +50,7 @@ Ba endpoint không phải ba server vật lý. Kịch bản dn_outage thay URL D
 
 POST /api/runs trả run_id; worker nền gọi pipeline thật, giới hạn một tác vụ trong tiến trình web. Poll trạng thái PENDING/RUNNING/SUCCESS/PARTIAL/FAILED, đọc logs/reconciliation/artifacts. Không có timeout tự báo SUCCESS hoặc metric random trong các trang chính. UI cũ được lưu ở frontend/demo với nhãn DEMO.
 
-Run registry JSON ghi atomic tại data_lake/runs/<run_id>/run.json, mirror PostgreSQL khi kết nối được. Registry hiển thị lỗi thật. Đây là runner cục bộ phục vụ đồ án, không có distributed durable queue/resume sau process crash. Không triển khai Airflow, Debezium, Kafka thật, MinIO, VPN trong luồng chính; local Raw đáp ứng phạm vi hiện tại.
+Run registry JSON ghi atomic tại data_lake/runs/<run_id>/run.json, mirror PostgreSQL khi kết nối được. Airflow đã tích hợp bốn DAG thật và retry theo từng task; collect giữ nguyên input theo manifest khi retry, load chỉ đọc manifest đã kiểm SHA256. Worker portal vẫn là runner nền cục bộ, không tự thay thế queue bền vững của Airflow. MinIO dùng S3 ở profile WithLake/WithAirflow; local Raw vẫn là profile mặc định và mirror giúp lineage dùng chung giữa Windows/container. Debezium, Kafka thật và VPN nằm ngoài luồng chính.
 
 ## Phân tích
 

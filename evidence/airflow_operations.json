@@ -1,0 +1,37 @@
+{
+  "dag_id": "retailpulse_operations",
+  "run_id": "verify__5df46bfc3bbd4568926f208adcb1c1bf",
+  "state": "success",
+  "tasks": [
+    {
+      "task_id": "collect_app",
+      "state": "success",
+      "try_number": 1
+    },
+    {
+      "task_id": "load_app",
+      "state": "success",
+      "try_number": 1
+    },
+    {
+      "task_id": "collect_inventory",
+      "state": "success",
+      "try_number": 1
+    },
+    {
+      "task_id": "load_inventory",
+      "state": "success",
+      "try_number": 1
+    },
+    {
+      "task_id": "prepare_dashboard",
+      "state": "success",
+      "try_number": 1
+    },
+    {
+      "task_id": "verify_dashboard",
+      "state": "success",
+      "try_number": 1
+    }
+  ]
+}

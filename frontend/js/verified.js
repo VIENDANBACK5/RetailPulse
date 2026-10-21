@@ -22,11 +22,11 @@ function table(target, data, columns) {
 }
 function json(target, data) {$(target).innerHTML = `<pre>${esc(JSON.stringify(data,null,2))}</pre>`;}
 async function health() {
-  try {const data = await api('/health'); $('connection').textContent = '● DWH connected · ' + data.warehouse.database;}
+  try {const data = await api('/health'); $('connection').textContent = '● DWH connected · ' + data.warehouse.database + (data.lake_backend === 's3' ? ' · MinIO Raw' : ' · Local Raw');}
   catch(e) {$('connection').textContent = '● DWH unavailable';}
 }
 async function loadSources(includeRaw=true) {
-  try {const data=await api('/sources'); table('sources',data.sources);table('source-status',data.collection_status,['branch_code','status','item_count','snapshot_time','collected_at','error']);table('manifest-status',data.manifests,['run_id','source_code','provenance','record_count','currency','checksum','raw_path']);$('source-note').textContent=data.note;}
+  try {const data=await api('/sources'); table('sources',data.sources);table('source-status',data.collection_status,['branch_code','status','item_count','snapshot_time','collected_at','error']);table('manifest-status',data.manifests.map(m=>({...m,lake_uri:m.metadata?.lake_uri||'',lake_manifest_key:m.metadata?.lake_manifest_key||''})),['run_id','source_code','provenance','record_count','currency','checksum','raw_path','lake_uri','lake_manifest_key']);$('source-note').textContent=data.note;}
   catch(e) {error('sources',e);}
   if(includeRaw)await loadRaw();
 }

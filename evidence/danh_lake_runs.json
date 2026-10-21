@@ -1,0 +1,220 @@
+{
+  "first": {
+    "run_id": "etl-20261021T084551-2d807b34f1",
+    "batch_id": "BATCH-9772578f28634917b83a5b8cb58223d0",
+    "status": "SUCCESS",
+    "sources": {
+      "app": {
+        "input_manifest": "raw/source=app/ingest_date=2026-10-21/batch_id=BATCH-9772578f28634917b83a5b8cb58223d0/manifest.json",
+        "lake_uri": "s3://retailpulse-raw/raw/source=app/ingest_date=2026-10-21/batch_id=BATCH-9772578f28634917b83a5b8cb58223d0/orders.csv",
+        "status": "SUCCESS",
+        "source_status": "AVAILABLE",
+        "raw_count": 29,
+        "valid_count": 29,
+        "rejected_count": 0,
+        "provenance": "DEMO",
+        "currency": "VND",
+        "counts": {
+          "inserted": 0,
+          "updated": 0,
+          "unchanged": 29,
+          "target_count": 29,
+          "target_amount": 9430000.0,
+          "mismatches": 0,
+          "source_amount": 9430000.0,
+          "reconciliation": "MATCHED"
+        },
+        "reconciliation": {
+          "batch_id": "BATCH-9772578f28634917b83a5b8cb58223d0",
+          "source_code": "APP_OPERATIONAL",
+          "source_records_count": 29,
+          "dwh_records_inserted": 0,
+          "rejected_records_count": 0,
+          "source_total_amount": 9430000.0,
+          "dwh_total_amount": 9430000.0,
+          "diff_amount": "0.0",
+          "status": "MATCHED",
+          "notes": "Exact source identity set; per-source, per-currency; purchases/returns/cancellations retained separately",
+          "currency": "VND",
+          "updated_count": 0,
+          "unchanged_count": 29,
+          "target_count": 29,
+          "run_id": "etl-20261021T084551-2d807b34f1"
+        },
+        "raw_path": "data_lake\\raw\\app_db\\etl-20261021T084551-2d807b34f1\\extract.csv"
+      },
+      "api": {
+        "input_manifest": "raw/source=api/ingest_date=2026-10-21/batch_id=BATCH-9772578f28634917b83a5b8cb58223d0/manifest.json",
+        "lake_uri": "s3://retailpulse-raw/raw/source=api/ingest_date=2026-10-21/batch_id=BATCH-9772578f28634917b83a5b8cb58223d0/inventory.json",
+        "status": "SUCCESS",
+        "branches": [
+          {
+            "branch_code": "HN",
+            "status": "ONLINE",
+            "snapshot_time": 1790085539.175853,
+            "collected_at": "2026-10-21T08:45:51.988358+00:00",
+            "error": null,
+            "http_status": 200
+          },
+          {
+            "branch_code": "DN",
+            "status": "ONLINE",
+            "snapshot_time": 1790085539.175853,
+            "collected_at": "2026-10-21T08:45:52.019673+00:00",
+            "error": null,
+            "http_status": 200
+          },
+          {
+            "branch_code": "SG",
+            "status": "ONLINE",
+            "snapshot_time": 1790085539.175853,
+            "collected_at": "2026-10-21T08:45:52.040672+00:00",
+            "error": null,
+            "http_status": 200
+          }
+        ],
+        "counts": {
+          "inserted": 0
+        },
+        "raw_path": "data_lake\\raw\\api_inventory\\etl-20261021T084551-2d807b34f1\\response.json",
+        "provenance": "DEMO"
+      }
+    },
+    "counts": {
+      "app": {
+        "raw": 29,
+        "valid": 29,
+        "rejected": 0,
+        "inserted": 0,
+        "updated": 0,
+        "unchanged": 29,
+        "target_count": 29,
+        "target_amount": 9430000.0,
+        "mismatches": 0,
+        "source_amount": 9430000.0,
+        "reconciliation": "MATCHED"
+      },
+      "api": {
+        "inserted": 0
+      }
+    },
+    "artifacts": [
+      "data_lake\\raw\\app_db\\etl-20261021T084551-2d807b34f1\\extract.csv",
+      "data_lake\\raw\\api_inventory\\etl-20261021T084551-2d807b34f1\\response.json"
+    ],
+    "started_at": "2026-10-21T08:45:51.122668+00:00",
+    "finished_at": "2026-10-21T08:45:52.368684+00:00",
+    "lake_result_uri": "s3://retailpulse-raw/runs/etl-20261021T084551-2d807b34f1.json"
+  },
+  "replay": {
+    "run_id": "etl-20261021T084552-43e3e49b35",
+    "batch_id": "BATCH-0fd3e6ca90dd4016908c64107243fe52",
+    "status": "SUCCESS",
+    "sources": {
+      "app": {
+        "input_manifest": "raw/source=app/ingest_date=2026-10-21/batch_id=BATCH-9772578f28634917b83a5b8cb58223d0/manifest.json",
+        "lake_uri": "s3://retailpulse-raw/raw/source=app/ingest_date=2026-10-21/batch_id=BATCH-9772578f28634917b83a5b8cb58223d0/orders.csv",
+        "status": "SUCCESS",
+        "source_status": "AVAILABLE",
+        "raw_count": 29,
+        "valid_count": 29,
+        "rejected_count": 0,
+        "provenance": "DEMO",
+        "currency": "VND",
+        "counts": {
+          "inserted": 0,
+          "updated": 0,
+          "unchanged": 29,
+          "target_count": 29,
+          "target_amount": 9430000.0,
+          "mismatches": 0,
+          "source_amount": 9430000.0,
+          "reconciliation": "MATCHED"
+        },
+        "reconciliation": {
+          "batch_id": "BATCH-0fd3e6ca90dd4016908c64107243fe52",
+          "source_code": "APP_OPERATIONAL",
+          "source_records_count": 29,
+          "dwh_records_inserted": 0,
+          "rejected_records_count": 0,
+          "source_total_amount": 9430000.0,
+          "dwh_total_amount": 9430000.0,
+          "diff_amount": "0.0",
+          "status": "MATCHED",
+          "notes": "Exact source identity set; per-source, per-currency; purchases/returns/cancellations retained separately",
+          "currency": "VND",
+          "updated_count": 0,
+          "unchanged_count": 29,
+          "target_count": 29,
+          "run_id": "etl-20261021T084552-43e3e49b35"
+        },
+        "raw_path": "data_lake\\raw\\app_db\\etl-20261021T084552-43e3e49b35\\extract.csv"
+      },
+      "api": {
+        "input_manifest": "raw/source=api/ingest_date=2026-10-21/batch_id=BATCH-9772578f28634917b83a5b8cb58223d0/manifest.json",
+        "lake_uri": "s3://retailpulse-raw/raw/source=api/ingest_date=2026-10-21/batch_id=BATCH-9772578f28634917b83a5b8cb58223d0/inventory.json",
+        "status": "SUCCESS",
+        "branches": [
+          {
+            "branch_code": "HN",
+            "status": "ONLINE",
+            "snapshot_time": 1790085539.175853,
+            "collected_at": "2026-10-21T08:45:51.988358+00:00",
+            "error": null,
+            "http_status": 200
+          },
+          {
+            "branch_code": "DN",
+            "status": "ONLINE",
+            "snapshot_time": 1790085539.175853,
+            "collected_at": "2026-10-21T08:45:52.019673+00:00",
+            "error": null,
+            "http_status": 200
+          },
+          {
+            "branch_code": "SG",
+            "status": "ONLINE",
+            "snapshot_time": 1790085539.175853,
+            "collected_at": "2026-10-21T08:45:52.040672+00:00",
+            "error": null,
+            "http_status": 200
+          }
+        ],
+        "counts": {
+          "inserted": 0
+        },
+        "raw_path": "data_lake\\raw\\api_inventory\\etl-20261021T084552-43e3e49b35\\response.json",
+        "provenance": "DEMO"
+      }
+    },
+    "counts": {
+      "app": {
+        "raw": 29,
+        "valid": 29,
+        "rejected": 0,
+        "inserted": 0,
+        "updated": 0,
+        "unchanged": 29,
+        "target_count": 29,
+        "target_amount": 9430000.0,
+        "mismatches": 0,
+        "source_amount": 9430000.0,
+        "reconciliation": "MATCHED"
+      },
+      "api": {
+        "inserted": 0
+      }
+    },
+    "artifacts": [
+      "data_lake\\raw\\app_db\\etl-20261021T084552-43e3e49b35\\extract.csv",
+      "data_lake\\raw\\api_inventory\\etl-20261021T084552-43e3e49b35\\response.json"
+    ],
+    "started_at": "2026-10-21T08:45:52.398259+00:00",
+    "input_manifests": [
+      "raw/source=app/ingest_date=2026-10-21/batch_id=BATCH-9772578f28634917b83a5b8cb58223d0/manifest.json",
+      "raw/source=api/ingest_date=2026-10-21/batch_id=BATCH-9772578f28634917b83a5b8cb58223d0/manifest.json"
+    ],
+    "finished_at": "2026-10-21T08:45:52.896392+00:00",
+    "lake_result_uri": "s3://retailpulse-raw/runs/etl-20261021T084552-43e3e49b35.json"
+  }
+}

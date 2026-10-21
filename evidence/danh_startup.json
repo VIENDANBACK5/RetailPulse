@@ -1,0 +1,29 @@
+{
+  "started_at": "2026-10-21T09:02:59.905171+00:00",
+  "command": [
+    "powershell",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "START_RETAILPULSE.ps1",
+    "-WithLake",
+    "-WithAirflow",
+    "-NoBrowser"
+  ],
+  "status": "PASS",
+  "exit_code": 0,
+  "finished_at": "2026-10-21T09:04:06.389178+00:00",
+  "health": {
+    "status": "UP",
+    "warehouse": {
+      "database": "retail_dwh_db",
+      "checked_at": "2026-10-21T09:04:06.453874+00:00"
+    },
+    "execution": "REAL",
+    "lake_backend": "s3",
+    "app_id": "retailpulse-control-v2",
+    "workspace": "D:\\CODE\\bt\\BTL_DATA_MINING",
+    "active_run": null
+  }
+}

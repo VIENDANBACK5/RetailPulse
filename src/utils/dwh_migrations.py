@@ -4,11 +4,11 @@ from sqlalchemy import text
 
 MONEY_COLUMNS = {
     "dim_product": {"unit_price_base": 4},
-    "fact_sales": {"unit_price": 4, "total_amount": 2},
-    "customer_segment_snapshot": {"monetary": 2},
+    "fact_sales": {"unit_price": 4, "total_amount": 4},
+    "customer_segment_snapshot": {"monetary": 4},
     "etl_reconciliation_log": {"source_total_amount": 2, "dwh_total_amount": 2, "diff_amount": 2},
 }
-VIEWS = ("vw_bi_customer_segments_latest", "vw_bi_customer_segments",
+VIEWS = ("vw_dashboard_inventory_branches", "vw_bi_customer_segments_latest", "vw_bi_customer_segments",
          "vw_bi_sales_analytics", "vw_bi_inventory_status",
          "vw_dashboard_etl_latest", "vw_dashboard_branches")
 
@@ -34,7 +34,7 @@ def migrate_money(connection):
     for table, column, scale in pending:
         connection.execute(text(f"""ALTER TABLE {table} ALTER COLUMN {column}
             TYPE NUMERIC(24,{scale}) USING round({column}::numeric,{scale})"""))
-    for path in sorted((Path(__file__).resolve().parents[2] / "sql/views").glob("*.sql")):
+    for path in sorted((Path(__file__).resolve().parents[2] / "bi/views").glob("*.sql")):
         connection.execute(text(path.read_text(encoding="utf-8")))
     quote = connection.dialect.identifier_preparer.quote_identifier
     for view, grantee, privilege, grantable in grants:
