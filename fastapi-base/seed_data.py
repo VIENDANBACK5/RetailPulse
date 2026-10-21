@@ -19,6 +19,7 @@ from app.models import Base, Branch, Product, BranchInventory, Order, OrderItem
 
 
 def seed():
+    random.seed(42)  # Reproducible DEMO source; existing records are preserved.
     print("🚀 Bắt đầu khởi tạo dữ liệu mẫu cho hệ thống tác nghiệp...")
     Base.metadata.create_all(bind=engine)
     session = SessionLocal()

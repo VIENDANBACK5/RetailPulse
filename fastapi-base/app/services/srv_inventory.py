@@ -48,7 +48,12 @@ class InventoryService:
         return BranchInventoryResponse(
             branch_code=branch.code,
             branch_name=branch.name,
-            snapshot_time=time.time(),
+            # The snapshot describes source state, not the HTTP poll time.
+            # Stable across repeated polls until an inventory/branch update.
+            snapshot_time=max(
+                [float(branch.updated_at or branch.created_at or 0)]
+                + [float(inv.updated_at or inv.created_at or 0) for inv, _ in inventories]
+            ),
             status="ONLINE",
             total_products=len(items),
             items=items

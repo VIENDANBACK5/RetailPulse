@@ -1,0 +1,134 @@
+{
+  "sales_by_source": [
+    {
+      "source_code": "APP_OPERATIONAL",
+      "currency": "VND",
+      "provenance": "DEMO",
+      "rows": 29,
+      "gross": "9430000.0000",
+      "returns": "0",
+      "cancelled": "0",
+      "net": "9430000.0000",
+      "orders": 15
+    },
+    {
+      "source_code": "UCI_HISTORICAL",
+      "currency": "GBP",
+      "provenance": "OFFICIAL_UCI",
+      "rows": 1061164,
+      "gross": "20972594.5500",
+      "returns": "1527415.0000",
+      "cancelled": "0",
+      "net": "19445179.5500",
+      "orders": 40077
+    }
+  ],
+  "dimension_counts": [
+    {
+      "name": "dim_customer",
+      "rows": 5966
+    },
+    {
+      "name": "dim_product",
+      "rows": 4959
+    },
+    {
+      "name": "dim_date",
+      "rows": 7305
+    },
+    {
+      "name": "dim_branch",
+      "rows": 4
+    },
+    {
+      "name": "dim_source",
+      "rows": 3
+    }
+  ],
+  "inventory": [
+    {
+      "source_code": "APP_OPERATIONAL",
+      "branch_code": "DN",
+      "node_status": "ONLINE",
+      "data_status": "CURRENT",
+      "skus": 20,
+      "last_known_stock": 2458,
+      "snapshot_time": "2026-10-20 16:55:21.674548+00:00",
+      "collected_at": "2026-10-21 03:13:15.334747+00:00"
+    },
+    {
+      "source_code": "APP_OPERATIONAL",
+      "branch_code": "HN",
+      "node_status": "ONLINE",
+      "data_status": "CURRENT",
+      "skus": 20,
+      "last_known_stock": 2531,
+      "snapshot_time": "2026-10-20 16:55:21.634418+00:00",
+      "collected_at": "2026-10-21 03:13:15.314039+00:00"
+    },
+    {
+      "source_code": "APP_OPERATIONAL",
+      "branch_code": "SG",
+      "node_status": "ONLINE",
+      "data_status": "CURRENT",
+      "skus": 20,
+      "last_known_stock": 2175,
+      "snapshot_time": "2026-10-20 16:55:21.687505+00:00",
+      "collected_at": "2026-10-20 17:07:12.906266+00:00"
+    }
+  ],
+  "segments": [
+    {
+      "run_id": "mining-20261020T170400-eea9afc3a6",
+      "source_code": "UCI_HISTORICAL",
+      "currency": "GBP",
+      "cluster_id": 0,
+      "cluster_name": "C0: less recent, infrequent, lower value",
+      "customers": 2827,
+      "median_r": 193.0,
+      "median_f": 1.0,
+      "median_m": 402.5
+    },
+    {
+      "run_id": "mining-20261020T170400-eea9afc3a6",
+      "source_code": "UCI_HISTORICAL",
+      "currency": "GBP",
+      "cluster_id": 1,
+      "cluster_name": "C1: recent, frequent, higher value",
+      "customers": 1490,
+      "median_r": 29.0,
+      "median_f": 6.0,
+      "median_m": 2223.2349999999997
+    }
+  ],
+  "monetary_storage": [
+    {
+      "table_name": "customer_segment_snapshot",
+      "column_name": "monetary",
+      "data_type": "numeric",
+      "numeric_precision": 20,
+      "numeric_scale": 4
+    },
+    {
+      "table_name": "dim_product",
+      "column_name": "unit_price_base",
+      "data_type": "numeric",
+      "numeric_precision": 20,
+      "numeric_scale": 4
+    },
+    {
+      "table_name": "fact_sales",
+      "column_name": "total_amount",
+      "data_type": "numeric",
+      "numeric_precision": 20,
+      "numeric_scale": 4
+    },
+    {
+      "table_name": "fact_sales",
+      "column_name": "unit_price",
+      "data_type": "numeric",
+      "numeric_precision": 20,
+      "numeric_scale": 4
+    }
+  ]
+}

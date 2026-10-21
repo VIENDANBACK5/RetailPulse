@@ -1,0 +1,31 @@
+{
+  "execution": "REAL_BROWSER",
+  "checks": [
+    {
+      "name": "UI_ETL_REAL_RUN",
+      "status": "PASS",
+      "run_id": "etl-20261021T031825-6e7ed2c596",
+      "batch_id": "BATCH-b86bc98211634e3797b549920b9f8c47"
+    },
+    {
+      "name": "OLAP_GBP_MONTH_CURRENCY_SELECTION",
+      "status": "PASS"
+    },
+    {
+      "name": "OLAP_DAY_SLICE_CURRENCY",
+      "status": "PASS"
+    },
+    {
+      "name": "OLAP_PIVOT_DRILLTHROUGH_LINEAGE",
+      "status": "PASS"
+    }
+  ],
+  "screenshots": [
+    "evidence/screenshots/01_overview.png",
+    "evidence/screenshots/02_etl_real_run.png",
+    "evidence/screenshots/03_olap_real_warehouse.png",
+    "evidence/screenshots/04_mining_registry.png"
+  ],
+  "javascript_errors": [],
+  "status": "PASS"
+}

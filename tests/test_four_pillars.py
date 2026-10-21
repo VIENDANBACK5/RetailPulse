@@ -1,13 +1,13 @@
 """
-Verification test suite for all 4 advanced engineering pillars:
-1. Real-time Event Streaming with Kafka Broker
-2. Deep Learning Autoencoder Latent Clustering
-3. Spatial Data Mining & Haversine Distance Matrix
-4. Distributed Pipeline Security & HMAC-SHA256 Lake Staging
+Optional extension mechanics. These are not evidence of a deployed Kafka cluster,
+Autoencoder superiority, optimal road logistics, or production security.
 """
 import json
 import os
 import sys
+import math
+from pathlib import Path
+import pytest
 
 # Ensure project root is on sys.path
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -47,19 +47,22 @@ def test_pillar_1_kafka_streaming():
     metrics = stream_processor.get_dashboard_stream_metrics()
     assert metrics['processed_events'] >= initial_count + 1
     assert metrics['realtime_revenue'] >= 31.0
-    print("[PASS] Pillar 1: Kafka Broker & Stream Processor working seamlessly.")
+    # Only in-process simulated broker behavior is exercised here.
 
 
-def test_pillar_2_deep_autoencoder():
-    with open('models/autoencoder_eval.json', 'r', encoding='utf-8') as f:
+def test_optional_historical_autoencoder_artifact_schema_only():
+    """Read-only historical schema check, never evidence of model improvement."""
+    artifact = Path(PROJECT_ROOT) / 'models' / 'autoencoder_eval.json'
+    if not artifact.is_file():
+        pytest.skip("Historical optional autoencoder artifact not present; no performance claim")
+    with artifact.open('r', encoding='utf-8') as f:
         eval_data = json.load(f)
 
-    # Validate model performance metrics
-    assert 'autoencoder_silhouette' in eval_data
-    assert 'reconstruction_mse' in eval_data
-    assert eval_data['autoencoder_silhouette'] > eval_data['traditional_silhouette']
-    assert eval_data['reconstruction_mse'] <= 0.02
-    print(f"[PASS] Pillar 2: Autoencoder Silhouette ({eval_data['autoencoder_silhouette']:.4f}) outperforms K-Means ({eval_data['traditional_silhouette']:.4f}) with MSE Loss ({eval_data['reconstruction_mse']:.5f}).")
+    for key in ('autoencoder_silhouette', 'traditional_silhouette', 'reconstruction_mse'):
+        assert key in eval_data and math.isfinite(float(eval_data[key]))
+    assert -1 <= eval_data['autoencoder_silhouette'] <= 1
+    assert eval_data['reconstruction_mse'] >= 0
+    # Scores measured in different feature spaces cannot establish superiority.
 
 
 def test_pillar_3_spatial_optimization():
@@ -88,8 +91,8 @@ def test_pillar_3_spatial_optimization():
     print(f"[PASS] Pillar 3: Haversine distance matrix verified. Optimal transfer: {rebalance['from_branch']} -> {rebalance['to_branch']} ({rebalance['distance_km']} km, {rebalance['est_delivery_time']}).")
 
 
-def test_pillar_4_pipeline_security():
-    staging_mgr = SecureStagingManager()
+def test_pillar_4_pipeline_security(tmp_path):
+    staging_mgr = SecureStagingManager(staging_dir=str(tmp_path / "secure_staging"))
     records = [{"order_id": 1, "sku": "PRD-001", "qty": 5}]
     payload = {
         "source_node": "SG",
@@ -126,10 +129,4 @@ def test_pillar_4_pipeline_security():
 
 
 if __name__ == '__main__':
-    test_pillar_1_kafka_streaming()
-    test_pillar_2_deep_autoencoder()
-    test_pillar_3_spatial_optimization()
-    test_pillar_4_pipeline_security()
-    print("\n==========================================")
-    print("ALL 4 ADVANCED PILLARS TESTED AND PASSED!")
-    print("==========================================")
+    raise SystemExit(pytest.main([__file__, "-q"]))

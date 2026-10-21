@@ -1,0 +1,285 @@
+{
+  "execution": "REAL_INTEGRATION",
+  "checked_at": "2026-10-21T03:18:15.195868+00:00",
+  "steps": [
+    {
+      "step": 1,
+      "name": "Docker services running",
+      "status": "PASS",
+      "evidence": [
+        {
+          "container": "retail-oltp-db",
+          "running": true,
+          "health": "healthy"
+        },
+        {
+          "container": "retail-dwh-db",
+          "running": true,
+          "health": "healthy"
+        },
+        {
+          "container": "retail-fastapi-app",
+          "running": true,
+          "health": "not_configured"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "name": "OLTP, DWH and APIs healthy",
+      "status": "PASS",
+      "evidence": {
+        "status": "UP",
+        "warehouse": {
+          "database": "retail_dwh_db",
+          "checked_at": "2026-10-21T03:18:15.699149+00:00"
+        },
+        "execution": "REAL"
+      }
+    },
+    {
+      "step": 3,
+      "name": "Real historical versus demo source labels",
+      "status": "PASS",
+      "evidence": [
+        {
+          "source_code": "UCI_HISTORICAL",
+          "provenance": "OFFICIAL_UCI",
+          "record_count": 1067371,
+          "currency": "GBP",
+          "raw_path": "data_lake\\raw\\uci\\etl-20261020T170459-277b7b811f\\online_retail_II_official.csv",
+          "checksum": "d1a40d4cda99c96f0d8a4ddf93a405fb47ac7244196410f1ee766532ebeb0a58"
+        },
+        {
+          "source_code": "APP_OPERATIONAL",
+          "provenance": "DEMO",
+          "record_count": 29,
+          "currency": "VND",
+          "raw_path": "data_lake\\raw\\app_db\\etl-20261020T170459-277b7b811f\\extract.csv",
+          "checksum": "5ebe5860f447a3a9aa74948828d2bc47318def2352ac124cbb6948a5552884f9"
+        },
+        {
+          "source_code": "INVENTORY_API",
+          "provenance": "DEMO",
+          "record_count": 60,
+          "currency": "VND",
+          "raw_path": "data_lake\\raw\\api_inventory\\etl-20261020T170459-277b7b811f\\response.json",
+          "checksum": "a803b7631b7c27e29c2ac02ffa71b4e15cc3d3db4c578409d16682b753cdc55f"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "name": "Previously executed three-source ingestion readback",
+      "status": "PASS",
+      "evidence": {
+        "run_id": "etl-20261020T170459-277b7b811f",
+        "status": "SUCCESS",
+        "sources": [
+          "uci",
+          "app",
+          "api"
+        ]
+      }
+    },
+    {
+      "step": 5,
+      "name": "Raw bytes match persisted source manifest checksums",
+      "status": "PASS",
+      "evidence": {
+        "checksum_verified_manifests": 3,
+        "run_id": "etl-20261020T170459-277b7b811f"
+      }
+    },
+    {
+      "step": 6,
+      "name": "Executed ETL facts read back from PostgreSQL",
+      "status": "PASS",
+      "evidence": [
+        {
+          "source_code": "APP_OPERATIONAL",
+          "rows": 29,
+          "signed_amount": "9430000.0000"
+        },
+        {
+          "source_code": "UCI_HISTORICAL",
+          "rows": 1061164,
+          "signed_amount": "19445179.5500"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "name": "Exact source/batch/currency reconciliation",
+      "status": "PASS",
+      "evidence": [
+        {
+          "source_code": "UCI_HISTORICAL",
+          "currency": "GBP",
+          "source_records_count": 1067371,
+          "target_count": 1061164,
+          "source_total_amount": 19445179.55,
+          "dwh_total_amount": 19445179.55,
+          "diff_amount": 0.0,
+          "status": "MATCHED"
+        },
+        {
+          "source_code": "APP_OPERATIONAL",
+          "currency": "VND",
+          "source_records_count": 29,
+          "target_count": 29,
+          "source_total_amount": 9430000.0,
+          "dwh_total_amount": 9430000.0,
+          "diff_amount": 0.0,
+          "status": "MATCHED"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "name": "Actual full Raw replay is idempotent (SQL membership readback)",
+      "status": "PASS",
+      "evidence": {
+        "run_id": "etl-20261020T170713-80ab68f74e",
+        "replay_of": "etl-20261020T170459-277b7b811f",
+        "sql_dispositions": [
+          {
+            "source_code": "APP_OPERATIONAL",
+            "disposition": "UNCHANGED",
+            "rows": 29
+          },
+          {
+            "source_code": "UCI_HISTORICAL",
+            "disposition": "UNCHANGED",
+            "rows": 1061164
+          }
+        ],
+        "inventory_inserted": 0
+      }
+    },
+    {
+      "step": 9,
+      "name": "SQL OLAP roll-up and multi-dimensional dice with live API",
+      "status": "PASS",
+      "evidence": {
+        "daily_groups": 604,
+        "monthly_groups": 25,
+        "rollup_sum": "19445179.5500",
+        "dice_country_groups": 29
+      }
+    },
+    {
+      "step": 10,
+      "name": "Executed official RFM and fifty-fit clustering experiment",
+      "status": "PASS",
+      "evidence": {
+        "run_id": "mining-20261020T170400-eea9afc3a6",
+        "customers": 4317,
+        "selected_k": 2,
+        "window": [
+          "2010-09-10",
+          "2011-09-09"
+        ],
+        "seed_fits_per_run": 50,
+        "pairwise_ari_per_run": 225,
+        "rfm_checksum": "fa90bf7afc92c17aa6a6802a4824b2e942ed41a96073257883b80f257b8ea577",
+        "actual_repeat_run": "mining-20261021T031513-fb14977ff5",
+        "repeat_profiles_and_metric_tables_exact": true,
+        "repeat_persisted_customers": 4317
+      }
+    },
+    {
+      "step": 11,
+      "name": "Persisted segment RFM/labels exactly match exported model results",
+      "status": "PASS",
+      "evidence": {
+        "run_id": "mining-20261020T170400-eea9afc3a6",
+        "exact_csv_to_database_customers": 4317
+      }
+    },
+    {
+      "step": 12,
+      "name": "Live SQL-backed BI dashboard (native Power BI remains blocked)",
+      "status": "PASS",
+      "evidence": {
+        "web_dashboard": "VERIFIED",
+        "views": {
+          "vw_bi_sales_analytics": 1061193,
+          "vw_bi_inventory_status": 60,
+          "vw_bi_customer_segments": 8634
+        },
+        "native_power_bi": "BLOCKED: Power BI Desktop unavailable; semantic model and DAX supplied, not executed"
+      }
+    },
+    {
+      "step": 13,
+      "name": "Actual API outage/recovery preserves last known inventory",
+      "status": "PASS",
+      "evidence": {
+        "outage_run": "etl-20261021T031819-10334e974a",
+        "outage_status": "PARTIAL",
+        "recovery_run": "etl-20261021T031822-09844255a9",
+        "recovery_status": "SUCCESS",
+        "unchanged_dn_snapshots": 20,
+        "mechanism": "real refused HTTP connection for DN; three endpoints share one demo API server"
+      }
+    },
+    {
+      "step": 14,
+      "name": "Portal reads real persisted run status, logs and reconciliation",
+      "status": "PASS",
+      "evidence": {
+        "run_id": "etl-20261020T170459-277b7b811f",
+        "status": "SUCCESS",
+        "backend_events": 10,
+        "reconciliation_rows": 2
+      }
+    },
+    {
+      "step": 15,
+      "name": "Actual Chrome interaction and captured screenshots",
+      "status": "PASS",
+      "evidence": {
+        "execution": "REAL_BROWSER",
+        "checks": [
+          {
+            "name": "UI_ETL_REAL_RUN",
+            "status": "PASS",
+            "run_id": "etl-20261021T031825-6e7ed2c596",
+            "batch_id": "BATCH-b86bc98211634e3797b549920b9f8c47"
+          },
+          {
+            "name": "OLAP_GBP_MONTH_CURRENCY_SELECTION",
+            "status": "PASS"
+          },
+          {
+            "name": "OLAP_DAY_SLICE_CURRENCY",
+            "status": "PASS"
+          },
+          {
+            "name": "OLAP_PIVOT_DRILLTHROUGH_LINEAGE",
+            "status": "PASS"
+          }
+        ],
+        "screenshots": [
+          "evidence/screenshots/01_overview.png",
+          "evidence/screenshots/02_etl_real_run.png",
+          "evidence/screenshots/03_olap_real_warehouse.png",
+          "evidence/screenshots/04_mining_registry.png"
+        ],
+        "javascript_errors": [],
+        "status": "PASS"
+      }
+    }
+  ],
+  "summary": {
+    "PASS": 15,
+    "FAIL": 0,
+    "BLOCKED": 0
+  },
+  "native_power_bi": {
+    "status": "BLOCKED",
+    "reason": "Power BI Desktop not installed/available; actual web BI fallback verified in steps 12 and 15. No PBIX execution claimed."
+  },
+  "status": "PASS_WITH_NATIVE_POWER_BI_BLOCKED"
+}

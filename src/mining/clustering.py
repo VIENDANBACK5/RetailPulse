@@ -1,131 +1,71 @@
-import os
-import sys
+﻿"""Reproducible customer segmentation; no implicit artifact overwrite."""
+from pathlib import Path
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
-from typing import Tuple, Dict
+from sklearn.preprocessing import StandardScaler
 
-if sys.platform == "win32":
-    try:
-        sys.stdout.reconfigure(encoding="utf-8")
-        sys.stderr.reconfigure(encoding="utf-8")
-    except Exception:
-        pass
-
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+FEATURES = ["recency", "frequency", "monetary"]
 
 
-def preprocess_rfm(rfm_df: pd.DataFrame) -> Tuple[np.ndarray, StandardScaler]:
-    """
-    Tiền xử lý đặc trưng RFM chuẩn mực:
-    1. Biến đổi log1p để khắc phục hiện tượng lệch phải nặng (Right-skewness)
-    2. Chuẩn hóa bằng StandardScaler (Z-score) đưa về cùng thang đo
-    """
-    features = ["recency", "frequency", "monetary"]
-    X = rfm_df[features].values
-
-    # 1. Log transform
-    X_log = np.log1p(X)
-
-    # 2. Scaling
+def preprocess_rfm(rfm_df):
+    values = rfm_df[FEATURES].to_numpy(dtype=float)
+    if not len(values) or not np.isfinite(values).all() or (values < 0).any():
+        raise ValueError("RFM must contain finite, nonnegative values")
     scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X_log)
-
-    return X_scaled, scaler
+    return scaler.fit_transform(np.log1p(values)), scaler
 
 
-def assign_cluster_names(rfm_df_with_clusters: pd.DataFrame) -> Dict[int, str]:
-    """
-    Tự động phân tích trung vị (Median) R, F, M của từng cụm để gán nhãn nghiệp vụ chính xác:
-    - VIP / Champions: Chi tiêu cao nhất, mua thường xuyên, mới mua gần đây
-    - Khách hàng Trung thành (Loyal): Mua nhiều lần, chi tiêu khá, recency tốt
-    - Khách hàng Tiềm năng (Potential): Mới mua gần đây (R thấp), số lần mua ít (F=1-2)
-    - Khách hàng Nguy cơ rời bỏ (At Risk): Từng mua nhiều trước đây nhưng lâu rồi chưa quay lại (R cao, F khá)
-    - Khách hàng Ngủ đông / Rời bỏ (Lost): Mua ít, chi tiêu ít và đã rất lâu không quay lại (R cao, F thấp, M thấp)
-    """
-    cluster_profiles = rfm_df_with_clusters.groupby("cluster_id").agg({
-        "recency": "median",
-        "frequency": "median",
-        "monetary": "median",
-        "customer_key": "count"
-    }).rename(columns={"customer_key": "count"})
-
-    cluster_names = {}
-    
-    # Sắp xếp các cụm theo Monetary trung vị giảm dần
-    sorted_by_monetary = cluster_profiles.sort_values(by="monetary", ascending=False).index.tolist()
-    
-    # Cụm chi tiêu cao nhất và F cao nhất luôn là VIP
-    vip_cluster = sorted_by_monetary[0]
-    cluster_names[vip_cluster] = "VIP / Champions"
-
-    remaining = [c for c in sorted_by_monetary if c != vip_cluster]
-
-    for c in remaining:
-        r = cluster_profiles.loc[c, "recency"]
-        f = cluster_profiles.loc[c, "frequency"]
-        m = cluster_profiles.loc[c, "monetary"]
-
-        # Nếu R rất cao (khách cũ)
-        if r > cluster_profiles["recency"].median():
-            if f > 1:
-                cluster_names[c] = "Khách hàng Có nguy cơ rời bỏ (At Risk)"
-            else:
-                cluster_names[c] = "Khách hàng Ngủ đông (Lost)"
-        else:
-            # Khách mua gần đây
-            if f >= 2:
-                cluster_names[c] = "Khách hàng Trung thành (Loyal)"
-            else:
-                cluster_names[c] = "Khách hàng Tiềm năng (Potential)"
-
-    return cluster_names
+def assign_cluster_names(frame):
+    """Describe cohort medians; do not infer churn or VIP status."""
+    medians = frame[FEATURES].median()
+    result = {}
+    for label, group in frame.groupby("cluster_id", sort=True):
+        profile = group[FEATURES].median()
+        parts = ["recent" if profile.recency <= medians.recency else "less recent",
+                 "frequent" if profile.frequency >= medians.frequency else "infrequent",
+                 "higher value" if profile.monetary >= medians.monetary else "lower value"]
+        result[int(label)] = f"C{label}: " + ", ".join(parts)
+    return result
 
 
-def train_kmeans_rfm(rfm_df: pd.DataFrame, n_clusters: int = 4, random_state: int = 42) -> Tuple[pd.DataFrame, KMeans, StandardScaler]:
-    """
-    Huấn luyện mô hình K-means và gắn nhãn phân khúc cho từng khách hàng
-    """
-    print(f"🤖 [Data Mining - K-Means] Đang huấn luyện mô hình K-means với K={n_clusters}...")
-    X_scaled, scaler = preprocess_rfm(rfm_df)
+def cluster_profiles(frame):
+    profiles = frame.groupby(["cluster_id", "cluster_name"], sort=True).agg(
+        customer_count=("customer_key", "size"), median_recency=("recency", "median"),
+        median_frequency=("frequency", "median"), median_monetary=("monetary", "median"),
+        purchase_value=("monetary", "sum")).reset_index()
+    profiles["customer_share"] = profiles.customer_count / len(frame)
+    profiles["purchase_value_share"] = profiles.purchase_value / frame.monetary.sum()
+    return profiles
 
-    kmeans = KMeans(
-        n_clusters=n_clusters,
-        init="k-means++",
-        n_init=20,
-        max_iter=300,
-        random_state=random_state
-    )
-    labels = kmeans.fit_predict(X_scaled)
 
-    result_df = rfm_df.copy()
-    result_df["cluster_id"] = labels
+def rule_based_segments(frame):
+    """Predeclared baseline with cohort medians and inclusive ties, no future data."""
+    result = frame.copy()
+    thresholds = frame[FEATURES].median()
+    recent = frame.recency <= thresholds.recency
+    valuable = frame.monetary >= thresholds.monetary
+    frequent = frame.frequency >= thresholds.frequency
+    result["baseline_segment"] = np.select(
+        [recent & valuable & frequent, recent, ~recent & valuable],
+        ["engaged_high_value", "recent_other", "less_recent_high_value"],
+        default="less_recent_other")
+    return result, thresholds.to_dict()
 
-    cluster_name_map = assign_cluster_names(result_df)
-    result_df["cluster_name"] = result_df["cluster_id"].map(cluster_name_map)
 
-    # Lưu mô hình
-    os.makedirs(os.path.join(BASE_DIR, "models"), exist_ok=True)
-    model_path = os.path.join(BASE_DIR, "models", f"kmeans_k{n_clusters}.pkl")
-    scaler_path = os.path.join(BASE_DIR, "models", "rfm_scaler.pkl")
-    joblib.dump(kmeans, model_path)
-    joblib.dump(scaler, scaler_path)
-
-    print(f"  + Đã lưu mô hình K-Means tại: {model_path}")
-    print(f"  + Đã lưu Scaler tại: {scaler_path}")
-
-    # In hồ sơ cụm
-    profile = result_df.groupby("cluster_name").agg({
-        "customer_key": "count",
-        "recency": "median",
-        "frequency": "median",
-        "monetary": ["median", "sum"]
-    })
-    print("\n📊 BẢNG HỒ SƠ PHÂN KHÚC KHÁCH HÀNG (CLUSTER PROFILES):")
-    print("-" * 75)
-    print(profile.to_string())
-    print("-" * 75)
-
-    return result_df, kmeans, scaler
+def train_kmeans_rfm(rfm_df, n_clusters=4, random_state=42, output_dir=None):
+    features, scaler = preprocess_rfm(rfm_df)
+    if not 2 <= n_clusters < len(features) or len(np.unique(features, axis=0)) < n_clusters:
+        raise ValueError("K requires at least K distinct RFM points and more than K customers")
+    model = KMeans(n_clusters=n_clusters, init="k-means++", n_init=20,
+                   max_iter=300, random_state=random_state)
+    result = rfm_df.copy()
+    result["cluster_id"] = model.fit_predict(features)
+    result["cluster_name"] = result.cluster_id.map(assign_cluster_names(result))
+    if output_dir is not None:
+        directory = Path(output_dir)
+        directory.mkdir(parents=True, exist_ok=True)
+        joblib.dump(model, directory / "kmeans.pkl")
+        joblib.dump(scaler, directory / "scaler.pkl")
+    return result, model, scaler

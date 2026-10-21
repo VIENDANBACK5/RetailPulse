@@ -1,0 +1,1224 @@
+{
+  "name": "RetailPulse",
+  "compatibilityLevel": 1567,
+  "model": {
+    "culture": "en-US",
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "tables": [
+      {
+        "name": "Sales",
+        "columns": [
+          {
+            "name": "sales_key",
+            "dataType": "int64",
+            "sourceColumn": "sales_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "source_record_id",
+            "dataType": "string",
+            "sourceColumn": "source_record_id",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "raw_path",
+            "dataType": "string",
+            "sourceColumn": "raw_path",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "run_id",
+            "dataType": "string",
+            "sourceColumn": "run_id",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "batch_id",
+            "dataType": "string",
+            "sourceColumn": "batch_id",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "provenance",
+            "dataType": "string",
+            "sourceColumn": "provenance",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "invoice_no",
+            "dataType": "string",
+            "sourceColumn": "invoice_no",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "order_identity",
+            "dataType": "string",
+            "sourceColumn": "order_identity",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "date_key",
+            "dataType": "int64",
+            "sourceColumn": "date_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "full_date",
+            "dataType": "dateTime",
+            "sourceColumn": "full_date",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "year",
+            "dataType": "int64",
+            "sourceColumn": "year",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "quarter",
+            "dataType": "int64",
+            "sourceColumn": "quarter",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "month",
+            "dataType": "int64",
+            "sourceColumn": "month",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "month_name",
+            "dataType": "string",
+            "sourceColumn": "month_name",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "day",
+            "dataType": "int64",
+            "sourceColumn": "day",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "day_of_week",
+            "dataType": "int64",
+            "sourceColumn": "day_of_week",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "is_weekend",
+            "dataType": "boolean",
+            "sourceColumn": "is_weekend",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "customer_key",
+            "dataType": "int64",
+            "sourceColumn": "customer_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "customer_code",
+            "dataType": "string",
+            "sourceColumn": "customer_code",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "customer_name",
+            "dataType": "string",
+            "sourceColumn": "customer_name",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "customer_country",
+            "dataType": "string",
+            "sourceColumn": "customer_country",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "product_key",
+            "dataType": "int64",
+            "sourceColumn": "product_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "stock_code",
+            "dataType": "string",
+            "sourceColumn": "stock_code",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "product_name",
+            "dataType": "string",
+            "sourceColumn": "product_name",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "branch_key",
+            "dataType": "int64",
+            "sourceColumn": "branch_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "branch_code",
+            "dataType": "string",
+            "sourceColumn": "branch_code",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "branch_name",
+            "dataType": "string",
+            "sourceColumn": "branch_name",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "branch_location",
+            "dataType": "string",
+            "sourceColumn": "branch_location",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "source_key",
+            "dataType": "int64",
+            "sourceColumn": "source_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "source_code",
+            "dataType": "string",
+            "sourceColumn": "source_code",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "source_name",
+            "dataType": "string",
+            "sourceColumn": "source_name",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "currency",
+            "dataType": "string",
+            "sourceColumn": "currency",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "quantity",
+            "dataType": "int64",
+            "sourceColumn": "quantity",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "unit_price",
+            "dataType": "decimal",
+            "sourceColumn": "unit_price",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "total_amount",
+            "dataType": "decimal",
+            "sourceColumn": "total_amount",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "is_cancelled",
+            "dataType": "boolean",
+            "sourceColumn": "is_cancelled",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "transaction_type",
+            "dataType": "string",
+            "sourceColumn": "transaction_type",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "gross_sales_amount",
+            "dataType": "decimal",
+            "sourceColumn": "gross_sales_amount",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "refund_amount",
+            "dataType": "decimal",
+            "sourceColumn": "refund_amount",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "cancellation_amount",
+            "dataType": "decimal",
+            "sourceColumn": "cancellation_amount",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "net_sales_amount",
+            "dataType": "decimal",
+            "sourceColumn": "net_sales_amount",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "loaded_at",
+            "dataType": "dateTime",
+            "sourceColumn": "loaded_at",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "updated_at",
+            "dataType": "dateTime",
+            "sourceColumn": "updated_at",
+            "summarizeBy": "none",
+            "isHidden": false
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Sales",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"localhost:5433\", \"retail_dwh_db\", [CreateNavigationProperties=false]),",
+                "    Data = Source{[Schema=\"public\",Item=\"vw_bi_sales_analytics\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Gross Purchase Value",
+            "expression": "IF(HASONEVALUE(Sales[currency]), SUM(Sales[gross_sales_amount]))",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Return Value",
+            "expression": "IF(HASONEVALUE(Sales[currency]), SUM(Sales[refund_amount]))",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Cancellation Value",
+            "expression": "IF(HASONEVALUE(Sales[currency]), SUM(Sales[cancellation_amount]))",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Net Sales",
+            "expression": "IF(HASONEVALUE(Sales[currency]), SUM(Sales[net_sales_amount]))",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Order Count",
+            "expression": "CALCULATE(DISTINCTCOUNT(Sales[order_identity]), Sales[transaction_type] = \"PURCHASE\")",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Quantity Sold",
+            "expression": "CALCULATE(SUM(Sales[quantity]), Sales[transaction_type] = \"PURCHASE\")",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Average Order Value",
+            "expression": "DIVIDE([Gross Purchase Value], [Order Count])",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Customer Count",
+            "expression": "CALCULATE(DISTINCTCOUNT(Sales[customer_key]), Sales[transaction_type] = \"PURCHASE\", Sales[customer_code] <> \"GUEST\")",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          }
+        ]
+      },
+      {
+        "name": "Inventory",
+        "columns": [
+          {
+            "name": "snapshot_key",
+            "dataType": "int64",
+            "sourceColumn": "snapshot_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "date_key",
+            "dataType": "int64",
+            "sourceColumn": "date_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "full_date",
+            "dataType": "dateTime",
+            "sourceColumn": "full_date",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "source_key",
+            "dataType": "int64",
+            "sourceColumn": "source_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "source_code",
+            "dataType": "string",
+            "sourceColumn": "source_code",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "currency",
+            "dataType": "string",
+            "sourceColumn": "currency",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "branch_key",
+            "dataType": "int64",
+            "sourceColumn": "branch_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "branch_code",
+            "dataType": "string",
+            "sourceColumn": "branch_code",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "branch_name",
+            "dataType": "string",
+            "sourceColumn": "branch_name",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "branch_location",
+            "dataType": "string",
+            "sourceColumn": "branch_location",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "product_key",
+            "dataType": "int64",
+            "sourceColumn": "product_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "stock_code",
+            "dataType": "string",
+            "sourceColumn": "stock_code",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "product_name",
+            "dataType": "string",
+            "sourceColumn": "product_name",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "stock_on_hand",
+            "dataType": "int64",
+            "sourceColumn": "stock_on_hand",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "snapshot_time",
+            "dataType": "dateTime",
+            "sourceColumn": "snapshot_time",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "node_status",
+            "dataType": "string",
+            "sourceColumn": "node_status",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "last_collection_at",
+            "dataType": "dateTime",
+            "sourceColumn": "last_collection_at",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "last_successful_update",
+            "dataType": "dateTime",
+            "sourceColumn": "last_successful_update",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "collection_error",
+            "dataType": "string",
+            "sourceColumn": "collection_error",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "data_status",
+            "dataType": "string",
+            "sourceColumn": "data_status",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "freshness_hours",
+            "dataType": "decimal",
+            "sourceColumn": "freshness_hours",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "inventory_health_status",
+            "dataType": "string",
+            "sourceColumn": "inventory_health_status",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "batch_id",
+            "dataType": "string",
+            "sourceColumn": "batch_id",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "run_id",
+            "dataType": "string",
+            "sourceColumn": "run_id",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "raw_path",
+            "dataType": "string",
+            "sourceColumn": "raw_path",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "loaded_at",
+            "dataType": "dateTime",
+            "sourceColumn": "loaded_at",
+            "summarizeBy": "none",
+            "isHidden": false
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Inventory",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"localhost:5433\", \"retail_dwh_db\", [CreateNavigationProperties=false]),",
+                "    Data = Source{[Schema=\"public\",Item=\"vw_bi_inventory_status\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Last Known Stock",
+            "expression": "SUM(Inventory[stock_on_hand])",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Verified Current Stock",
+            "expression": "CALCULATE(SUM(Inventory[stock_on_hand]), Inventory[node_status] = \"ONLINE\", Inventory[data_status] = \"CURRENT\")",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Latest Snapshot Time",
+            "expression": "MAX(Inventory[snapshot_time])",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Last Successful Update",
+            "expression": "MAX(Inventory[last_successful_update])",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Inventory Age Hours",
+            "expression": "MAX(Inventory[freshness_hours])",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Branch Collection Status",
+            "expression": "SELECTEDVALUE(Inventory[node_status], \"Multiple / unknown\")",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          }
+        ]
+      },
+      {
+        "name": "Segments",
+        "columns": [
+          {
+            "name": "segment_key",
+            "dataType": "int64",
+            "sourceColumn": "segment_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "analysis_date",
+            "dataType": "dateTime",
+            "sourceColumn": "analysis_date",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "window_start",
+            "dataType": "dateTime",
+            "sourceColumn": "window_start",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "window_end",
+            "dataType": "dateTime",
+            "sourceColumn": "window_end",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "model_version",
+            "dataType": "string",
+            "sourceColumn": "model_version",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "run_id",
+            "dataType": "string",
+            "sourceColumn": "run_id",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "source_code",
+            "dataType": "string",
+            "sourceColumn": "source_code",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "currency",
+            "dataType": "string",
+            "sourceColumn": "currency",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "customer_key",
+            "dataType": "int64",
+            "sourceColumn": "customer_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "customer_code",
+            "dataType": "string",
+            "sourceColumn": "customer_code",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "customer_name",
+            "dataType": "string",
+            "sourceColumn": "customer_name",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "country",
+            "dataType": "string",
+            "sourceColumn": "country",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "recency",
+            "dataType": "double",
+            "sourceColumn": "recency",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "frequency",
+            "dataType": "int64",
+            "sourceColumn": "frequency",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "monetary",
+            "dataType": "decimal",
+            "sourceColumn": "monetary",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "cluster_id",
+            "dataType": "int64",
+            "sourceColumn": "cluster_id",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "cluster_name",
+            "dataType": "string",
+            "sourceColumn": "cluster_name",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "is_latest_run",
+            "dataType": "boolean",
+            "sourceColumn": "is_latest_run",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "business_action_recommendation",
+            "dataType": "string",
+            "sourceColumn": "business_action_recommendation",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "created_at",
+            "dataType": "dateTime",
+            "sourceColumn": "created_at",
+            "summarizeBy": "none",
+            "isHidden": false
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Segments",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"localhost:5433\", \"retail_dwh_db\", [CreateNavigationProperties=false]),",
+                "    Data = Source{[Schema=\"public\",Item=\"vw_bi_customer_segments\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Segment Customer Count",
+            "expression": "IF(HASONEVALUE(Segments[run_id]), DISTINCTCOUNT(Segments[customer_key]))",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Median Recency",
+            "expression": "IF(HASONEVALUE(Segments[run_id]), MEDIAN(Segments[recency]))",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Median Frequency",
+            "expression": "IF(HASONEVALUE(Segments[run_id]), MEDIAN(Segments[frequency]))",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Median Monetary",
+            "expression": "IF(HASONEVALUE(Segments[run_id]) && HASONEVALUE(Segments[currency]), MEDIAN(Segments[monetary]))",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Segment Monetary",
+            "expression": "IF(HASONEVALUE(Segments[run_id]) && HASONEVALUE(Segments[currency]), SUM(Segments[monetary]))",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          },
+          {
+            "name": "Segment Customer Share",
+            "expression": "DIVIDE([Segment Customer Count], CALCULATE([Segment Customer Count], REMOVEFILTERS(Segments[cluster_id]), REMOVEFILTERS(Segments[cluster_name])))",
+            "description": "IMPLEMENTED; DAX requires Desktop validation. SQL reference is verified separately."
+          }
+        ]
+      },
+      {
+        "name": "Date",
+        "columns": [
+          {
+            "name": "date_key",
+            "dataType": "int64",
+            "sourceColumn": "date_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "full_date",
+            "dataType": "dateTime",
+            "sourceColumn": "full_date",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "day_of_week",
+            "dataType": "int64",
+            "sourceColumn": "day_of_week",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "day_name",
+            "dataType": "string",
+            "sourceColumn": "day_name",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "day_of_month",
+            "dataType": "int64",
+            "sourceColumn": "day_of_month",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "month",
+            "dataType": "int64",
+            "sourceColumn": "month",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "month_name",
+            "dataType": "string",
+            "sourceColumn": "month_name",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "quarter",
+            "dataType": "int64",
+            "sourceColumn": "quarter",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "year",
+            "dataType": "int64",
+            "sourceColumn": "year",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "is_weekend",
+            "dataType": "boolean",
+            "sourceColumn": "is_weekend",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "is_holiday",
+            "dataType": "boolean",
+            "sourceColumn": "is_holiday",
+            "summarizeBy": "none",
+            "isHidden": false
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Date",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"localhost:5433\", \"retail_dwh_db\", [CreateNavigationProperties=false]),",
+                "    Data = Source{[Schema=\"public\",Item=\"dim_date\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Calendar",
+            "levels": [
+              {
+                "name": "Year",
+                "ordinal": 0,
+                "column": "year"
+              },
+              {
+                "name": "Quarter",
+                "ordinal": 1,
+                "column": "quarter"
+              },
+              {
+                "name": "Month",
+                "ordinal": 2,
+                "column": "month"
+              },
+              {
+                "name": "Day_Of_Month",
+                "ordinal": 3,
+                "column": "day_of_month"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Source",
+        "columns": [
+          {
+            "name": "source_key",
+            "dataType": "int64",
+            "sourceColumn": "source_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "source_code",
+            "dataType": "string",
+            "sourceColumn": "source_code",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "source_name",
+            "dataType": "string",
+            "sourceColumn": "source_name",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "currency",
+            "dataType": "string",
+            "sourceColumn": "currency",
+            "summarizeBy": "none",
+            "isHidden": false
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Source",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"localhost:5433\", \"retail_dwh_db\", [CreateNavigationProperties=false]),",
+                "    Data = Source{[Schema=\"public\",Item=\"dim_source\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Product",
+        "columns": [
+          {
+            "name": "product_key",
+            "dataType": "int64",
+            "sourceColumn": "product_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "source_key",
+            "dataType": "int64",
+            "sourceColumn": "source_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "stock_code",
+            "dataType": "string",
+            "sourceColumn": "stock_code",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "description",
+            "dataType": "string",
+            "sourceColumn": "description",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "category",
+            "dataType": "string",
+            "sourceColumn": "category",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "unit_price_base",
+            "dataType": "decimal",
+            "sourceColumn": "unit_price_base",
+            "summarizeBy": "none",
+            "isHidden": false
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Product",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"localhost:5433\", \"retail_dwh_db\", [CreateNavigationProperties=false]),",
+                "    Data = Source{[Schema=\"public\",Item=\"dim_product\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Customer",
+        "columns": [
+          {
+            "name": "customer_key",
+            "dataType": "int64",
+            "sourceColumn": "customer_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "source_key",
+            "dataType": "int64",
+            "sourceColumn": "source_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "customer_code",
+            "dataType": "string",
+            "sourceColumn": "customer_code",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "customer_name",
+            "dataType": "string",
+            "sourceColumn": "customer_name",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "country",
+            "dataType": "string",
+            "sourceColumn": "country",
+            "summarizeBy": "none",
+            "isHidden": false
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Customer",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"localhost:5433\", \"retail_dwh_db\", [CreateNavigationProperties=false]),",
+                "    Data = Source{[Schema=\"public\",Item=\"dim_customer\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Branch",
+        "columns": [
+          {
+            "name": "branch_key",
+            "dataType": "int64",
+            "sourceColumn": "branch_key",
+            "summarizeBy": "none",
+            "isHidden": true
+          },
+          {
+            "name": "branch_code",
+            "dataType": "string",
+            "sourceColumn": "branch_code",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "branch_name",
+            "dataType": "string",
+            "sourceColumn": "branch_name",
+            "summarizeBy": "none",
+            "isHidden": false
+          },
+          {
+            "name": "location",
+            "dataType": "string",
+            "sourceColumn": "location",
+            "summarizeBy": "none",
+            "isHidden": false
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Branch",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"localhost:5433\", \"retail_dwh_db\", [CreateNavigationProperties=false]),",
+                "    Data = Source{[Schema=\"public\",Item=\"dim_branch\"]}[Data]",
+                "in",
+                "    Data"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "d1e871fa-ee6c-5777-a7fe-624c7daa21b2",
+        "fromTable": "Sales",
+        "fromColumn": "date_key",
+        "toTable": "Date",
+        "toColumn": "date_key",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "055c2284-91e7-5324-908b-0259d3ab1f7f",
+        "fromTable": "Sales",
+        "fromColumn": "source_key",
+        "toTable": "Source",
+        "toColumn": "source_key",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "f75d5fdb-6bdb-54eb-8b07-8f9b306f64fe",
+        "fromTable": "Sales",
+        "fromColumn": "product_key",
+        "toTable": "Product",
+        "toColumn": "product_key",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "e717bff6-68bc-5df2-8d21-b75b86efee37",
+        "fromTable": "Sales",
+        "fromColumn": "customer_key",
+        "toTable": "Customer",
+        "toColumn": "customer_key",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "5161336a-e1a7-5ea0-923b-a4d6ba185bb1",
+        "fromTable": "Sales",
+        "fromColumn": "branch_key",
+        "toTable": "Branch",
+        "toColumn": "branch_key",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "c4418081-7acc-52cf-a3e6-0c4e1ff1e90f",
+        "fromTable": "Inventory",
+        "fromColumn": "source_key",
+        "toTable": "Source",
+        "toColumn": "source_key",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "1fbc7c32-f6ab-5e37-b568-c3feda18ce87",
+        "fromTable": "Inventory",
+        "fromColumn": "product_key",
+        "toTable": "Product",
+        "toColumn": "product_key",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "4a859d34-c669-5f05-8929-2d632507e989",
+        "fromTable": "Inventory",
+        "fromColumn": "branch_key",
+        "toTable": "Branch",
+        "toColumn": "branch_key",
+        "crossFilteringBehavior": "oneDirection"
+      },
+      {
+        "name": "82e04043-9172-52ce-b06d-8b4742decf48",
+        "fromTable": "Segments",
+        "fromColumn": "customer_key",
+        "toTable": "Customer",
+        "toColumn": "customer_key",
+        "crossFilteringBehavior": "oneDirection"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "RetailPulseVerification",
+        "value": "IMPLEMENTED; native Power BI Desktop unavailable. Not a completed report."
+      }
+    ]
+  }
+}

@@ -46,7 +46,7 @@ api_nodes:
 
 etl:
   uci_window_months: 12
-  uci_file_path: "data_lake/raw/uci/online_retail_II.csv"
+  uci_file_path: "data_lake/raw/uci/official/online_retail_II_official.csv"
   reconcile_tolerance: 0.01
 
 mining:

@@ -1,126 +1,74 @@
+"""Explicit cancellation is distinct from signed return adjustments."""
 import hashlib
-import datetime
+import json
+from decimal import Decimal, ROUND_HALF_UP
+import numpy as np
 import pandas as pd
-from typing import Tuple, List, Dict, Any
 
+def generate_row_hash(source_code,*identity):
+    return hashlib.sha256((source_code+'|'+'|'.join(map(str,identity))).encode()).hexdigest()
 
-def generate_row_hash(source_code: str, invoice_no: str, stock_code: str, quantity: int, unit_price: float, date_key: int) -> str:
-    raw_str = f"{source_code}|{invoice_no}|{stock_code}|{quantity}|{unit_price:.4f}|{date_key}"
-    return hashlib.sha256(raw_str.encode("utf-8")).hexdigest()
+def transform_sales_data(df,source_code):
+    if df.empty: return df.copy(),df.copy()
+    df=df.copy()
+    for column in ['invoice_no','stock_code','quantity','unit_price','invoice_date','source_record_id']:
+        if column not in df: df[column]=None
+    reasons=pd.Series('',index=df.index)
+    def reject(mask,reason):
+        nonlocal reasons
+        reasons=reasons+np.where(mask,reason+'; ','')
+    for column in ['invoice_no','stock_code','source_record_id']:
+        reject(df[column].isna()|df[column].astype(str).str.strip().isin(['','nan','None','<NA>']),'Missing '+column)
+        df[column]=df[column].astype(str).str.strip()
+    reject(df['source_record_id'].duplicated(keep=False),'Duplicate source identity')
+    df['quantity']=pd.to_numeric(df['quantity'],errors='coerce')
+    df['unit_price']=pd.to_numeric(df['unit_price'],errors='coerce')
+    reject(df['quantity'].isna()|~np.isfinite(df['quantity'])|(df['quantity']==0)|(df['quantity']%1!=0)|(df['quantity'].abs()>2147483647),'Invalid quantity')
+    reject(df['unit_price'].isna()|~np.isfinite(df['unit_price'])|(df['unit_price']<=0)|(df['unit_price']>=10**14),'Invalid price')
+    df['invoice_date']=pd.to_datetime(df['invoice_date'],errors='coerce',utc=True)
+    reject(df['invoice_date'].isna(),'Invalid invoice date')
+    df['branch_code']=df.get('branch_code',pd.Series('UNKNOWN',index=df.index)).fillna('UNKNOWN')
+    reject(~df['branch_code'].isin(['UNKNOWN','HN','DN','SG']),'Invalid branch mapping')
+    rejected=df.loc[reasons!=''].copy()
+    rejected['rejection_reason']=reasons[reasons!=''].str.rstrip('; ')
+    valid=df.loc[reasons==''].copy()
+    if valid.empty: return valid,rejected
+    explicit=valid.get('is_cancelled',pd.Series(False,index=valid.index)).map(lambda x:str(x).lower() in ('true','1'))
+    returns=(valid['quantity']<0)|valid['invoice_no'].str.upper().str.startswith('C')
+    valid['transaction_type']=np.select([explicit,returns],['CANCELLATION','RETURN'],default='PURCHASE')
+    valid['is_cancelled']=explicit
+    valid['quantity']=valid['quantity'].astype(int)
+    valid.loc[valid['transaction_type']=='RETURN','quantity']=-valid.loc[valid['transaction_type']=='RETURN','quantity'].abs()
+    valid['total_amount']=[(Decimal(str(q))*Decimal(str(p))).quantize(Decimal('.01'),rounding=ROUND_HALF_UP) for q,p in zip(valid['quantity'],valid['unit_price'])]
+    valid['date_key']=valid['invoice_date'].dt.strftime('%Y%m%d').astype(int)
+    customers=valid.get('customer_id',pd.Series(None,index=valid.index,dtype=object))
+    valid['customer_code']=customers.fillna('GUEST_'+source_code).astype(str).str.replace(r'\.0$','',regex=True)
+    valid.loc[valid['customer_code'].isin(['','None','nan']),'customer_code']='GUEST_'+source_code
+    valid['description']=valid.get('description',pd.Series('',index=valid.index)).fillna('Unknown product').astype(str).str[:255]
+    valid['country']=valid.get('country',pd.Series(None,index=valid.index)).fillna('Unknown')
+    valid['source_code']=source_code
+    valid['currency']=valid.get('currency','GBP' if source_code=='UCI_HISTORICAL' else 'VND')
+    valid['provenance']=valid.get('provenance','UNVERIFIED')
+    valid['raw_path']=valid.get('raw_path','')
+    valid['record_hash']=valid['source_record_id'].map(lambda x:generate_row_hash(source_code,x))
+    cols=['invoice_no','stock_code','customer_code','country','branch_code','quantity','unit_price','date_key','transaction_type','currency','provenance']
+    valid['content_hash']=[hashlib.sha256(json.dumps(list(row),default=str).encode()).hexdigest() for row in valid[cols].itertuples(index=False,name=None)]
+    return valid,rejected
 
-
-def transform_sales_data(df: pd.DataFrame, source_code: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    Làm sạch, chuẩn hóa và gắn nhãn nghiệp vụ cho dữ liệu bán hàng:
-    - Nhận diện đơn hủy: is_cancelled = True khi Quantity < 0 hoặc Invoice bắt đầu bằng 'C'
-    - Tách biệt bản ghi không hợp lệ (đơn giá <= 0, thiếu mã hàng) vào rejected_df
-    - Tính total_amount, date_key và record_hash (chống nạp trùng)
-    - Trả về (valid_df, rejected_df)
-    """
-    if df.empty:
-        return pd.DataFrame(), pd.DataFrame()
-
-    print(f"🔄 [ETL - Transform] Đang làm sạch và chuẩn hóa {len(df):,} bản ghi bán hàng ({source_code})...")
-    df = df.copy()
-
-    # 1. Điền giá trị mặc định
-    if "branch_code" not in df.columns:
-        df["branch_code"] = "UNKNOWN"
-    df["branch_code"] = df["branch_code"].fillna("UNKNOWN")
-
-    df["invoice_no"] = df["invoice_no"].astype(str).str.strip()
-    df["stock_code"] = df["stock_code"].astype(str).str.strip()
-    df["description"] = df["description"].fillna("Sản phẩm không có mô tả").astype(str)
-    df["quantity"] = pd.to_numeric(df["quantity"], errors="coerce").fillna(0).astype(int)
-    df["unit_price"] = pd.to_numeric(df["unit_price"], errors="coerce").fillna(0.0).astype(float)
-
-    # 2. Nhận diện đơn hủy/hoàn
-    is_cancel_mask = (df["quantity"] < 0) | (df["invoice_no"].str.startswith("C", na=False))
-    df["is_cancelled"] = is_cancel_mask
-
-    # 3. Phân loại dòng lỗi (Rejection Rules)
-    # Lỗi: Đơn giá <= 0 (trong trường hợp không phải đơn hủy điều chỉnh) hoặc thiếu mã sản phẩm
-    invalid_price_mask = (df["unit_price"] <= 0)
-    invalid_stock_mask = (df["stock_code"] == "") | (df["stock_code"].str.upper() == "NAN")
-
-    reject_mask = invalid_price_mask | invalid_stock_mask
-    rejected_df = df[reject_mask].copy()
-    valid_df = df[~reject_mask].copy()
-
-    # Gán lý do từ chối
-    if not rejected_df.empty:
-        reasons = []
-        for _, row in rejected_df.iterrows():
-            r_list = []
-            if row["unit_price"] <= 0:
-                r_list.append("Unit Price <= 0")
-            if row["stock_code"] in ["", "NAN"]:
-                r_list.append("Missing StockCode")
-            reasons.append("; ".join(r_list))
-        rejected_df["rejection_reason"] = reasons
-
-    # 4. Tính toán các chỉ số cho dòng hợp lệ
-    if not valid_df.empty:
-        valid_df["invoice_date"] = pd.to_datetime(valid_df["invoice_date"])
-        valid_df["date_key"] = valid_df["invoice_date"].dt.strftime("%Y%m%d").astype(int)
-        
-        # Với đơn hủy, total_amount sẽ âm phản ánh đúng dòng tiền hoàn trả
-        valid_df["total_amount"] = (valid_df["quantity"] * valid_df["unit_price"]).round(2)
-
-        # Xử lý khách hàng vãng lai
-        guest_code = f"GUEST_{source_code}"
-        valid_df["customer_code"] = valid_df["customer_id"].fillna(guest_code)
-        valid_df["customer_code"] = valid_df["customer_code"].astype(str).str.replace(".0", "", regex=False).str.strip()
-        valid_df.loc[valid_df["customer_code"].isin(["None", "nan", ""], ), "customer_code"] = guest_code
-
-        # Sinh mã băm chống trùng lặp (Idempotent Key)
-        hashes = [
-            generate_row_hash(source_code, row["invoice_no"], row["stock_code"], row["quantity"], row["unit_price"], row["date_key"])
-            for _, row in valid_df.iterrows()
-        ]
-        valid_df["record_hash"] = hashes
-        valid_df["source_code"] = source_code
-
-    print(f"  + Hợp lệ: {len(valid_df):,} dòng | Bị loại (Rejected): {len(rejected_df):,} dòng")
-    return valid_df, rejected_df
-
-
-def transform_inventory_snapshots(snapshots: List[Dict[str, Any]], source_code: str = "APP_OPERATIONAL") -> pd.DataFrame:
-    """
-    Chuyển đổi dữ liệu JSON từ API tồn kho các chi nhánh sang DataFrame chuẩn bị nạp FactInventorySnapshot.
-    """
-    records = []
-    current_date = datetime.date.today()
-    date_key = int(current_date.strftime("%Y%m%d"))
-
+def transform_inventory_snapshots(snapshots,source_code='APP_OPERATIONAL'):
+    records=[]
     for node in snapshots:
-        branch_code = node.get("branch_code", "UNKNOWN")
-        status = node.get("status", "OFFLINE")
-        raw_time = node.get("snapshot_time")
-        snapshot_time = datetime.datetime.fromtimestamp(raw_time) if raw_time else None
-
-        if status == "ONLINE" and node.get("items"):
-            for item in node["items"]:
-                records.append({
-                    "date_key": date_key,
-                    "branch_code": branch_code,
-                    "stock_code": item.get("stock_code"),
-                    "stock_on_hand": item.get("stock_on_hand", 0),
-                    "snapshot_time": snapshot_time or datetime.datetime.now(),
-                    "node_status": "ONLINE",
-                    "source_code": source_code
-                })
-        else:
-            # Node mất kết nối: Tuân thủ đề cương 6.2 - Không coi dữ liệu thiếu là tồn bằng 0!
-            # Ghi nhận stock_on_hand = None (NULL trong DWH) kèm trạng thái OFFLINE để Dashboard cảnh báo rõ ràng
-            records.append({
-                "date_key": date_key,
-                "branch_code": branch_code,
-                "stock_code": "ALL_PRODUCTS",
-                "stock_on_hand": None,
-                "snapshot_time": snapshot_time,
-                "node_status": "OFFLINE",
-                "source_code": source_code
-            })
-
+        if node.get('status') not in ('ONLINE','EMPTY'): continue
+        raw=node.get('snapshot_time')
+        if isinstance(raw,bool): raise ValueError('Invalid source snapshot time')
+        timestamp=pd.to_datetime(raw,unit='s',utc=True) if isinstance(raw,(int,float)) else pd.to_datetime(raw,utc=True,errors='coerce')
+        if pd.isna(timestamp): raise ValueError('Invalid source snapshot time')
+        timestamp=timestamp.round('us')
+        seen=set()
+        for item in node.get('items',[]):
+            sku=item.get('stock_code'); quantity=item.get('stock_on_hand')
+            if not sku or sku in seen or isinstance(quantity,bool) or not isinstance(quantity,(int,float)) or not np.isfinite(quantity) or quantity<0 or quantity%1:
+                raise ValueError(f'Invalid inventory item in {node["branch_code"]}: {item}')
+            seen.add(sku)
+            records.append(dict(date_key=int(timestamp.strftime('%Y%m%d')),branch_code=node['branch_code'],stock_code=str(sku),description=item.get('product_name',item.get('name',str(sku))),stock_on_hand=int(quantity),snapshot_time=timestamp.to_pydatetime(),node_status='ONLINE',source_code=source_code,raw_path=node.get('raw_path',''),snapshot_identity=timestamp.isoformat()))
     return pd.DataFrame(records)

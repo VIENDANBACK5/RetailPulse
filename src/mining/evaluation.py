@@ -1,127 +1,139 @@
-import os
-import sys
+﻿"""Observed model metrics only, with predeclared model selection and stability."""
+from itertools import combinations
+from pathlib import Path
+import json
+import numpy as np
 import pandas as pd
 import matplotlib
-matplotlib.use("Agg")  # Chạy headless không cần GUI window
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score, adjusted_rand_score
-import json
-from typing import Dict, Any
+from sklearn.metrics import adjusted_rand_score, silhouette_score
+from threadpoolctl import threadpool_limits
+from src.mining.clustering import FEATURES, preprocess_rfm, rule_based_segments
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
-sys.path.append(BASE_DIR)
-
-from src.mining.clustering import preprocess_rfm
+DEFAULT_SEEDS = (42, 123, 7, 19, 31, 53, 71, 89, 101, 137)
 
 
-def evaluate_k_selection(rfm_df: pd.DataFrame, k_range: range = range(2, 7), random_state: int = 42) -> Dict[str, Any]:
-    """
-    Thực nghiệm quét các giá trị K từ 2 đến 6 để tìm K tối ưu (Tuân thủ đề cương 5.2):
-    - Tính toán Inertia (Elbow Method / SSE)
-    - Tính toán Silhouette Score (độ gắn kết nội cụm & tách biệt ngoại cụm)
-    - Phân tích Quy mô các cụm hình thành (tránh cụm quá bé < 5% hoặc quá áp đảo > 70%)
-    - Kiểm định độ ổn định của cụm khi đổi hạt giống ngẫu nhiên (Adjusted Rand Index)
-    - Lưu bảng so sánh K ra file CSV & JSON phục vụ minh chứng nghiệm thu
-    """
-    print(f"📈 [Data Mining - Evaluation] Bắt đầu thực nghiệm lựa chọn số cụm K từ {min(k_range)} đến {max(k_range)}...")
-    X_scaled, _ = preprocess_rfm(rfm_df)
-    n_samples = len(X_scaled)
+def measured_silhouette(features, labels, indices):
+    selected_labels = np.asarray(labels)[indices]
+    if len(np.unique(selected_labels)) < 2 or len(np.unique(selected_labels)) >= len(indices):
+        return None
+    return float(silhouette_score(features[indices], selected_labels))
 
-    k_summary = []
-    inertias = []
-    silhouette_scores = []
-    k_values = list(k_range)
 
-    print("\n" + "=" * 90)
-    print(f"{'K':<4} | {'Inertia (SSE)':<14} | {'Silhouette':<11} | {'Quy mô cụm (% min - % max)':<28} | {'Độ ổn định (ARI)':<16}")
-    print("-" * 90)
+def evaluate_k_selection(rfm_df, k_range=range(2, 7), random_state=42,
+                         output_dir=None, seeds=DEFAULT_SEEDS):
+    features, _ = preprocess_rfm(rfm_df)
+    if rfm_df.customer_key.duplicated().any():
+        raise ValueError("Stability requires exactly one row per aligned customer")
+    distinct_points = len(np.unique(features, axis=0))
+    candidates = [int(k) for k in k_range if 2 <= k < len(features) and k <= distinct_points]
+    if not candidates:
+        raise ValueError("At least three eligible customers and two distinct RFM points are required")
+    seeds = tuple(dict.fromkeys([int(random_state), *map(int, seeds)]))
+    if len(seeds) < 2:
+        raise ValueError("Stability evaluation requires at least two seeds")
+    # Fixed customer sample shared by K values, seeds and baseline; no fabricated scores.
+    indices = np.sort(np.random.default_rng(42).choice(len(features), min(1000, len(features)), replace=False))
+    runs, pairwise, summary = [], [], []
+    with threadpool_limits(limits=1):
+        for k in candidates:
+            labels_by_seed = {}
+            for seed in seeds:
+                model = KMeans(n_clusters=k, n_init=20, max_iter=300, random_state=seed)
+                labels = model.fit_predict(features)
+                if len(np.unique(labels)) != k:
+                    continue
+                labels_by_seed[seed] = labels
+                counts = np.bincount(labels, minlength=k)
+                runs.append({"k": k, "seed": seed, "inertia": float(model.inertia_),
+                    "silhouette_score": measured_silhouette(features, labels, indices),
+                    "cluster_sizes": counts.tolist(), "sorted_cluster_sizes": sorted(counts.tolist()),
+                    "min_cluster_pct": float(counts.min() / len(features) * 100),
+                    "max_cluster_pct": float(counts.max() / len(features) * 100)})
+            ari_values = []
+            for first, second in combinations(labels_by_seed, 2):
+                ari = float(adjusted_rand_score(labels_by_seed[first], labels_by_seed[second]))
+                pairwise.append({"k": k, "seed_a": first, "seed_b": second, "ari": ari})
+                ari_values.append(ari)
+            current = [row for row in runs if row["k"] == k]
+            scores = [row["silhouette_score"] for row in current if row["silhouette_score"] is not None]
+            if not scores or not ari_values:
+                continue
+            size_matrix = np.asarray([row["sorted_cluster_sizes"] for row in current])
+            summary.append({"k": k, "inertia": float(np.mean([row["inertia"] for row in current])),
+                "inertia_std": float(np.std([row["inertia"] for row in current])),
+                "silhouette_score": float(np.mean(scores)), "silhouette_std": float(np.std(scores)),
+                "min_cluster_pct": min(row["min_cluster_pct"] for row in current),
+                "max_cluster_pct": max(row["max_cluster_pct"] for row in current),
+                "stability_ari_mean": float(np.mean(ari_values)), "stability_ari_min": float(min(ari_values)),
+                "cluster_size_rank_std": size_matrix.std(axis=0).tolist(),
+                "seed_count": len(current), "pair_count": len(ari_values)})
+    if not summary:
+        raise ValueError("No valid clustering evaluation; check duplicate or constant RFM features")
+    # The guard is an analysis policy, never a claim that these thresholds guarantee quality.
+    eligible = [row for row in summary if row["min_cluster_pct"] >= 1 and row["stability_ari_mean"] >= .8]
+    pool = eligible or summary
+    chosen = sorted(pool, key=lambda row: (-row["silhouette_score"], row["k"]))[0]
+    baseline, thresholds = rule_based_segments(rfm_df)
+    baseline_labels, names = pd.factorize(baseline.baseline_segment, sort=True)
+    baseline_score = measured_silhouette(features, baseline_labels, indices)
+    result = {"k_values": [r["k"] for r in summary], "recommended_k": chosen["k"],
+        "selection_rule": "Max mean silhouette among K with minimum cluster >=1% at every seed and mean pairwise ARI>=0.8; tie: lower K. If none qualifies, highest mean silhouette with warning.",
+        "selection_warning": None if eligible else "No candidate meets stability/size guard; conclusions exploratory",
+        "summary_table": summary, "seed_runs": runs, "pairwise_ari": pairwise,
+        "seeds": list(seeds), "n_init": 20, "silhouette_sample_customers": len(indices),
+        "baseline": {"method": "observation-cohort median rules v1", "thresholds": thresholds,
+            "silhouette_same_feature_space": baseline_score,
+            "segment_sizes": baseline.baseline_segment.value_counts().to_dict()},
+        "inertias": [r["inertia"] for r in summary],
+        "silhouette_scores": [r["silhouette_score"] for r in summary]}
+    if output_dir is not None:
+        directory = Path(output_dir)
+        directory.mkdir(parents=True, exist_ok=True)
+        pd.DataFrame(summary).to_csv(directory / "k_comparison_summary.csv", index=False)
+        pd.DataFrame(runs).to_csv(directory / "seed_metrics.csv", index=False)
+        pd.DataFrame(pairwise).to_csv(directory / "pairwise_ari.csv", index=False)
+        (directory / "evaluation.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
+        fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+        axes[0].errorbar(result["k_values"], result["inertias"], yerr=[r["inertia_std"] for r in summary], marker="o")
+        axes[0].set(title="K-means inertia: 10 seed experiments", xlabel="K", ylabel="Inertia")
+        axes[1].errorbar(result["k_values"], result["silhouette_scores"], yerr=[r["silhouette_std"] for r in summary], marker="o")
+        axes[1].set(title="Silhouette in log-scaled RFM", xlabel="K", ylabel="Silhouette")
+        fig.tight_layout()
+        plot_path = directory / "elbow_silhouette.png"
+        fig.savefig(plot_path, dpi=150)
+        plt.close(fig)
+        result["plot_path"] = str(plot_path)
+    return result
 
-    for k in k_values:
-        # 1. Chạy KMeans với random_state chính (seed 42)
-        km = KMeans(n_clusters=k, init="k-means++", n_init=20, max_iter=300, random_state=random_state)
-        cluster_labels = km.fit_predict(X_scaled)
-        
-        # 2. Chạy với seed phụ (seed 123) để kiểm định độ ổn định của phân cụm
-        km_alt = KMeans(n_clusters=k, init="k-means++", n_init=20, max_iter=300, random_state=123)
-        alt_labels = km_alt.fit_predict(X_scaled)
-        stability_ari = adjusted_rand_score(cluster_labels, alt_labels)
 
-        # 3. Phân tích quy mô cụm
-        counts = pd.Series(cluster_labels).value_counts().sort_index()
-        pcts = (counts / n_samples * 100).round(1).tolist()
-        min_pct = min(pcts)
-        max_pct = max(pcts)
-        size_str = f"Min: {min_pct:.1f}% - Max: {max_pct:.1f}% ({counts.tolist()})"
-
-        # 4. Tính toán Inertia & Silhouette
-        inertia_val = round(float(km.inertia_), 2)
-        inertias.append(inertia_val)
-
-        sil_sample_size = min(5000, n_samples)
-        sil_avg = round(float(silhouette_score(X_scaled, cluster_labels, sample_size=sil_sample_size, random_state=random_state)), 4)
-        silhouette_scores.append(sil_avg)
-
-        print(f"K={k:<2d} | {inertia_val:<14,.2f} | {sil_avg:<11.4f} | {size_str:<28} | ARI = {stability_ari:.4f}")
-
-        k_summary.append({
-            "k": k,
-            "inertia": inertia_val,
-            "silhouette_score": sil_avg,
-            "min_cluster_pct": min_pct,
-            "max_cluster_pct": max_pct,
-            "cluster_sizes": counts.tolist(),
-            "stability_ari_seed_test": round(float(stability_ari), 4)
-        })
-
-    print("=" * 90 + "\n")
-
-    # Lưu bảng so sánh thực nghiệm ra file phục vụ báo cáo minh chứng
-    models_dir = os.path.join(BASE_DIR, "models")
-    os.makedirs(models_dir, exist_ok=True)
-    summary_df = pd.DataFrame(k_summary)
-    csv_path = os.path.join(models_dir, "k_comparison_summary.csv")
-    summary_df.to_csv(csv_path, index=False)
-    
-    json_path = os.path.join(models_dir, "k_comparison_summary.json")
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(k_summary, f, ensure_ascii=False, indent=2)
-    print(f"📊 Đã lưu bảng so sánh thực nghiệm K tại: {csv_path}")
-
-    # Vẽ biểu đồ kết hợp Elbow & Silhouette
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
-
-    # Đồ thị Elbow
-    ax1.plot(k_values, inertias, "bo-", linewidth=2, markersize=8)
-    ax1.set_title("Biểu đồ Elbow Method (Inertia)", fontsize=13, fontweight="bold")
-    ax1.set_xlabel("Số cụm (K)", fontsize=11)
-    ax1.set_ylabel("Inertia (Tổng khoảng cách bình phương)", fontsize=11)
-    ax1.grid(True, linestyle="--", alpha=0.6)
-
-    # Đồ thị Silhouette
-    ax2.plot(k_values, silhouette_scores, "rs--", linewidth=2, markersize=8)
-    ax2.set_title("Biểu đồ Điểm Silhouette (Cohesion & Separation)", fontsize=13, fontweight="bold")
-    ax2.set_xlabel("Số cụm (K)", fontsize=11)
-    ax2.set_ylabel("Silhouette Score", fontsize=11)
-    ax2.grid(True, linestyle="--", alpha=0.6)
-
-    plt.tight_layout()
-    plot_path = os.path.join(models_dir, "elbow_silhouette_evaluation.png")
-    plt.savefig(plot_path, dpi=300)
-    plt.close()
-    print(f"✅ Đã lưu biểu đồ thực nghiệm đánh giá K tại: {plot_path}")
-
-    # Tìm K tối ưu theo Silhouette & Ý nghĩa nghiệp vụ
-    best_k_idx = int(pd.Series(silhouette_scores).idxmax())
-    recommended_k = k_values[best_k_idx]
-    print(f"💡 Đề xuất số cụm tối ưu định lượng: K = {recommended_k} (Silhouette = {silhouette_scores[best_k_idx]:.4f})")
-    print(f"📌 Đề xuất số cụm nghiệp vụ bán lẻ: K = 4 (VIP, Khách thân thiết, Tiềm năng, Nguy cơ rời bỏ)\n")
-
-    return {
-        "k_values": k_values,
-        "inertias": inertias,
-        "silhouette_scores": silhouette_scores,
-        "recommended_k": recommended_k,
-        "summary_table": k_summary,
-        "plot_path": plot_path
-    }
+def save_eda(rfm_df, output_dir):
+    directory = Path(output_dir)
+    summary = {"customer_count": len(rfm_df), "missing": rfm_df[FEATURES].isna().sum().to_dict(),
+        "distribution": rfm_df[FEATURES].describe().to_dict(),
+        "correlation": rfm_df[FEATURES].corr().fillna(0).to_dict(),
+        "outlier_policy": "Retain all eligible customers; IQR flagged for reporting only", "iqr_outliers": {}}
+    fig, axes = plt.subplots(2, 3, figsize=(12, 7))
+    for col, feature in enumerate(FEATURES):
+        values = rfm_df[feature]
+        q1, q3 = values.quantile([.25, .75])
+        summary["iqr_outliers"][feature] = int(((values < q1-1.5*(q3-q1)) | (values > q3+1.5*(q3-q1))).sum())
+        axes[0, col].hist(values, bins=40)
+        axes[0, col].set_title(f"Original {feature}")
+        axes[1, col].hist(np.log1p(values), bins=40)
+        axes[1, col].set_title(f"log1p {feature}")
+    fig.tight_layout()
+    fig.savefig(directory / "rfm_distributions.png", dpi=150)
+    plt.close(fig)
+    fig, ax = plt.subplots(figsize=(5, 4))
+    image = ax.imshow(rfm_df[FEATURES].corr().fillna(0), vmin=-1, vmax=1, cmap="coolwarm")
+    ax.set_xticks(range(3), FEATURES)
+    ax.set_yticks(range(3), FEATURES)
+    fig.colorbar(image)
+    fig.tight_layout()
+    fig.savefig(directory / "rfm_correlation.png", dpi=150)
+    plt.close(fig)
+    (directory / "eda.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    return summary

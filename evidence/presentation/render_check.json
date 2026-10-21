@@ -1,0 +1,157 @@
+{
+  "execution": "REAL_CHROME_RENDER",
+  "slides": [
+    {
+      "slide": 1,
+      "title": "RetailPulse",
+      "bottom": 518.96875,
+      "width": 1280,
+      "height": 720,
+      "images": [],
+      "overflow": false
+    },
+    {
+      "slide": 2,
+      "title": "Bài toán và tiêu chí thành công",
+      "bottom": 390.625,
+      "width": 1280,
+      "height": 720,
+      "images": [],
+      "overflow": false
+    },
+    {
+      "slide": 3,
+      "title": "Nguồn dữ liệu và xuất xứ",
+      "bottom": 433.15625,
+      "width": 1280,
+      "height": 720,
+      "images": [],
+      "overflow": false
+    },
+    {
+      "slide": 4,
+      "title": "Kiến trúc thực thi",
+      "bottom": 489.03125,
+      "width": 1280,
+      "height": 720,
+      "images": [],
+      "overflow": false
+    },
+    {
+      "slide": 5,
+      "title": "ETL và chất lượng dữ liệu",
+      "bottom": 440.421875,
+      "width": 1280,
+      "height": 720,
+      "images": [],
+      "overflow": false
+    },
+    {
+      "slide": 6,
+      "title": "Star Schema và mức chi tiết",
+      "bottom": 488.15625,
+      "width": 1280,
+      "height": 720,
+      "images": [],
+      "overflow": false
+    },
+    {
+      "slide": 7,
+      "title": "Đối soát và chạy lại",
+      "bottom": 565.75,
+      "width": 1280,
+      "height": 720,
+      "images": [],
+      "overflow": false
+    },
+    {
+      "slide": 8,
+      "title": "OLAP trên Warehouse",
+      "bottom": 621.375,
+      "width": 1280,
+      "height": 720,
+      "images": [
+        {
+          "src": "../../evidence/screenshots/05_olap_viewport.png",
+          "ok": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slide": 9,
+      "title": "Thiết kế kiểm chứng theo thời gian",
+      "bottom": 529.75,
+      "width": 1280,
+      "height": 720,
+      "images": [],
+      "overflow": false
+    },
+    {
+      "slide": 10,
+      "title": "RFM, tiền xử lý và baseline",
+      "bottom": 529.59375,
+      "width": 1280,
+      "height": 720,
+      "images": [
+        {
+          "src": "../../models/runs/mining-20261020T170400-eea9afc3a6/rfm_distributions.png",
+          "ok": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slide": 11,
+      "title": "Chọn K và độ ổn định",
+      "bottom": 610.8125,
+      "width": 1280,
+      "height": 720,
+      "images": [],
+      "overflow": false
+    },
+    {
+      "slide": 12,
+      "title": "Hồ sơ cụm và hành vi tương lai",
+      "bottom": 588.21875,
+      "width": 1280,
+      "height": 720,
+      "images": [],
+      "overflow": false
+    },
+    {
+      "slide": 13,
+      "title": "Dashboard và kết quả truy vết được",
+      "bottom": 621.375,
+      "width": 1280,
+      "height": 720,
+      "images": [
+        {
+          "src": "../../evidence/screenshots/06_customer_viewport.png",
+          "ok": true
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "slide": 14,
+      "title": "Kiểm chứng và kịch bản demo",
+      "bottom": 481.625,
+      "width": 1280,
+      "height": 720,
+      "images": [],
+      "overflow": false
+    },
+    {
+      "slide": 15,
+      "title": "Kết quả và giới hạn",
+      "bottom": 502.625,
+      "width": 1280,
+      "height": 720,
+      "images": [],
+      "overflow": false
+    }
+  ],
+  "navigation": "PASS",
+  "status": "PASS"
+}

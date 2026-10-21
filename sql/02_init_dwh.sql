@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS dim_product (
     stock_code VARCHAR(100) NOT NULL,
     description VARCHAR(255) NOT NULL,
     category VARCHAR(100),
-    unit_price_base DOUBLE PRECISION DEFAULT 0.0,
+    unit_price_base NUMERIC(20,4) DEFAULT 0.0,
     CONSTRAINT uq_product_source_code UNIQUE (source_key, stock_code)
 );
 
@@ -65,8 +65,8 @@ CREATE TABLE IF NOT EXISTS fact_sales (
     source_key INTEGER NOT NULL REFERENCES dim_source(source_key),
     invoice_no VARCHAR(100) NOT NULL,
     quantity INTEGER NOT NULL,
-    unit_price DOUBLE PRECISION NOT NULL,
-    total_amount DOUBLE PRECISION NOT NULL,
+    unit_price NUMERIC(20,4) NOT NULL,
+    total_amount NUMERIC(20,4) NOT NULL,
     is_cancelled BOOLEAN NOT NULL DEFAULT FALSE,
     record_hash VARCHAR(64) UNIQUE NOT NULL,  -- Khóa băm SHA256 chống nạp trùng (Idempotent)
     batch_id VARCHAR(100) NOT NULL,
@@ -95,9 +95,9 @@ CREATE TABLE IF NOT EXISTS customer_segment_snapshot (
     window_start DATE,                        -- Ngày bắt đầu cửa sổ RFM (12 tháng)
     window_end DATE,                          -- Ngày kết thúc cửa sổ RFM
     customer_key INTEGER NOT NULL REFERENCES dim_customer(customer_key),
-    recency DOUBLE PRECISION NOT NULL,
+    recency NUMERIC(20,4) NOT NULL,
     frequency INTEGER NOT NULL,
-    monetary DOUBLE PRECISION NOT NULL,
+    monetary NUMERIC(20,4) NOT NULL,
     cluster_id INTEGER NOT NULL,
     cluster_name VARCHAR(100) NOT NULL,       -- 'VIP', 'Loyal', 'Potential', 'At Risk', 'Lost'
     model_version VARCHAR(50) NOT NULL,
@@ -124,9 +124,9 @@ CREATE TABLE IF NOT EXISTS etl_reconciliation_log (
     source_records_count INTEGER NOT NULL,
     dwh_records_inserted INTEGER NOT NULL,
     rejected_records_count INTEGER NOT NULL,
-    source_total_amount DOUBLE PRECISION NOT NULL,
-    dwh_total_amount DOUBLE PRECISION NOT NULL,
-    diff_amount DOUBLE PRECISION NOT NULL,
+    source_total_amount NUMERIC(20,4) NOT NULL,
+    dwh_total_amount NUMERIC(20,4) NOT NULL,
+    diff_amount NUMERIC(20,4) NOT NULL,
     status VARCHAR(50) NOT NULL,              -- 'MATCHED', 'DISCREPANCY'
     notes TEXT
 );

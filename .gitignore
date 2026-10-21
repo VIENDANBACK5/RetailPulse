@@ -61,3 +61,16 @@ data_lake/raw/uci/online_retail_II.xlsx
 data_lake/raw/uci/*.zip
 data_lake/raw/uci/*.csv
 !data_lake/raw/multi_store/*
+
+# Local execution state and protected database backups
+data_lake/backups/
+data_lake/runs/
+evidence/browser-profile/
+.build/
+
+# Downloaded original data and per-run Raw snapshots (keep manifests locally)
+data_lake/raw/uci/official/
+data_lake/raw/uci/etl-*/
+data_lake/raw/app_db/etl-*/
+data_lake/raw/api_inventory/etl-*/
+models/runs/

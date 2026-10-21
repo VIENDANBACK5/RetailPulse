@@ -1,105 +1,43 @@
-# HƯỚNG DẪN XÂY DỰNG & KẾT NỐI BÁO CÁO POWER BI (RETAILPULSE)
+# Power BI và dashboard thay thế
 
-Tài liệu hướng dẫn kết nối **Power BI Desktop** với Kho dữ liệu PostgreSQL DWH và dựng hoàn chỉnh 3 trang báo cáo đáp ứng 100% tiêu chí nghiệm thu môn học.
+**Native Power BI: BLOCKED trong môi trường này.** Không tìm thấy Power BI Desktop, không mở/refresh được report .pbix. Không có screenshot Power BI và không tuyên bố Power BI hoàn thành. Dashboard web tương tác dùng cùng PostgreSQL đã được kiểm chứng bằng trình duyệt thật.
 
----
+## Demo dùng ngay
 
-## 1. THÔNG TIN KẾT NỐI KHO DỮ LIỆU (POSTGRESQL DWH)
+```powershell
+.\START_RETAILPULSE.ps1 -NoBrowser
+```
 
-Mở Power BI Desktop -> Chọn **Get Data** -> Chọn **PostgreSQL database**:
+- Sales/OLAP và inventory: http://127.0.0.1:8010/frontend/dashboard.html
+- Customer segments: http://127.0.0.1:8010/frontend/customer-segments.html
+- ETL, Raw/audit/lineage: http://127.0.0.1:8010/frontend/etl-monitor.html
 
-* **Server:** `localhost:5433` (hoặc `dwh-db:5432` nếu chạy trong Docker network)
-* **Database:** `retailpulse_dwh`
-* **Data Connectivity mode:** `Import` (khuyến nghị cho hiệu năng mượt và DAX Median)
-* **Username:** `dwh_user`
-* **Password:** `dwh_pass`
+Ảnh thật tại evidence/screenshots/, kết quả tại evidence/browser_verification.json. DEMO OLTP VND được phân biệt với UCI chính thức GBP.
 
-### Cách chọn bảng:
-Bạn có 2 lựa chọn để import:
-1. **Lựa chọn 1 (Mô hình Star Schema chuẩn):**
-   * `fact_sales`
-   * `fact_inventory_snapshot`
-   * `customer_segment_snapshot`
-   * `dim_date`
-   * `dim_customer`
-   * `dim_product`
-   * `dim_branch`
-   * `dim_source`
-2. **Lựa chọn 2 (Sử dụng sẵn các View tổng hợp trong `bi/views/`):**
-   * `vw_bi_sales_analytics`
-   * `vw_bi_inventory_status`
-   * `vw_bi_customer_segments`
+## Artifact đã chuẩn bị
 
----
+- RetailPulse.SemanticModel/model.bim: TMSL import từ view/dimension thật, quan hệ một-nhiều, Date hierarchy, DAX guard currency/run.
+- RetailPulse.SemanticModel/definition.pbism: định nghĩa project Semantic Model dạng TMSL.
+- DAX_MEASURES.md: công thức và giới hạn kiểm chứng.
+- REFERENCE_QUERIES.sql: SQL để đối chiếu report.
 
-## 2. THIẾT KẾ CHI TIẾT 3 TRANG BÁO CÁO
+Các artifact này **IMPLEMENTED, chưa mở xác minh bằng Desktop**; không phải report .pbix/.pbip hoàn chỉnh. Model không chứa password hoặc cache dữ liệu.
 
-### TRANG 1: TỔNG QUAN BÁN HÀNG ĐA KÊNH (SALES OVERVIEW)
-* **Bộ lọc (Slicers) ở đầu trang:**
-  * Bộ lọc Thời gian: `DimDate[Year]`, `DimDate[Quarter]`, `DimDate[Month_Name]`
-  * Bộ lọc Nguồn dữ liệu: `DimSource[source_name]` (Lịch sử UCI vs Nội bộ App)
-  * Bộ lọc Tiền tệ: `DimSource[currency]` (GBP / VND)
-* **Hàng thẻ số KPI chính (Card Visuals):**
-  * `[Gross Sales]`: Tổng giá trị mua hàng
-  * `[Refund Amount]`: Tổng giá trị hủy/hoàn (màu đỏ)
-  * `[Net Sales]`: Doanh thu thuần
-  * `[Total Orders]`: Số đơn hàng phân biệt
-  * `[AOV]`: Giá trị trung bình một đơn
-* **Biểu đồ đường / miền (Area/Line Chart):**
-  * Trục X: `DimDate[full_date]`
-  * Trục Y: `[Gross Sales]` và `[Refund Amount]`
-  * Tiêu đề: *Xu hướng doanh thu theo thời gian*
-* **Biểu đồ cột ngang (Bar Chart):**
-  * Trục Y: `DimProduct[description]` (Top 10)
-  * Trục X: `[Gross Sales]`
-  * Tiêu đề: *Top 10 sản phẩm đóng góp doanh số cao nhất*
-* **Biểu đồ hình phễu / Donut (Donut Chart):**
-  * Legend: `DimBranch[branch_name]`
-  * Values: `[Gross Sales]`
-  * Tiêu đề: *Cơ cấu doanh thu theo chi nhánh*
+## Bước còn phải làm trên Power BI Desktop
 
----
+1. Cài Power BI Desktop, khởi động hệ thống bằng script trên.
+2. Kết nối PostgreSQL localhost:5433, database **retail_dwh_db**. User lấy từ config/config.yaml/Compose hiện hành; nhập credential tại Desktop, không nhúng password vào report.
+3. Get Data → PostgreSQL → chọn vw_bi_sales_analytics, vw_bi_inventory_status, vw_bi_customer_segments, dim_date, dim_source, dim_product, dim_customer, dim_branch. Đổi tên bảng như model.bim; thêm measure trong DAX_MEASURES.md. Có thể dùng Semantic Model project làm điểm khởi đầu nếu Desktop hỗ trợ định dạng đó.
+4. Quan hệ single-direction từ dimension tới fact/view theo surrogate key. Sales nối Date[date_key]. Inventory dùng latest snapshot view, không nối Date để tránh ẩn last-known stock. Segment chọn run riêng.
+5. Tạo ba trang dưới đây, đặt slicer và đối chiếu từng KPI với SQL cùng filter. Refresh Import model trước demo.
+6. Lưu .pbix/.pbip, mở lại, refresh, thử OLAP và chụp ảnh thật vào evidence/powerbi/. Khi đó mới cập nhật trạng thái nghiệm thu Power BI.
 
-### TRANG 2: THEO DÕI TỒN KHO CHI NHÁNH (INVENTORY MONITORING)
-* **Hàng thẻ thông tin trạng thái (Cards):**
-  * `[Latest Snapshot Time]`: Mốc thời gian chụp ảnh tồn kho gần nhất
-  * `[Current Stock]`: Tổng số lượng hàng tồn hiện tại
-  * `[Low Stock SKUs]`: Số sản phẩm sắp hết hàng (tồn <= 10)
-* **Bảng thẻ cảnh báo chi nhánh (Multi-row Card / Table):**
-  * Cột: `DimBranch[branch_name]`, `FactInventorySnapshot[node_status]`, `[Node Connection Status]`
-  * Định dạng có điều kiện (Conditional Formatting): Nếu `OFFLINE` -> Đổi nền màu vàng cam cảnh báo *"⚠️ MẤT KẾT NỐI (Chưa lấy được dữ liệu)"*.
-* **Bảng chi tiết tồn kho (Matrix Visual):**
-  * Rows: `DimBranch[branch_name]` -> `DimProduct[stock_code]` (`DimProduct[description]`)
-  * Values: `[Current Stock]`
-  * Tiêu đề: *Chi tiết tồn kho theo mặt hàng và chi nhánh*
+| Trang | Visual và thao tác | Kiểm chứng |
+|---|---|---|
+| Sales | Cards gross/return/net/orders/AOV; line Date Year→Quarter→Month→Day; top product; matrix pivot; slicer source/currency/country/date; drill-through sales_key | SQL cùng bộ lọc, không cộng hai tiền tệ |
+| Inventory | Branch/SKU stock, snapshot_time, last_successful_update, node_status/data_status; last-known card khác verified-current card | Mỗi source/branch/SKU một snapshot; offline giữ số cũ |
+| Customers | Single-select run; model/date/window; cluster sizes; median RFM; customer table, monetary distribution | COUNT snapshot đúng run; không cộng nhiều model |
 
----
+SQL fixture kiểm tra: purchase100 + return(-20) + cancellation50 → net80, cancellation đứng riêng. Order Count dùng source-aware order_identity. RFM chỉ dùng purchase đủ điều kiện trong cửa sổ khóa; Monetary phân cụm khác Net Sales toàn nguồn.
 
-### TRANG 3: PHÂN CỤM KHÁCH HÀNG RFM (CUSTOMER SEGMENTATION)
-* **Hàng thẻ KPI phân cụm (Cards):**
-  * Tổng số khách hàng phân tích: `[Customer Count]`
-  * Ngày tham chiếu T: Hiển thị mốc phân tích
-  * Phiên bản mô hình: `CustomerSegmentSnapshot[model_version]`
-* **Biểu đồ tròn / Treemap (Treemap / Donut Chart):**
-  * Category: `CustomerSegmentSnapshot[cluster_name]` (VIP, Loyal, Potential, At Risk, Lost)
-  * Values: `[Customer Count]`
-  * Tooltips: `[% Customers]`, `[% Revenue Contribution]`
-  * Tiêu đề: *Quy mô và Tỷ trọng các nhóm khách hàng*
-* **Biểu đồ phân tán (Scatter Plot):**
-  * Trục X: `CustomerSegmentSnapshot[recency]`
-  * Trục Y: `CustomerSegmentSnapshot[monetary]`
-  * Kích thước bong bóng (Size): `CustomerSegmentSnapshot[frequency]`
-  * Màu sắc (Legend): `CustomerSegmentSnapshot[cluster_name]`
-  * Tiêu đề: *Ma trận phân tán Recency vs Monetary vs Frequency*
-* **Bảng ma trận chỉ số RFM trung vị (Table Visual):**
-  * Cột: `cluster_name`, `[Customer Count]`, `[% Customers]`, `[Median Recency]`, `[Median Frequency]`, `[Median Monetary]`, `[% Revenue Contribution]`
-  * Cột: `business_action_recommendation` (Chiến lược chăm sóc khách hàng tương ứng)
-
----
-
-## 3. LƯU VÀ BÀN GIAO FILE BÁO CÁO
-
-Sau khi thiết kế xong trên Power BI Desktop:
-1. Nhấn **File** -> **Save As**
-2. Lưu file với tên: `bi/RetailPulse_Dashboard.pbix`
-3. Commit file `.pbix` này vào Git repository cùng toàn bộ dự án.
+Tham khảo định dạng chính thức: [Semantic Model project](https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-dataset), [Report project](https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-report). JSON hợp lệ không thay thế kiểm thử refresh/Desktop.

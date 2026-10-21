@@ -1,174 +1,50 @@
-# TẬP HỢP CÔNG THỨC DAX CHUẨN MỰC - POWER BI RETAILPULSE
+﻿# DAX theo hợp đồng KPI
 
-Tài liệu này cung cấp toàn bộ công thức DAX chính xác cho 3 trang báo cáo Power BI, tuân thủ chặt chẽ theo **Đề cương BTL Kho dữ liệu & Khai phá dữ liệu (PTIT)**:
-- Tách riêng Doanh số mua vs Hủy/hoàn
-- Đếm đơn theo hóa đơn phân biệt (`DISTINCTCOUNT(InvoiceNo)`)
-- Không cộng dồn tồn kho của nhiều mốc thời gian
-- Xử lý trạng thái OFFLINE / Mất kết nối mà không coi là tồn bằng 0
+Trạng thái: IMPLEMENTED; **chưa TESTED trong Power BI Desktop**. SQL tương ứng đã chạy trên PostgreSQL trong `tests/test_runtime_and_bi.py` và `REFERENCE_QUERIES.sql`. Không gọi kiểm chứng SQL là kiểm chứng DAX.
 
----
+Bảng `Sales`, `Inventory`, `Segments` import từ ba view `vw_bi_*`; tên cột giữ nguyên. Monetary dùng fixed decimal. Measure tiền BLANK nếu chưa chọn đúng một currency. Không cộng GBP với VND.
 
-## 1. BÁO CÁO 1: BÁN HÀNG ĐA KÊNH (SALES ANALYTICS)
+## Sales
 
-### 1.1. Doanh số mua (Gross Sales)
 ```dax
-Gross Sales = 
-CALCULATE(
-    SUM(FactSales[total_amount]),
-    FactSales[is_cancelled] = FALSE
-)
+Gross Purchase Value = IF(HASONEVALUE(Sales[currency]), SUM(Sales[gross_sales_amount]))
+Return Value = IF(HASONEVALUE(Sales[currency]), SUM(Sales[refund_amount]))
+Cancellation Value = IF(HASONEVALUE(Sales[currency]), SUM(Sales[cancellation_amount]))
+Net Sales = IF(HASONEVALUE(Sales[currency]), SUM(Sales[net_sales_amount]))
+Order Count = CALCULATE(DISTINCTCOUNT(Sales[order_identity]), Sales[transaction_type] = "PURCHASE")
+Quantity Sold = CALCULATE(SUM(Sales[quantity]), Sales[transaction_type] = "PURCHASE")
+Average Order Value = DIVIDE([Gross Purchase Value], [Order Count])
+Customer Count = CALCULATE(DISTINCTCOUNT(Sales[customer_key]), Sales[transaction_type] = "PURCHASE", Sales[customer_code] <> "GUEST")
 ```
 
-### 1.2. Giá trị Hủy / Hoàn (Refund Amount)
+Return Value đã dương do view đổi dấu khoản hoàn âm. Net Sales cộng signed purchase/return; không trừ khoản hoàn âm lần nữa. Cancellation đứng riêng. Với UCI, RETURN là proxy suy từ mã C hoặc quantity âm, không chứng minh đã hoàn tiền thực tế. Order identity gồm nguồn và invoice. AOV dùng giá trị mua.
+
+## Inventory
+
+View đã chọn một snapshot nguồn gần nhất cho mỗi source/branch/product; không cộng lịch sử.
+
 ```dax
-Refund Amount = 
-CALCULATE(
-    SUM(FactSales[total_amount]),
-    FactSales[is_cancelled] = TRUE
-)
+Last Known Stock = SUM(Inventory[stock_on_hand])
+Verified Current Stock = CALCULATE(SUM(Inventory[stock_on_hand]), Inventory[node_status] = "ONLINE", Inventory[data_status] = "CURRENT")
+Latest Snapshot Time = MAX(Inventory[snapshot_time])
+Last Successful Update = MAX(Inventory[last_successful_update])
+Inventory Age Hours = MAX(Inventory[freshness_hours])
+Branch Collection Status = SELECTEDVALUE(Inventory[node_status], "Multiple / unknown")
 ```
 
-### 1.3. Doanh thu thuần (Net Sales)
+Last Known Stock vẫn có giá trị khi offline nhưng phải có node_status, data_status, timestamp cạnh số. Verified Current Stock có thể BLANK, không phải 0. Refresh Import model để cập nhật freshness. Branch chưa từng có snapshot xem inventory_source_status hoặc trang Sources trên web.
+
+## Customer Segments
+
+Chọn đúng một run_id bằng single-select slicer, kèm model_version/analysis_date/window/source/currency. Không cộng snapshot nhiều lần.
+
 ```dax
-Net Sales = [Gross Sales] - [Refund Amount]
+Segment Customer Count = IF(HASONEVALUE(Segments[run_id]), DISTINCTCOUNT(Segments[customer_key]))
+Median Recency = IF(HASONEVALUE(Segments[run_id]), MEDIAN(Segments[recency]))
+Median Frequency = IF(HASONEVALUE(Segments[run_id]), MEDIAN(Segments[frequency]))
+Median Monetary = IF(HASONEVALUE(Segments[run_id]) && HASONEVALUE(Segments[currency]), MEDIAN(Segments[monetary]))
+Segment Monetary = IF(HASONEVALUE(Segments[run_id]) && HASONEVALUE(Segments[currency]), SUM(Segments[monetary]))
+Segment Customer Share = DIVIDE([Segment Customer Count], CALCULATE([Segment Customer Count], REMOVEFILTERS(Segments[cluster_id]), REMOVEFILTERS(Segments[cluster_name])))
 ```
 
-### 1.4. Tổng số lượng sản phẩm bán (Total Quantity Sold)
-```dax
-Total Quantity Sold = 
-CALCULATE(
-    SUM(FactSales[quantity]),
-    FactSales[is_cancelled] = FALSE
-)
-```
-
-### 1.5. Số đơn hàng phân biệt (Total Distinct Invoices)
-```dax
-Total Orders = 
-CALCULATE(
-    DISTINCTCOUNT(FactSales[invoice_no]),
-    FactSales[is_cancelled] = FALSE
-)
-```
-
-### 1.6. Giá trị đơn hàng trung bình (Average Order Value - AOV)
-```dax
-AOV = 
-DIVIDE([Gross Sales], [Total Orders], 0)
-```
-
-### 1.7. Tỷ lệ Hủy đơn (Cancellation Rate)
-```dax
-Cancellation Rate = 
-DIVIDE(
-    CALCULATE(DISTINCTCOUNT(FactSales[invoice_no]), FactSales[is_cancelled] = TRUE),
-    DISTINCTCOUNT(FactSales[invoice_no]),
-    0
-)
-```
-
----
-
-## 2. BÁO CÁO 2: TỒN KHO CHI NHÁNH (INVENTORY STATUS)
-
-### 2.1. Mốc thời gian cập nhật mới nhất (Latest Snapshot Time)
-```dax
-Latest Snapshot Time = 
-CALCULATE(
-    MAX(FactInventorySnapshot[snapshot_time]),
-    ALLSELECTED(FactInventorySnapshot)
-)
-```
-
-### 2.2. Tổng tồn kho hiện tại (Current Stock On Hand)
-> **Quy tắc nghiệp vụ đề cương 4.3:** Chỉ tính tồn kho tại mốc chụp mới nhất của từng chi nhánh, tuyệt đối không cộng dồn các ngày khác nhau.
-```dax
-Current Stock = 
-VAR MaxBatchPerBranch = 
-    CALCULATETABLE(
-        ADDCOLUMNS(
-            SUMMARIZE(FactInventorySnapshot, DimBranch[branch_code]),
-            "LatestTime", CALCULATE(MAX(FactInventorySnapshot[snapshot_time]))
-        ),
-        ALLSELECTED(DimDate)
-    )
-RETURN
-    CALCULATE(
-        SUM(FactInventorySnapshot[stock_on_hand]),
-        TREATAS(MaxBatchPerBranch, DimBranch[branch_code], FactInventorySnapshot[snapshot_time])
-    )
-```
-
-### 2.3. Cảnh báo Trạng thái Node Chi nhánh (Node Connection Indicator)
-```dax
-Node Connection Status = 
-VAR CurrentBranchStatus = SELECTEDVALUE(FactInventorySnapshot[node_status], "ONLINE")
-RETURN
-    IF(
-        CurrentBranchStatus = "OFFLINE",
-        "⚠️ MẤT KẾT NỐI (Chưa lấy được dữ liệu)",
-        "✅ HOẠT ĐỘNG BÌNH THƯỜNG"
-    )
-```
-
-### 2.4. Số lượng SKU sắp hết hàng (Low Stock SKU Count)
-```dax
-Low Stock SKUs = 
-CALCULATE(
-    DISTINCTCOUNT(FactInventorySnapshot[product_key]),
-    FactInventorySnapshot[stock_on_hand] > 0,
-    FactInventorySnapshot[stock_on_hand] <= 10,
-    FactInventorySnapshot[node_status] = "ONLINE"
-)
-```
-
----
-
-## 3. BÁO CÁO 3: PHÂN KHÚC KHÁCH HÀNG (CUSTOMER RFM MINING)
-
-### 3.1. Tổng số khách hàng trong cụm (Segment Customer Count)
-```dax
-Customer Count = 
-DISTINCTCOUNT(CustomerSegmentSnapshot[customer_key])
-```
-
-### 3.2. Tỷ trọng khách hàng theo cụm (% Customers in Segment)
-```dax
-% Customers = 
-DIVIDE(
-    [Customer Count],
-    CALCULATE([Customer Count], ALL(CustomerSegmentSnapshot[cluster_name])),
-    0
-)
-```
-
-### 3.3. Trung vị Recency (Median R)
-```dax
-Median Recency = 
-MEDIAN(CustomerSegmentSnapshot[recency])
-```
-
-### 3.4. Trung vị Frequency (Median F)
-```dax
-Median Frequency = 
-MEDIAN(CustomerSegmentSnapshot[frequency])
-```
-
-### 3.5. Trung vị Monetary (Median M)
-```dax
-Median Monetary = 
-MEDIAN(CustomerSegmentSnapshot[monetary])
-```
-
-### 3.6. Tỷ trọng đóng góp Doanh số của Cụm (% Revenue Contribution)
-```dax
-Total Segment Monetary = 
-SUM(CustomerSegmentSnapshot[monetary])
-
-% Revenue Contribution = 
-DIVIDE(
-    [Total Segment Monetary],
-    CALCULATE([Total Segment Monetary], ALL(CustomerSegmentSnapshot[cluster_name])),
-    0
-)
-```
+Không gọi cluster name là xác suất churn. Monetary lịch sử không chứng minh tác động marketing. Holdout/baseline lấy từ artifact thực nghiệm, không tự sinh metric trong DAX.

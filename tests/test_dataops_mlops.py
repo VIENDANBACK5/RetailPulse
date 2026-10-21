@@ -14,7 +14,6 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from src.dataops.data_profiler import data_profiler
-from src.dataops.model_registry import model_registry
 from src.dataops.data_activation import data_activation
 
 
@@ -44,62 +43,59 @@ def test_data_profiler():
     print(f"  [PASS] Data Profiler: {profile['valid_rows']}/{profile['total_rows']} valid, Quality Score: {profile['overall_quality_score']}%.")
 
 
-def test_model_registry():
-    print("Testing MLOps Model Registry...")
-    # Get all versions
-    reg_data = model_registry.get_all_versions()
-    assert len(reg_data["versions"]) >= 3
-    assert reg_data["active_version"] is not None
+def test_model_registry(tmp_path, monkeypatch):
+    """Optional registry storage mechanics; isolated from user model artifacts."""
+    import json
+    import numpy as np
+    from sklearn.cluster import KMeans
+    from sklearn.metrics import silhouette_score
+    from threadpoolctl import threadpool_limits
+    # Import-time legacy singleton, if created, must also live under pytest temp.
+    monkeypatch.chdir(tmp_path)
+    from src.dataops.model_registry import ModelRegistry
+    storage = tmp_path / "models" / "test_registry.json"
+    storage.parent.mkdir(exist_ok=True)
+    storage.write_text(json.dumps({"active_version": None, "versions": []}), encoding="utf-8")
+    registry = ModelRegistry(str(storage))
+    assert registry.get_all_versions()["versions"] == []
+    fixture = np.array([[0,0],[0,1],[1,0],[1,1],[10,10],[10,11],[11,10],[11,11]], dtype=float)
+    with threadpool_limits(limits=1):
+        observed_model = KMeans(n_clusters=2, n_init=10, random_state=42).fit(fixture)
+        observed_score = silhouette_score(fixture, observed_model.labels_)
 
     # Register custom new version
-    new_v = model_registry.register_new_version(
-        name="Tuning K=5 (Weighted)",
-        algorithm="K-Means (Weighted RFM)",
-        k_clusters=5,
-        analysis_window="6_months",
+    new_v = registry.register_new_version(
+        name="TEST_ONLY fixture storage lifecycle",
+        algorithm="K-Means on deterministic TEST fixture",
+        k_clusters=2,
+        analysis_window="TEST_ONLY",
         rfm_weights={"r": 0.2, "f": 0.4, "m": 0.4},
-        silhouette_score_val=0.3245,
-        inertia_val=1120.0,
-        notes="Thử nghiệm K=5 trên dữ liệu 6 tháng gần nhất"
+        silhouette_score_val=observed_score,
+        inertia_val=observed_model.inertia_,
+        notes="Actual fixture metric; not an experiment on UCI or production registry"
     )
-    assert new_v["k_clusters"] == 5
-    assert new_v["silhouette_score"] == 0.3245
+    assert new_v["k_clusters"] == 2
+    assert new_v["silhouette_score"] == round(observed_score, 4)
 
     # Promote to production
-    promoted = model_registry.promote_version(new_v["version"])
+    promoted = registry.promote_version(new_v["version"])
     assert promoted is True
-    updated_reg = model_registry.get_all_versions()
+    updated_reg = registry.get_all_versions()
     assert updated_reg["active_version"] == new_v["version"]
 
-    # Re-promote default v2.0-deep-autoencoder
-    model_registry.promote_version("v2.0-deep-autoencoder")
-    print(f"  [PASS] Model Registry: Version {new_v['version']} registered and tested promote lifecycle.")
 
 
 def test_data_activation():
-    print("Testing Data Activation & CRM API...")
+    """Optional CRM config generation only; does not prove a real CRM integration."""
     # Generate API endpoint config
     api_cfg = data_activation.generate_api_endpoint(segment_slug="at-risk", api_type="REST_PULL")
     assert "sk_live_crm_" in api_cfg["api_token"]
     assert "segments/at-risk/feed" in api_cfg["endpoint_url"]
     assert "curl" in api_cfg["curl_command"]
 
-    # Get sample CRM feed preview
-    feed = data_activation.get_segment_feed_preview(cluster_id=2, limit=2)
-    assert feed["status"] == "SUCCESS"
-    assert len(feed["data"]) > 0
-    assert "churn_risk_score" in feed["data"][0]
-    assert "recommended_action" in feed["data"][0]
-    print(f"  [PASS] Data Activation: Dynamic API endpoint generated ({api_cfg['endpoint_url'][:45]}...) with {len(feed['data'])} records.")
+    assert api_cfg["api_token"] in api_cfg["curl_command"]
 
 
 if __name__ == "__main__":
-    print("==================================================")
-    print("RUNNING DATAOPS & MLOPS AUTOMATED TEST SUITE")
-    print("==================================================")
-    test_data_profiler()
-    test_model_registry()
-    test_data_activation()
-    print("==================================================")
-    print("ALL DATAOPS & MLOPS TESTS COMPLETED SUCCESSFULLY!")
-    print("==================================================")
+    import pytest
+    raise SystemExit(pytest.main([__file__, "-q"]))

@@ -1,244 +1,108 @@
+"""Bulk load with source identity; reconcile the exact source-key set in SQL."""
+import io
+import json
 import pandas as pd
 from sqlalchemy import text
-from sqlalchemy.engine import Engine
-from typing import Dict, Tuple
 
-
-def get_dimension_lookups(engine: Engine) -> Tuple[Dict[str, int], Dict[str, int]]:
-    """Lấy danh sách mã tra cứu cho DimSource và DimBranch"""
+def get_dimension_lookups(engine):
     with engine.connect() as conn:
-        sources = conn.execute(text("SELECT source_code, source_key FROM dim_source")).fetchall()
-        source_map = {row[0]: row[1] for row in sources}
+        return (dict(conn.execute(text('SELECT source_code,source_key FROM dim_source')).fetchall()),dict(conn.execute(text('SELECT branch_code,branch_key FROM dim_branch')).fetchall()))
 
-        branches = conn.execute(text("SELECT branch_code, branch_key FROM dim_branch")).fetchall()
-        branch_map = {row[0]: row[1] for row in branches}
+def _copy(conn,table,frame):
+    stream=io.StringIO()
+    frame.to_csv(stream,index=False,header=False,na_rep='\\N')
+    stream.seek(0)
+    cursor=conn.connection.cursor()
+    cursor.copy_expert(f"COPY {table} ({','.join(frame.columns)}) FROM STDIN WITH (FORMAT CSV, NULL '\\N')",stream)
+    cursor.close()
 
-    return source_map, branch_map
-
-
-def sync_dim_products(engine: Engine, df: pd.DataFrame, source_key: int) -> Dict[str, int]:
-    """Cập nhật sản phẩm mới vào DimProduct và trả về dictionary mapping {stock_code: product_key}"""
-    unique_prods = df[["stock_code", "description"]].drop_duplicates(subset=["stock_code"]).copy()
-
+def load_fact_sales(engine,valid_df,batch_id,run_id=None):
+    empty=dict(inserted=0,updated=0,unchanged=0,target_count=0,target_amount=0.0,source_amount=0.0,reconciliation='MATCHED')
+    if valid_df.empty: return empty
+    if valid_df['source_code'].nunique()!=1 or valid_df['currency'].nunique()!=1:
+        raise ValueError('Each load must contain exactly one source and currency')
+    columns=['source_record_id','invoice_no','stock_code','description','customer_code','country','branch_code','date_key','quantity','unit_price','total_amount','is_cancelled','transaction_type','currency','provenance','raw_path','record_hash','content_hash']
+    stage=valid_df[columns].copy()
+    source_code=str(valid_df['source_code'].iloc[0]); currency=str(valid_df['currency'].iloc[0])
     with engine.begin() as conn:
-        # 1. Lấy danh sách sản phẩm đã có
-        existing = conn.execute(
-            text("SELECT stock_code, product_key FROM dim_product WHERE source_key = :sk"),
-            {"sk": source_key}
-        ).fetchall()
-        prod_map = {row[0]: row[1] for row in existing}
+        conn.exec_driver_sql("SET LOCAL work_mem='128MB'")
+        source=conn.execute(text('SELECT source_key,currency FROM dim_source WHERE source_code=:code'),dict(code=source_code)).mappings().one()
+        if currency!=source['currency']: raise ValueError('Source currency contract mismatch')
+        sk=source['source_key']
+        conn.execute(text('SELECT pg_advisory_xact_lock(71234,:sk)'),dict(sk=sk))
+        conn.exec_driver_sql('''CREATE TEMP TABLE sales_stage(source_record_id TEXT,invoice_no TEXT,stock_code TEXT,description TEXT,customer_code TEXT,country TEXT,branch_code TEXT,date_key INT,quantity INT,unit_price NUMERIC(20,4),total_amount NUMERIC(20,4),is_cancelled BOOLEAN,transaction_type TEXT,currency TEXT,provenance TEXT,raw_path TEXT,record_hash TEXT,content_hash TEXT) ON COMMIT DROP''')
+        _copy(conn,'sales_stage',stage)
+        conn.exec_driver_sql('ANALYZE sales_stage')
+        conn.exec_driver_sql('''INSERT INTO dim_date(date_key,full_date,day_of_week,day_name,day_of_month,month,month_name,quarter,year,is_weekend,is_holiday)
+        SELECT date_key,d,extract(isodow from d)::int,to_char(d,'Day'),extract(day from d)::int,extract(month from d)::int,to_char(d,'Month'),extract(quarter from d)::int,extract(year from d)::int,extract(isodow from d)>=6,false
+        FROM (SELECT DISTINCT date_key,to_date(date_key::text,'YYYYMMDD') AS d FROM sales_stage) dates ON CONFLICT(date_key) DO NOTHING''')
+        conn.execute(text('''INSERT INTO dim_product(source_key,stock_code,description)
+        SELECT DISTINCT ON(stock_code) :sk,stock_code,left(description,255) FROM sales_stage ORDER BY stock_code
+        ON CONFLICT(source_key,stock_code) DO UPDATE SET description=EXCLUDED.description'''),dict(sk=sk))
+        conn.execute(text('''INSERT INTO dim_customer(source_key,customer_code,customer_name,country)
+        SELECT DISTINCT ON(customer_code) :sk,customer_code,left('Customer '||customer_code,255),left(country,100) FROM sales_stage ORDER BY customer_code
+        ON CONFLICT(source_key,customer_code) DO UPDATE SET country=EXCLUDED.country'''),dict(sk=sk))
+        params=dict(sk=sk,batch_id=batch_id,run_id=run_id or batch_id)
+        counts=conn.execute(text('''SELECT count(*) FILTER(WHERE f.sales_key IS NULL) AS inserted,
+          count(*) FILTER(WHERE f.sales_key IS NOT NULL AND f.content_hash IS DISTINCT FROM s.content_hash) AS updated,
+          count(*) FILTER(WHERE f.sales_key IS NOT NULL AND f.content_hash=s.content_hash) AS unchanged
+          FROM sales_stage s LEFT JOIN fact_sales f ON f.source_key=:sk AND f.source_record_id=s.source_record_id'''),params).mappings().one()
+        result=dict(counts)
+        conn.execute(text('''INSERT INTO etl_batch_records(batch_id,run_id,source_key,source_record_id,disposition,raw_path)
+         SELECT :batch_id,:run_id,:sk,s.source_record_id,
+         CASE WHEN f.sales_key IS NULL THEN 'INSERTED' WHEN f.content_hash IS DISTINCT FROM s.content_hash THEN 'UPDATED' ELSE 'UNCHANGED' END,s.raw_path
+         FROM sales_stage s LEFT JOIN fact_sales f ON f.source_key=:sk AND f.source_record_id=s.source_record_id
+         ON CONFLICT(batch_id,source_key,source_record_id) DO NOTHING'''),params)
+        conn.execute(text('''INSERT INTO fact_sales(date_key,customer_key,product_key,branch_key,source_key,invoice_no,quantity,unit_price,total_amount,is_cancelled,record_hash,batch_id,source_record_id,raw_path,provenance,currency,transaction_type,content_hash,run_id)
+        SELECT s.date_key,c.customer_key,p.product_key,b.branch_key,:sk,s.invoice_no,s.quantity,s.unit_price,s.total_amount,s.is_cancelled,s.record_hash,:batch_id,s.source_record_id,s.raw_path,s.provenance,s.currency,s.transaction_type,s.content_hash,:run_id
+        FROM sales_stage s JOIN dim_customer c ON c.source_key=:sk AND c.customer_code=s.customer_code
+        JOIN dim_product p ON p.source_key=:sk AND p.stock_code=s.stock_code JOIN dim_branch b ON b.branch_code=s.branch_code
+        ON CONFLICT(source_key,source_record_id) DO UPDATE SET date_key=EXCLUDED.date_key,customer_key=EXCLUDED.customer_key,product_key=EXCLUDED.product_key,branch_key=EXCLUDED.branch_key,invoice_no=EXCLUDED.invoice_no,quantity=EXCLUDED.quantity,unit_price=EXCLUDED.unit_price,total_amount=EXCLUDED.total_amount,is_cancelled=EXCLUDED.is_cancelled,transaction_type=EXCLUDED.transaction_type,content_hash=EXCLUDED.content_hash,currency=EXCLUDED.currency,provenance=EXCLUDED.provenance,raw_path=EXCLUDED.raw_path,run_id=EXCLUDED.run_id,batch_id=EXCLUDED.batch_id,updated_at=now()
+        WHERE fact_sales.content_hash IS DISTINCT FROM EXCLUDED.content_hash'''),params)
+        actual=conn.execute(text('''SELECT count(f.sales_key) AS target_count,COALESCE(sum(f.total_amount),0) AS target_amount,
+        count(*) FILTER(WHERE f.content_hash IS DISTINCT FROM s.content_hash OR f.currency IS DISTINCT FROM s.currency
+          OR f.total_amount IS DISTINCT FROM s.total_amount OR f.quantity IS DISTINCT FROM s.quantity
+          OR f.unit_price IS DISTINCT FROM s.unit_price OR f.transaction_type IS DISTINCT FROM s.transaction_type
+          OR f.invoice_no IS DISTINCT FROM s.invoice_no OR f.date_key IS DISTINCT FROM s.date_key
+          OR f.is_cancelled IS DISTINCT FROM s.is_cancelled) AS mismatches
+        FROM sales_stage s LEFT JOIN fact_sales f ON f.source_key=:sk AND f.source_record_id=s.source_record_id'''),params).mappings().one()
+        result.update(dict(actual)); result['source_amount']=float(sum(valid_df['total_amount']))
+        result['target_amount']=float(result['target_amount'])
+        result['reconciliation']='MATCHED' if result['target_count']==len(stage) and result['mismatches']==0 and abs(result['target_amount']-result['source_amount'])<0.005 else 'DISCREPANCY'
+    # Refresh planner statistics only after the business transaction commits.
+    # ANALYZE permits normal reads and does not rewrite user data.
+    if result['inserted']+result['updated']>=10000:
+        with engine.begin() as conn:
+            conn.exec_driver_sql('ANALYZE fact_sales; ANALYZE dim_source; ANALYZE dim_customer; ANALYZE dim_product; ANALYZE dim_date')
+    return result
 
-        # 2. Tìm các sản phẩm mới cần thêm
-        new_prods = unique_prods[~unique_prods["stock_code"].isin(prod_map.keys())]
-        if not new_prods.empty:
-            for _, row in new_prods.iterrows():
-                res = conn.execute(
-                    text("""
-                        INSERT INTO dim_product (source_key, stock_code, description, unit_price_base)
-                        VALUES (:sk, :sc, :desc, 0.0)
-                        ON CONFLICT (source_key, stock_code) DO UPDATE SET description = EXCLUDED.description
-                        RETURNING product_key
-                    """),
-                    {"sk": source_key, "sc": row["stock_code"], "desc": str(row["description"])[:255]}
-                )
-                prod_map[row["stock_code"]] = res.scalar()
-
-    return prod_map
-
-
-def sync_dim_customers(engine: Engine, df: pd.DataFrame, source_key: int) -> Dict[str, int]:
-    """Cập nhật khách hàng mới vào DimCustomer và trả về dictionary mapping {customer_code: customer_key}"""
-    unique_custs = df[["customer_code", "country"]].drop_duplicates(subset=["customer_code"]).copy()
-
+def load_fact_inventory(engine,inv_df,batch_id,run_id=None):
+    if inv_df.empty: return 0
+    count=0
     with engine.begin() as conn:
-        existing = conn.execute(
-            text("SELECT customer_code, customer_key FROM dim_customer WHERE source_key = :sk"),
-            {"sk": source_key}
-        ).fetchall()
-        cust_map = {row[0]: row[1] for row in existing}
+        sources,branches=get_dimension_lookups(engine)
+        for row in inv_df.to_dict('records'):
+            sk=sources[row['source_code']]
+            pk=conn.execute(text('''INSERT INTO dim_product(source_key,stock_code,description) VALUES(:sk,:code,:description)
+            ON CONFLICT(source_key,stock_code) DO UPDATE SET stock_code=EXCLUDED.stock_code RETURNING product_key'''),dict(sk=sk,code=row['stock_code'],description=str(row['description'])[:255])).scalar_one()
+            row.update(source_key=sk,product_key=pk,branch_key=branches[row['branch_code']],batch_id=batch_id,run_id=run_id or batch_id)
+            count+=conn.execute(text('''INSERT INTO fact_inventory_snapshot(date_key,branch_key,product_key,source_key,stock_on_hand,snapshot_time,node_status,batch_id,raw_path,run_id,snapshot_identity)
+            VALUES(:date_key,:branch_key,:product_key,:source_key,:stock_on_hand,:snapshot_time,:node_status,:batch_id,:raw_path,:run_id,:snapshot_identity)
+            ON CONFLICT(source_key,branch_key,product_key,snapshot_identity) DO NOTHING'''),row).rowcount
+    return count
 
-        new_custs = unique_custs[~unique_custs["customer_code"].isin(cust_map.keys())]
-        if not new_custs.empty:
-            for _, row in new_custs.iterrows():
-                country = str(row["country"]) if pd.notna(row["country"]) else "United Kingdom"
-                res = conn.execute(
-                    text("""
-                        INSERT INTO dim_customer (source_key, customer_code, customer_name, country)
-                        VALUES (:sk, :cc, :cname, :ctry)
-                        ON CONFLICT (source_key, customer_code) DO NOTHING
-                        RETURNING customer_key
-                    """),
-                    {
-                        "sk": source_key,
-                        "cc": row["customer_code"],
-                        "cname": f"Khách hàng {row['customer_code']}",
-                        "ctry": country
-                    }
-                )
-                new_key = res.scalar()
-                if new_key:
-                    cust_map[row["customer_code"]] = new_key
-
-    return cust_map
-
-
-def load_fact_sales(engine: Engine, valid_df: pd.DataFrame, batch_id: str) -> Tuple[int, float]:
-    """
-    Nạp dữ liệu vào FactSales với cơ chế Idempotent chống nạp trùng (ON CONFLICT DO NOTHING qua record_hash).
-    Trả về: (số dòng nạp thành công, tổng tiền nạp)
-    """
-    if valid_df.empty:
-        return 0, 0.0
-
-    print(f"📤 [ETL - Load] Đang nạp {len(valid_df):,} bản ghi vào FactSales (Batch: {batch_id})...")
-    source_map, branch_map = get_dimension_lookups(engine)
-
-    source_code = valid_df["source_code"].iloc[0]
-    source_key = source_map.get(source_code, 1)
-
-    # Đồng bộ Dim
-    prod_map = sync_dim_products(engine, valid_df, source_key)
-    cust_map = sync_dim_customers(engine, valid_df, source_key)
-
-    # Chuẩn bị dữ liệu Fact
-    fact_rows = []
-    default_branch_key = branch_map.get("UNKNOWN", 1)
-
-    for _, row in valid_df.iterrows():
-        b_key = branch_map.get(row["branch_code"], default_branch_key)
-        p_key = prod_map.get(row["stock_code"])
-        c_key = cust_map.get(row["customer_code"])
-
-        if p_key and c_key:
-            fact_rows.append({
-                "date_key": int(row["date_key"]),
-                "customer_key": int(c_key),
-                "product_key": int(p_key),
-                "branch_key": int(b_key),
-                "source_key": int(source_key),
-                "invoice_no": str(row["invoice_no"]),
-                "quantity": int(row["quantity"]),
-                "unit_price": float(row["unit_price"]),
-                "total_amount": float(row["total_amount"]),
-                "is_cancelled": bool(row["is_cancelled"]),
-                "record_hash": str(row["record_hash"]),
-                "batch_id": str(batch_id)
-            })
-
-    # Nạp theo lô (Chunk loading) để tối ưu hiệu năng
-    inserted_count = 0
-    chunk_size = 2000
-
-    insert_sql = text("""
-        INSERT INTO fact_sales (
-            date_key, customer_key, product_key, branch_key, source_key,
-            invoice_no, quantity, unit_price, total_amount, is_cancelled, record_hash, batch_id
-        ) VALUES (
-            :date_key, :customer_key, :product_key, :branch_key, :source_key,
-            :invoice_no, :quantity, :unit_price, :total_amount, :is_cancelled, :record_hash, :batch_id
-        )
-        ON CONFLICT (record_hash) DO NOTHING
-    """)
-
+def load_inventory_status(engine,nodes,batch_id,run_id):
     with engine.begin() as conn:
-        for i in range(0, len(fact_rows), chunk_size):
-            chunk = fact_rows[i:i + chunk_size]
-            res = conn.execute(insert_sql, chunk)
-            inserted_count += (res.rowcount if res.rowcount != -1 else len(chunk))
+        for node in nodes:
+            raw=node.get('snapshot_time')
+            stamp=(pd.to_datetime(raw,unit='s',utc=True) if isinstance(raw,(int,float)) else pd.to_datetime(raw,utc=True,errors='coerce')) if raw is not None else None
+            if stamp is not None and pd.isna(stamp): stamp=None
+            collected=pd.to_datetime(node.get('collected_at'),utc=True) if node.get('collected_at') else pd.Timestamp.now(tz='UTC')
+            conn.execute(text('''INSERT INTO inventory_source_status(run_id,batch_id,branch_code,status,snapshot_time,collected_at,error,raw_path,item_count)
+            VALUES(:run_id,:batch_id,:branch_code,:status,:snapshot_time,:collected_at,:error,:raw_path,:item_count)'''),dict(run_id=run_id,batch_id=batch_id,branch_code=node['branch_code'],status=node['status'],snapshot_time=stamp,collected_at=collected,error=node.get('error'),raw_path=node.get('raw_path'),item_count=len(node.get('items',[]))))
 
-    # Truy vấn DWH trực tiếp để đối soát số lượng và số tiền thực tế đã nạp (không dùng counter nội bộ)
-    with engine.connect() as conn:
-        audit_res = conn.execute(
-            text("SELECT COUNT(*), COALESCE(SUM(total_amount), 0.0) FROM fact_sales WHERE batch_id = :batch_id"),
-            {"batch_id": str(batch_id)}
-        ).fetchone()
-        dwh_actual_count = audit_res[0] if audit_res else inserted_count
-        dwh_actual_amount = round(float(audit_res[1]), 2) if audit_res else round(float(valid_df["total_amount"].sum()), 2)
-
-    print(f"  + Hoàn tất nạp FactSales: Đã xác nhận trong DWH {dwh_actual_count:,} bản ghi (Tổng tiền: {dwh_actual_amount:,.2f})")
-    return dwh_actual_count, dwh_actual_amount
-
-
-def load_fact_inventory(engine: Engine, inv_df: pd.DataFrame, batch_id: str) -> int:
-    """Nạp dữ liệu chụp tồn kho vào FactInventorySnapshot"""
-    if inv_df.empty:
-        return 0
-
-    print(f"📤 [ETL - Load] Đang nạp {len(inv_df):,} bản ghi vào FactInventorySnapshot...")
-    source_map, branch_map = get_dimension_lookups(engine)
-    source_key = source_map.get("APP_OPERATIONAL", 2)
-
+def load_rejected_records(engine,rejected_df,batch_id,source_code):
+    if rejected_df.empty: return
+    records=[dict(batch_id=batch_id,source_code=source_code,raw_data=json.dumps(row,default=str,ensure_ascii=False),rejection_reason=str(row.get('rejection_reason','Invalid record'))[:255]) for row in rejected_df.to_dict('records')]
     with engine.begin() as conn:
-        # Lấy product map
-        prods = conn.execute(text("SELECT stock_code, product_key FROM dim_product")).fetchall()
-        prod_map = {r[0]: r[1] for r in prods}
-
-        # Nếu chưa có ALL_PRODUCTS (dùng cho node offline)
-        if "ALL_PRODUCTS" not in prod_map:
-            res = conn.execute(
-                text("INSERT INTO dim_product (source_key, stock_code, description) VALUES (:sk, 'ALL_PRODUCTS', 'Tất cả sản phẩm (Node Offline)') RETURNING product_key"),
-                {"sk": source_key}
-            )
-            prod_map["ALL_PRODUCTS"] = res.scalar()
-
-        rows_to_insert = []
-        for _, row in inv_df.iterrows():
-            b_key = branch_map.get(row["branch_code"], 1)
-            p_key = prod_map.get(row["stock_code"], prod_map["ALL_PRODUCTS"])
-            
-            # An toàn xử lý giá trị tồn kho None khi node OFFLINE (không ép int gây crash)
-            stock_raw = row["stock_on_hand"]
-            stock_val = int(stock_raw) if (pd.notnull(stock_raw) and stock_raw is not None) else None
-            
-            snap_raw = row["snapshot_time"]
-            snap_val = snap_raw if (pd.notnull(snap_raw) and snap_raw is not None) else None
-
-            rows_to_insert.append({
-                "date_key": int(row["date_key"]),
-                "branch_key": int(b_key),
-                "product_key": int(p_key),
-                "source_key": int(source_key),
-                "stock_on_hand": stock_val,
-                "snapshot_time": snap_val,
-                "node_status": str(row["node_status"]),
-                "batch_id": str(batch_id)
-            })
-
-        sql = text("""
-            INSERT INTO fact_inventory_snapshot (
-                date_key, branch_key, product_key, source_key,
-                stock_on_hand, snapshot_time, node_status, batch_id
-            ) VALUES (
-                :date_key, :branch_key, :product_key, :source_key,
-                :stock_on_hand, :snapshot_time, :node_status, :batch_id
-            )
-            ON CONFLICT (date_key, branch_key, product_key, batch_id) DO NOTHING
-        """)
-        conn.execute(sql, rows_to_insert)
-
-    print(f"  + Hoàn tất nạp FactInventorySnapshot ({len(rows_to_insert)} bản ghi).")
-    return len(rows_to_insert)
-
-
-def load_rejected_records(engine: Engine, rejected_df: pd.DataFrame, batch_id: str, source_code: str):
-    """Ghi nhận các dòng dữ liệu bị loại vào etl_rejected_records để phục vụ kiểm toán"""
-    if rejected_df.empty:
-        return
-
-    print(f"⚠️ [ETL - Load] Ghi nhật ký {len(rejected_df):,} dòng bị loại vào etl_rejected_records...")
-    records = []
-    for _, row in rejected_df.iterrows():
-        raw_summary = f"Invoice:{row.get('invoice_no')}, Stock:{row.get('stock_code')}, Qty:{row.get('quantity')}, Price:{row.get('unit_price')}"
-        records.append({
-            "batch_id": batch_id,
-            "source_code": source_code,
-            "raw_data": raw_summary,
-            "rejection_reason": str(row.get("rejection_reason", "Invalid Record"))[:250]
-        })
-
-    sql = text("""
-        INSERT INTO etl_rejected_records (batch_id, source_code, raw_data, rejection_reason)
-        VALUES (:batch_id, :source_code, :raw_data, :rejection_reason)
-    """)
-    with engine.begin() as conn:
-        conn.execute(sql, records)
+        conn.execute(text('INSERT INTO etl_rejected_records(batch_id,source_code,raw_data,rejection_reason) VALUES(:batch_id,:source_code,:raw_data,:rejection_reason)'),records)

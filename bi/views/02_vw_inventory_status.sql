@@ -1,61 +1,36 @@
--- ===============================================================================
--- HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG (PTIT)
--- BÀI TẬP LỚN: KHO DỮ LIỆU VÀ KHAI PHÁ DỮ LIỆU
--- VIEW 2: DỮ LIỆU BÁO CÁO TỒN KHO CHI NHÁNH (INVENTORY STATUS)
--- Phục vụ Power BI: Tồn mới nhất từng chi nhánh, mốc cập nhật, cảnh báo OFFLINE
--- ===============================================================================
-
+-- Last valid snapshot at source, augmented with latest collection status.
 CREATE OR REPLACE VIEW vw_bi_inventory_status AS
-WITH ranked_snapshots AS (
-    SELECT 
-        fis.snapshot_key,
-        fis.date_key,
-        dd.full_date,
-        fis.branch_key,
-        db.branch_code,
-        db.branch_name,
-        db.location AS branch_location,
-        fis.product_key,
-        dp.stock_code,
-        dp.description AS product_name,
-        fis.stock_on_hand,
-        fis.snapshot_time,
-        fis.node_status,
-        fis.batch_id,
-        fis.loaded_at,
-        ROW_NUMBER() OVER(
-            PARTITION BY fis.branch_key, fis.product_key 
-            ORDER BY fis.loaded_at DESC, fis.snapshot_key DESC
-        ) AS rn
-    FROM fact_inventory_snapshot fis
-    JOIN dim_branch db ON fis.branch_key = db.branch_key
-    JOIN dim_product dp ON fis.product_key = dp.product_key
-    LEFT JOIN dim_date dd ON fis.date_key = dd.date_key
+WITH snapshots AS (
+ SELECT f.*,row_number() OVER(PARTITION BY source_key,branch_key,product_key
+  ORDER BY snapshot_time DESC,loaded_at DESC,snapshot_key DESC) AS rn
+ FROM fact_inventory_snapshot f WHERE snapshot_identity IS NOT NULL AND snapshot_time IS NOT NULL
+), collection AS (
+ SELECT s.*,row_number() OVER(PARTITION BY source_code,branch_code ORDER BY collected_at DESC,id DESC) AS rn
+ FROM inventory_source_status s
+), success AS (
+ SELECT source_code,branch_code,max(collected_at) AS last_successful_update
+ FROM inventory_source_status WHERE status IN ('ONLINE','EMPTY') GROUP BY source_code,branch_code
 )
-SELECT 
-    snapshot_key,
-    date_key,
-    full_date,
-    branch_key,
-    branch_code,
-    branch_name,
-    branch_location,
-    product_key,
-    stock_code,
-    product_name,
-    
-    -- Tuân thủ đề cương 4.3 & 6.2: 
-    -- Không coi dữ liệu thiếu/OFFLINE là tồn bằng 0
-    stock_on_hand,
-    snapshot_time,
-    node_status,
-    CASE 
-        WHEN node_status = 'OFFLINE' THEN 'Mất kết nối / Chưa lấy được dữ liệu'
-        WHEN stock_on_hand IS NULL THEN 'Dữ liệu không đầy đủ'
-        WHEN stock_on_hand <= 10 THEN 'Cảnh báo sắp hết hàng (Low Stock)'
-        ELSE 'Bình thường'
-    END AS inventory_health_status,
-    batch_id,
-    loaded_at
-FROM ranked_snapshots
-WHERE rn = 1;
+SELECT f.snapshot_key,f.date_key,dd.full_date,f.source_key,ds.source_code,ds.currency,
+ f.branch_key,b.branch_code,b.branch_name,b.location AS branch_location,
+ f.product_key,p.stock_code,p.description AS product_name,f.stock_on_hand,f.snapshot_time,
+ COALESCE(c.status,'UNKNOWN') AS node_status,c.collected_at AS last_collection_at,
+ z.last_successful_update,c.error AS collection_error,
+ CASE WHEN c.status IN ('OFFLINE','INVALID') THEN 'STALE'
+      WHEN c.status='EMPTY' THEN 'EMPTY_SOURCE'
+      WHEN f.snapshot_time < now()-interval '24 hours' THEN 'STALE'
+      ELSE 'CURRENT' END AS data_status,
+ extract(epoch FROM (now()-f.snapshot_time))/3600.0 AS freshness_hours,
+ CASE WHEN c.status IN ('OFFLINE','INVALID') THEN 'Last known stock; collection failed'
+      WHEN c.status='EMPTY' THEN 'Source reports empty; old snapshot retained for audit'
+      WHEN f.stock_on_hand=0 THEN 'OUT_OF_STOCK'
+      WHEN f.stock_on_hand<=10 THEN 'LOW_STOCK' ELSE 'NORMAL' END AS inventory_health_status,
+ f.batch_id,f.run_id,f.raw_path,f.loaded_at
+FROM snapshots f
+JOIN dim_branch b ON b.branch_key=f.branch_key
+JOIN dim_product p ON p.product_key=f.product_key
+JOIN dim_source ds ON ds.source_key=f.source_key
+LEFT JOIN dim_date dd ON dd.date_key=f.date_key
+LEFT JOIN collection c ON c.source_code=ds.source_code AND c.branch_code=b.branch_code AND c.rn=1
+LEFT JOIN success z ON z.source_code=ds.source_code AND z.branch_code=b.branch_code
+WHERE f.rn=1;

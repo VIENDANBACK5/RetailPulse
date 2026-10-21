@@ -1,157 +1,91 @@
-import os
-import sys
-import datetime
+﻿"""Strict SQL-backed RFM. Database errors are never replaced with raw CSV."""
+import datetime as dt
+import numpy as np
 import pandas as pd
 from sqlalchemy import text
-from sqlalchemy.engine import Engine
-
-if sys.platform == "win32":
-    try:
-        sys.stdout.reconfigure(encoding="utf-8")
-        sys.stderr.reconfigure(encoding="utf-8")
-    except Exception:
-        pass
-
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
-sys.path.append(BASE_DIR)
-
 from src.utils.db_helper import get_dwh_engine
 
 
-from typing import Tuple
+def calendar_window(window_end, window_months=12, window_start=None):
+    end = pd.Timestamp(window_end).date()
+    if window_months < 1:
+        raise ValueError("window_months must be positive")
+    start = pd.Timestamp(window_start).date() if window_start else (
+        pd.Timestamp(end) + pd.Timedelta(days=1) - pd.DateOffset(months=window_months)).date()
+    if start > end:
+        raise ValueError("window_start is after window_end")
+    return start, end, end + dt.timedelta(days=1)
 
 
-def extract_rfm_from_dwh(
-    engine: Engine = None,
-    source_code: str = "UCI_HISTORICAL",
-    window_months: int = 12,
-    window_start: datetime.date = None,
-    window_end: datetime.date = None
-) -> Tuple[pd.DataFrame, datetime.date, datetime.date, datetime.date]:
-    """
-    Trích xuất đặc trưng RFM trực tiếp từ Data Warehouse (FactSales + DimDate + DimCustomer):
-    - Áp dụng cửa sổ thời gian chuẩn mực 12 tháng gần nhất (Tuân thủ đề cương mục 5.1)
-    - Chỉ lấy giao dịch thành công (is_cancelled = FALSE, quantity > 0, total_amount > 0)
-    - Loại trừ khách hàng vãng lai (GUEST)
-    - Ngày tham chiếu T = ngày kết thúc cửa sổ + 1 ngày
-    """
-    if engine is None:
-        engine = get_dwh_engine()
+def calculate_rfm(transactions, reference_date):
+    frame = transactions.copy()
+    frame["invoice_date"] = pd.to_datetime(frame.invoice_date).dt.normalize()
+    frame["total_amount"] = pd.to_numeric(frame.total_amount)
+    frame["invoice_no"] = frame.invoice_no.astype(str)
+    if "source_code" not in frame:
+        raise ValueError("source_code is required to count invoices safely")
+    frame["invoice_identity"] = list(zip(frame.source_code, frame.invoice_no))
+    grouped = frame.groupby(["customer_key", "customer_code"], sort=True)
+    result = grouped.agg(last_purchase=("invoice_date", "max"),
+                         frequency=("invoice_identity", "nunique"),
+                         monetary=("total_amount", "sum")).reset_index()
+    result["recency"] = (pd.Timestamp(reference_date) - result.last_purchase).dt.days
+    result["monetary"] = result.monetary.round(4)
+    if (result.recency < 1).any():
+        raise ValueError("Reference date must be strictly after observation data")
+    return result.drop(columns="last_purchase")
 
-    # 1. Xác định mốc thời gian cửa sổ khảo sát (12 tháng gần nhất)
-    if window_end is None:
-        try:
-            with engine.connect() as conn:
-                max_res = conn.execute(
-                    text("""
-                        SELECT MAX(dd.full_date) 
-                        FROM fact_sales fs
-                        JOIN dim_date dd ON fs.date_key = dd.date_key
-                        JOIN dim_source ds ON fs.source_key = ds.source_key
-                        WHERE ds.source_code = :src 
-                          AND fs.is_cancelled = FALSE 
-                          AND fs.total_amount > 0
-                    """),
-                    {"src": source_code}
-                ).scalar()
-                if max_res:
-                    window_end = max_res
-        except Exception:
-            pass
 
-    # Nếu không truy vấn được từ DWH, dùng mốc max của tập UCI Online Retail II
-    if window_end is None:
-        window_end = datetime.date(2011, 12, 9)
+def purchase_predicate():
+    return """ds.source_code=:src AND fs.source_record_id IS NOT NULL
+        AND fs.provenance=:provenance AND fs.transaction_type='PURCHASE'
+        AND fs.is_cancelled=FALSE AND fs.quantity>0 AND fs.total_amount>0
+        AND dc.customer_code NOT LIKE 'GUEST%' AND dc.customer_code<>''"""
 
-    if isinstance(window_end, str):
-        window_end = pd.to_datetime(window_end).date()
-    elif isinstance(window_end, pd.Timestamp):
-        window_end = window_end.date()
 
-    if window_start is None:
-        window_start = window_end - datetime.timedelta(days=int(window_months * 30.5))
-    elif isinstance(window_start, str):
-        window_start = pd.to_datetime(window_start).date()
-
-    reference_date = window_end + datetime.timedelta(days=1)
-
-    print(f"🔍 [Data Mining - RFM] Trích xuất RFM từ FactSales ({source_code})...")
-    print(f"  + Cửa sổ phân tích ({window_months} tháng): từ {window_start} đến {window_end}")
-    print(f"  + Ngày tham chiếu T (sau cửa sổ 1 ngày): {reference_date}")
-    
-    query = text("""
-        SELECT 
-            fs.customer_key,
-            dc.customer_code,
-            dd.full_date AS invoice_date,
-            fs.invoice_no,
-            fs.total_amount
-        FROM fact_sales fs
-        JOIN dim_date dd ON fs.date_key = dd.date_key
-        JOIN dim_customer dc ON fs.customer_key = dc.customer_key
-        JOIN dim_source ds ON fs.source_key = ds.source_key
-        WHERE ds.source_code = :src
-          AND dd.full_date BETWEEN :w_start AND :w_end
-          AND fs.is_cancelled = FALSE
-          AND fs.quantity > 0
-          AND fs.total_amount > 0
-          AND dc.customer_code NOT LIKE 'GUEST%'
-    """)
-
-    try:
-        with engine.connect() as conn:
-            df = pd.read_sql(query, conn, params={
-                "src": source_code,
-                "w_start": window_start,
-                "w_end": window_end
-            })
-    except Exception as ex:
-        print(f"⚠️ Lỗi kết nối DWH ({ex}). Đang sử dụng fallback từ file raw/curated...")
-        # Fallback đọc từ file curated/raw để test offline
-        csv_path = os.path.join(BASE_DIR, "data_lake", "raw", "uci", "online_retail_II.csv")
-        raw_df = pd.read_csv(csv_path)
-        raw_df = raw_df.dropna(subset=["Customer ID"])
-        raw_df = raw_df[(raw_df["Quantity"] > 0) & (raw_df["Price"] > 0) & (~raw_df["Invoice"].astype(str).str.startswith("C"))]
-        
-        raw_df["inv_date"] = pd.to_datetime(raw_df["InvoiceDate"]).dt.date
-        # Lọc đúng cửa sổ 12 tháng
-        raw_df = raw_df[(raw_df["inv_date"] >= window_start) & (raw_df["inv_date"] <= window_end)]
-
-        df = pd.DataFrame({
-            "customer_key": raw_df["Customer ID"].astype(int),
-            "customer_code": raw_df["Customer ID"].astype(str).str.replace(".0", "", regex=False),
-            "invoice_date": raw_df["inv_date"],
-            "invoice_no": raw_df["Invoice"].astype(str),
-            "total_amount": raw_df["Quantity"] * raw_df["Price"]
-        })
-
-    if df.empty:
-        raise ValueError(f"Không tìm thấy giao dịch hợp lệ trong cửa sổ {window_start} -> {window_end} để tính RFM.")
-
-    # 2. Gom nhóm theo Khách hàng và tính R, F, M
-    rfm_records = []
-    grouped = df.groupby(["customer_key", "customer_code"])
-
-    for (c_key, c_code), group in grouped:
-        last_purchase = group["invoice_date"].max()
-        if isinstance(last_purchase, str):
-            last_purchase = pd.to_datetime(last_purchase).date()
-        elif isinstance(last_purchase, pd.Timestamp):
-            last_purchase = last_purchase.date()
-
-        r_days = (reference_date - last_purchase).days
-        f_invoices = group["invoice_no"].nunique()
-        m_total = round(float(group["total_amount"].sum()), 2)
-
-        if m_total > 0 and f_invoices > 0:
-            rfm_records.append({
-                "customer_key": c_key,
-                "customer_code": c_code,
-                "recency": float(r_days),
-                "frequency": int(f_invoices),
-                "monetary": float(m_total)
-            })
-
-    rfm_df = pd.DataFrame(rfm_records)
-    print(f"✅ Đã trích xuất thành công {len(rfm_df):,} khách hàng hợp lệ với đặc trưng RFM!")
-    return rfm_df, reference_date, window_start, window_end
+def extract_rfm_from_dwh(engine=None, source_code="UCI_HISTORICAL", window_months=12,
+                         window_start=None, window_end=None, allow_demo=False,
+                         return_details=False):
+    engine = engine or get_dwh_engine()
+    provenance = "DEMO" if allow_demo else "OFFICIAL_UCI"
+    params = {"src": source_code, "provenance": provenance}
+    joins = """FROM fact_sales fs JOIN dim_date dd ON fs.date_key=dd.date_key
+        JOIN dim_customer dc ON dc.customer_key=fs.customer_key
+        JOIN dim_source ds ON ds.source_key=fs.source_key"""
+    with engine.connect() as conn:
+        span = conn.execute(text(f"SELECT MIN(dd.full_date), MAX(dd.full_date) {joins} WHERE {purchase_predicate()}"), params).one()
+        if span[1] is None:
+            raise ValueError(f"No eligible DWH purchases for {source_code}/{provenance}. Run verified ETL first; demo requires allow_demo=True.")
+        start, end, reference = calendar_window(window_end or span[1], window_months, window_start)
+        if end > span[1]:
+            raise ValueError("Observation end exceeds last eligible source purchase")
+        params.update(w_start=start, w_end=end, reference=reference)
+        predicate = purchase_predicate() + " AND dd.full_date BETWEEN :w_start AND :w_end"
+        transactions = pd.read_sql(text(f"""SELECT fs.customer_key,dc.customer_code,ds.source_code,
+            dd.full_date AS invoice_date,fs.invoice_no,fs.total_amount,fs.currency,
+            fs.source_record_id,fs.raw_path,fs.batch_id {joins} WHERE {predicate}
+            ORDER BY fs.customer_key,dd.full_date,fs.source_record_id"""), conn, params=params)
+        if transactions.empty:
+            raise ValueError("No eligible customers in observation window")
+        currencies = transactions.currency.dropna().unique().tolist()
+        if len(currencies) != 1 or transactions.currency.isna().any():
+            raise ValueError("RFM must use exactly one known currency")
+        sql_rfm = pd.read_sql(text(f"""SELECT fs.customer_key,
+            CAST(:reference AS date)-MAX(dd.full_date) AS recency,
+            COUNT(DISTINCT (ds.source_code,fs.invoice_no)) AS frequency,
+            SUM(fs.total_amount) AS monetary {joins} WHERE {predicate}
+            GROUP BY fs.customer_key ORDER BY fs.customer_key"""), conn, params=params)
+    rfm = calculate_rfm(transactions, reference)
+    comparison = rfm.merge(sql_rfm, on="customer_key", suffixes=("_python", "_sql"))
+    for feature in ["recency", "frequency", "monetary"]:
+        comparison[f"{feature}_match"] = np.isclose(comparison[f"{feature}_python"].astype(float),
+                                                  comparison[f"{feature}_sql"].astype(float), atol=.00005, rtol=0)
+    if not comparison.filter(like="_match").all().all() or len(comparison) != len(rfm):
+        raise ValueError("Independent SQL/Python RFM comparison failed")
+    details = {"source_code": source_code, "provenance": provenance, "currency": currencies[0],
+               "available_start": str(span[0]), "available_end": str(span[1]),
+               "transaction_count": len(transactions), "source_batch_ids": sorted(transactions.batch_id.unique().tolist()),
+               "raw_paths": sorted(transactions.raw_path.dropna().unique().tolist()),
+               "sql_python_comparison": comparison, "transactions": transactions}
+    result = (rfm, reference, start, end)
+    return (*result, details) if return_details else result

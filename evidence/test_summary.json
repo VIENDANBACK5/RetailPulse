@@ -1,0 +1,69 @@
+{
+  "timestamp": "2026-10-21T10:12:59.846317+07:00",
+  "pytest": {
+    "tests": 58,
+    "passed": 58,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "duration_seconds": 39.052,
+    "categories": {
+      "optional_extension_mechanics": 15,
+      "core_unit_and_api_contract": 30,
+      "actual_database_or_http_integration": 13
+    },
+    "warnings": [
+      "Starlette TestClient httpx deprecation",
+      "pandas invalid-date fixture format inference"
+    ]
+  },
+  "node_sidebar": {
+    "tests": 6,
+    "passed": 6,
+    "failed": 0,
+    "evidence": "evidence/sidebar-tests.log"
+  },
+  "browser": {
+    "execution": "REAL_BROWSER",
+    "checks": [
+      {
+        "name": "UI_ETL_REAL_RUN",
+        "status": "PASS",
+        "run_id": "etl-20261021T031825-6e7ed2c596",
+        "batch_id": "BATCH-b86bc98211634e3797b549920b9f8c47"
+      },
+      {
+        "name": "OLAP_GBP_MONTH_CURRENCY_SELECTION",
+        "status": "PASS"
+      },
+      {
+        "name": "OLAP_DAY_SLICE_CURRENCY",
+        "status": "PASS"
+      },
+      {
+        "name": "OLAP_PIVOT_DRILLTHROUGH_LINEAGE",
+        "status": "PASS"
+      }
+    ],
+    "screenshots": [
+      "evidence/screenshots/01_overview.png",
+      "evidence/screenshots/02_etl_real_run.png",
+      "evidence/screenshots/03_olap_real_warehouse.png",
+      "evidence/screenshots/04_mining_registry.png"
+    ],
+    "javascript_errors": [],
+    "status": "PASS"
+  },
+  "limitations": [
+    "Power BI Desktop / DAX engine execution not available; SQL KPI execution is not a DAX engine test",
+    "Historical Autoencoder artifact schema only is not model-performance evidence",
+    "In-process broker / fixture FX / generated CRM configuration tests do not establish external service integration"
+  ],
+  "browser_checked_at": "2026-10-21T03:18:15.195868+00:00",
+  "presentation": {
+    "status": "PASS",
+    "slides": 15,
+    "evidence": "evidence/presentation/render_check.json",
+    "format": "HTML; no PPTX export claimed"
+  }
+}

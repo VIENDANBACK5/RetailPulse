@@ -23,7 +23,8 @@ def get_connection_url(section: str = "dwh") -> str:
     user = os.environ.get(f"{section.upper()}_USER", cfg.get("user", "postgres"))
     password = os.environ.get(f"{section.upper()}_PASSWORD", cfg.get("password", "postgres"))
     database = os.environ.get(f"{section.upper()}_DB", cfg.get("database", f"retail_{section}_db"))
-    return f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
+    from sqlalchemy.engine import URL
+    return URL.create('postgresql+psycopg2', username=user, password=password, host=host, port=int(port), database=database)
 
 
 def get_oltp_engine() -> Engine:
@@ -45,7 +46,15 @@ def init_dwh_schema(engine: Engine = None):
         with engine.begin() as conn:
             # Tách và thực thi các câu lệnh SQL
             conn.execute(text(sql_content))
-        print("✅ Đã khởi tạo schema Star Schema trong Data Warehouse thành công!")
+        migration = os.path.join(BASE_DIR, 'sql', '04_verified_contract.sql')
+        if os.path.exists(migration):
+            with engine.begin() as conn:
+                conn.execute(text('CREATE TABLE IF NOT EXISTS retailpulse_schema_versions(version TEXT PRIMARY KEY, applied_at TIMESTAMPTZ DEFAULT now())'))
+                if not conn.execute(text("SELECT 1 FROM retailpulse_schema_versions WHERE version='verified-contract-2'")).scalar():
+                    with open(migration, encoding='utf-8') as stream:
+                        conn.execute(text(stream.read()))
+                    conn.execute(text("INSERT INTO retailpulse_schema_versions(version) VALUES('verified-contract-2') ON CONFLICT DO NOTHING"))
+        print("DWH schema and verified contract initialized")
 
 
 def populate_dim_date(engine: Engine = None, start_year: int = 2008, end_year: int = 2027):
