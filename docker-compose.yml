@@ -11,11 +11,11 @@ services:
     container_name: retail-oltp-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${OLTP_POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${OLTP_POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: retail_app_db
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - oltp_data:/var/lib/postgresql/data
       - ./sql/01_init_oltp.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
@@ -38,11 +38,11 @@ services:
     container_name: retail-dwh-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${DWH_POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${DWH_POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: retail_dwh_db
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
       - dwh_data:/var/lib/postgresql/data
       - ./sql/02_init_dwh.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
@@ -70,16 +70,16 @@ services:
       POSTGRES_HOST: oltp-db
       POSTGRES_PORT: 5432
       POSTGRES_DB: retail_app_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      SECRET_KEY: btl_secret_key_ptit_2026
+      POSTGRES_USER: ${OLTP_POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${OLTP_POSTGRES_PASSWORD:-postgres}
+      SECRET_KEY: ${APP_SECRET_KEY:-btl_secret_key_ptit_2026}
       API_PREFIX: /api
       API_VERSION: v1
       DWH_HOST: dwh-db
       DWH_PORT: 5432
       DWH_DB: retail_dwh_db
-      DWH_READ_USER: retail_dashboard
-      DWH_READ_PASSWORD: retail-dashboard-local-only
+      DWH_READ_USER: ${DWH_READ_USER:-retail_dashboard}
+      DWH_READ_PASSWORD: ${DWH_READ_PASSWORD:-retail-dashboard-local-only}
     ports:
       - "8001:8000"
     depends_on:
@@ -131,10 +131,10 @@ services:
     container_name: retail-pgadmin
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@ptit.edu.vn
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@ptit.edu.vn}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
     ports:
-      - "5050:80"
+      - "127.0.0.1:5050:80"
     profiles:
       - tools
     depends_on:

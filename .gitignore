@@ -65,6 +65,7 @@ data_lake/raw/uci/*.csv
 # Local execution state and protected database backups
 data_lake/backups/
 data_lake/runs/
+data_lake/raw/secure_staging/
 evidence/browser-profile/
 .build/
 
