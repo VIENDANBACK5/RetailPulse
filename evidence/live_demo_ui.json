@@ -1,0 +1,96 @@
+{
+  "execution": "REAL_CHROME_REAL_OLTP_ETL_MINING",
+  "started_at": "2026-10-23T15:24:12.906538+00:00",
+  "idempotency_key": "ui-demo-797efd245fb94ae79cea54af584e7164",
+  "checks": [
+    {
+      "name": "PREPARE_OWNED_THREE_OLTP_ROWS",
+      "status": "PASS",
+      "warehouse_before": 0
+    },
+    {
+      "name": "OFFICIAL_FILE_RAW_PREVIEW",
+      "status": "PASS"
+    },
+    {
+      "name": "ACTUAL_ETL_AND_SESSION_SQL_KPI",
+      "status": "PASS",
+      "actual": {
+        "rows": 3,
+        "gross_purchase_value": 325000.0,
+        "return_value": 0.0,
+        "cancellation_value": 50000.0,
+        "net_sales": 325000.0,
+        "order_count": 1,
+        "quantity_sold": 3,
+        "currency": "VND"
+      }
+    },
+    {
+      "name": "THREE_FACT_LINES_TRACE_TO_RAW",
+      "status": "PASS"
+    },
+    {
+      "name": "FROZEN_RAW_REPLAY_IDEMPOTENT",
+      "status": "PASS",
+      "session_observation": {
+        "run_id": "etl-20261023T152436-f5661140c8",
+        "batch_id": "BATCH-b146e77d1d7c47c4bbf51e787a56ed3f",
+        "rows": 3,
+        "inserted": 0,
+        "updated": 0,
+        "unchanged": 3
+      },
+      "source_counts": {
+        "inserted": 0,
+        "updated": 0,
+        "unchanged": 35,
+        "target_count": 35,
+        "target_amount": 9980000.0,
+        "mismatches": 0,
+        "source_amount": 9980000.0,
+        "reconciliation": "MATCHED"
+      }
+    },
+    {
+      "name": "DN_OFFLINE_AND_RECOVERY_PRESERVE_STOCK",
+      "status": "PASS",
+      "sku_count": 20
+    },
+    {
+      "name": "OLAP_DEEPLINK_AND_PERSISTED_SESSION_RETURN",
+      "status": "PASS"
+    },
+    {
+      "name": "ACTUAL_FIFTY_FIT_MINING_AND_SNAPSHOT",
+      "status": "PASS",
+      "run_id": "mining-20261023T152521-c7d284951f",
+      "selected_k": 2,
+      "persisted_customers": 4317
+    },
+    {
+      "name": "SEVEN_CHAPTERS_MOBILE_FIT_AND_NO_JS_ERRORS",
+      "status": "PASS"
+    }
+  ],
+  "status": "PASS",
+  "session_id": "demo-264e2a5ebdd7d23de88b",
+  "source_item_ids": [
+    "33",
+    "34",
+    "35"
+  ],
+  "source_order_codes": [
+    "RP-DEMO-264e2a5ebdd7d23de88b-BUY",
+    "RP-DEMO-264e2a5ebdd7d23de88b-CANCEL"
+  ],
+  "runs": {
+    "run-demo-etl": "etl-20261023T152418-9971434598",
+    "replay-demo": "etl-20261023T152436-f5661140c8",
+    "outage-demo": "etl-20261023T152448-b58f629f37",
+    "recover-demo": "etl-20261023T152502-7114a78cc4",
+    "run-demo-mining": "mining-20261023T152521-c7d284951f"
+  },
+  "javascript_errors": [],
+  "finished_at": "2026-10-23T15:25:58.163992+00:00"
+}

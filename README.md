@@ -63,3 +63,11 @@ Bản kiểm kê SYSTEM_CURRENT_STATE_REVIEW.md và README cũ trong docs/archiv
 Profile này bật MinIO và bốn DAG Airflow thật. Airflow mặc định paused, chỉ chạy khi trigger. Không cần Airflow thì dùng -WithLake; không có flag thì local Raw như trước. Portal giữ cổng8010, thêm [Báo cáo tổng hợp](http://127.0.0.1:8010/frontend/reports.html); MinIO9001, Airflow18082.
 
 MinIO manifest được đọc/checksum trước load, replay không collect lại. Latest customer report chỉ chọn run SUCCESS, Analytics dùng tài khoản đọc. Xem [báo cáo sau tích hợp](docs/DANH_INTEGRATION_REPORT.md), [demo mới](docs/DANH_DEMO_GUIDE.md). Các kết quả test trong phần trước thuộc lần bàn giao cũ; kết quả mới đọc báo cáo tích hợp.
+## Giao diện và demo dùng khi bảo vệ
+
+Mở **http://127.0.0.1:8010/frontend/demo-guide.html**. Các trang RetailPulse đã dùng chung menu, font, màu sắc và API client; kịch bản tạo đơn DEMO, ETL/Raw/DWH, replay, offline/recovery và mining nằm trên một luồng trình bày.
+
+- [Kịch bản nói–bấm12–15phút](docs/DEMO_THUC_TE_12_PHUT.md)
+- [Bàn giao UI/demo và bằng chứng đã chạy](docs/PORTAL_DEMO_HANDOFF.md)
+
+Khởi động profile demo: `.\START_RETAILPULSE.ps1 -WithLake`. Chỉ mở MinIO/Airflow khi cần giải thích hạ tầng.

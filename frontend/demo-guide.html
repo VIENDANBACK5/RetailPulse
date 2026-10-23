@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Demo thực tế · RetailPulse</title>
+  <link rel="stylesheet" href="css/portal.css"><link rel="stylesheet" href="css/demo-guide.css">
+</head>
+<body data-page="demo-guide">
+  <div id="portal-shell"></div>
+  <main id="main">
+    <div class="eyebrow">Kịch bản bảo vệ · 12–15 phút</div>
+    <h1>Một đơn hàng đi qua hệ thống thế nào?</h1>
+    <p class="subtitle">Tạo dữ liệu DEMO trong PostgreSQL, chạy ETL thật, xem Raw, kiểm chứng Warehouse và phân tích. Mọi trạng thái và số liệu bên dưới được đọc từ backend.</p>
+    <div id="demo-message" role="status" aria-live="polite" class="notice">Đang đọc trạng thái hệ thống…</div>
+    <section class="panel demo-session">
+      <div><h2>Buổi demo cửa hàng bán lẻ</h2><p>Khách ở HN mua <strong>325.000đ</strong>. Một đơn tại DN bị hủy, trị giá <strong>50.000đ</strong>. Net sales của phiên phải là <strong>325.000đ</strong>.</p><small>Đây là kỳ vọng của kịch bản, chưa phải kết quả đo. Phiên này không tự trừ tồn kho API độc lập.</small></div>
+      <div class="demo-session-actions"><label>Tên buổi demo<input id="session-label" value="Bảo vệ RetailPulse" maxlength="160"></label><button id="prepare-session" class="primary">Tạo phiên demo trong nguồn</button><button id="new-session">Bắt đầu phiên mới</button><small id="session-id">Chưa có phiên được chọn.</small></div>
+    </section>
+    <nav class="demo-stepper" aria-label="Các bước demo">
+      <button data-step="0" aria-current="step">01 · Nguồn</button><button data-step="1">02 · ETL & Raw</button><button data-step="2">03 · DWH & KPI</button><button data-step="3">04 · Chạy lại</button><button data-step="4">05 · Mất kết nối</button><button data-step="5">06 · OLAP</button><button data-step="6">07 · Khai phá</button>
+    </nav>
+    <section class="panel demo-chapter" data-demo-step="0">
+      <div class="eyebrow">01 / 2 phút</div><h2>Chỉ ra ba nguồn và đúng xuất xứ</h2>
+      <p class="demo-say">“Dữ liệu bán lẻ lịch sử đến từ File UCI chính thức. Phần chạy trực tiếp hôm nay dùng đơn hàng và API tồn kho có nhãn DEMO, bằng VND.”</p>
+      <h3>Đơn hàng vừa tạo trong PostgreSQL OLTP</h3><div id="source-orders" class="empty">Tạo phiên demo để xem ba dòng hàng thật trong nguồn.</div>
+      <details><summary>File UCI chính thức đã dùng cho thực nghiệm</summary><div id="official-evidence"></div><button id="preview-file">Xem 5 dòng Raw từ File</button> <button id="preview-rejected">Xem 5 dòng bị loại và lý do</button><div id="file-preview"></div><div id="rejected-preview"></div></details>
+      <details><summary>Nguồn API tồn kho và trạng thái thu thập gần nhất</summary><div id="source-inventory"></div><p class="muted">HN/DN/SG là ba endpoint của cùng ứng dụng demo. Phần mất kết nối được kiểm tra ở bước05.</p></details>
+    </section>
+    <section class="panel demo-chapter" data-demo-step="1" hidden>
+      <div class="eyebrow">02 / 2 phút</div><h2>Chạy ETL và xem dữ liệu đã đi đâu</h2>
+      <p class="demo-say">“Tôi thu thập đơn hàng và API, lưu Raw có checksum, kiểm tra dữ liệu, rồi nạp và đối soát bằng SQL.”</p>
+      <p>Luồng chạy trực tiếp là DB + API. File UCI lớn đã có lần thực thi đầy đủ, được mở ở bước01 và bước07.</p>
+      <button id="run-demo-etl" class="primary" data-needs-session>Chạy ETL cho DB + API</button>
+      <button id="refresh-status">Đọc lại trạng thái và dữ liệu</button>
+      <h3 class="demo-spaced">Raw của lần nạp phiên demo</h3><div id="demo-raw" class="empty">Chưa chọn lần nạp cho phiên này.</div><div id="demo-raw-preview"></div>
+      <details><summary>Chi tiết hạ tầng khi thầy hỏi</summary><p>MinIO lưu object/manifest, Airflow điều phối task. Không cần rời portal để chứng minh số liệu của phiên.</p><a class="button" href="http://127.0.0.1:9001" target="_blank" rel="noopener">MinIO Console</a> <a class="button" href="http://127.0.0.1:18082" target="_blank" rel="noopener">Airflow</a></details>
+    </section>
+    <section class="panel demo-chapter" data-demo-step="2" hidden>
+      <div class="eyebrow">03 / 2 phút</div><h2>Đối chiếu từng dòng nguồn với Warehouse</h2>
+      <p class="demo-say">“Hai dòng của đơn mua được cộng 325.000đ. Đơn hủy giữ riêng 50.000đ, không làm tăng Net Sales. Đây là kết quả SQL của đúng phiên tôi vừa tạo.”</p>
+      <div id="session-kpis"></div><div id="session-checks"></div><div id="warehouse-orders"></div>
+      <details><summary>KPI toàn nguồn trước và sau, cùng đơn vị VND</summary><p class="muted">Chênh lệch toàn nguồn có thể bao gồm những phiên khác. Bảng KPI phiên bên trên mới là phép đối chiếu ba dòng của phiên này.</p><div id="global-kpis"></div></details>
+    </section>
+    <section class="panel demo-chapter" data-demo-step="3" hidden>
+      <div class="eyebrow">04 / 1 phút</div><h2>Chạy lại đúng Raw để kiểm tra chống trùng</h2>
+      <p class="demo-say">“Tôi xử lý lại chính bản Raw đã thu thập. Nếu pipeline đúng, số dòng chèn mới và cập nhật bằng0, tổng tiền không tăng.”</p>
+      <button id="replay-demo" class="primary" data-needs-session>Replay Raw của lần nạp phiên</button>
+      <div id="replay-proof" class="empty">Cần hoàn thành bước02 trước.</div>
+    </section>
+    <section class="panel demo-chapter" data-demo-step="4" hidden>
+      <div class="eyebrow">05 / 2 phút</div><h2>DN mất kết nối và khôi phục</h2>
+      <p class="demo-say">“Mất kết nối nghĩa là chưa thu thập được dữ liệu mới. Hệ thống giữ tồn kho đã biết, đánh dấu nguồn lỗi và trả PARTIAL.”</p>
+      <p>Thử nghiệm này tạo lỗi HTTP thật bằng cách cho riêng DN đi vào endpoint không kết nối được. Nó không chứng minh ba máy chủ vật lý độc lập.</p>
+      <button id="outage-demo">Chạy API với DN mất kết nối</button> <button id="recover-demo" class="primary">Khôi phục thu thập bình thường</button>
+      <div id="outage-proof" class="empty">Chưa chạy tình huống lỗi trong phiên này.</div><div id="inventory-comparison"></div>
+    </section>
+    <section class="panel demo-chapter" data-demo-step="5" hidden>
+      <div class="eyebrow">06 / 2 phút</div><h2>Giải thích OLAP bằng số liệu vừa thay đổi</h2>
+      <p class="demo-say">“Từ Warehouse tôi phân tích theo thời gian, sản phẩm và nguồn. Tôi có thể mở số tổng hợp xuống đúng giao dịch và bản Raw.”</p>
+      <ol><li>Chọn nguồn App, tiền VND; xem số mua và số hủy.</li><li>Đổi cấp tháng sang ngày: drill-down. Đổi ngược: roll-up.</li><li>Lọc đồng thời ngày và sản phẩm: slice/dice.</li><li>Pivot sản phẩm × thời gian, rồi drill-through tới đơn của phiên.</li></ol>
+      <a id="open-olap" class="button primary" href="dashboard.html?source=APP_OPERATIONAL&amp;currency=VND">Mở OLAP với bộ lọc VND</a> <a class="button" href="reports.html">Mở báo cáo tổng hợp</a>
+      <p class="muted">Các trang dùng cùng menu, màu sắc và cách thao tác. Nhấn Demo thực tế trên menu để quay lại phiên đang trình bày.</p>
+    </section>
+    <section class="panel demo-chapter" data-demo-step="6" hidden>
+      <div class="eyebrow">07 / 2–3 phút</div><h2>Khai phá trên lịch sử UCI đã xác minh</h2>
+      <p class="demo-say">“Vài đơn demo không đủ để phân cụm có ý nghĩa. Tôi dùng lịch sử UCI thật để tính RFM, thử K, kiểm tra nhiều seed và đánh giá hành vi ở giai đoạn tương lai.”</p>
+      <button id="show-mining">Đọc mô hình SUCCESS gần nhất</button> <button id="run-demo-mining" class="primary">Chạy lại RFM và chọn K thật</button>
+      <div id="demo-mining" class="empty">Đang đọc thực nghiệm đã có…</div><a class="button" href="customer-segments.html">Mở đầy đủ thực nghiệm và artifact</a>
+    </section>
+    <section id="demo-run-panel" class="panel" hidden>
+      <div class="row between"><div><h2>Lần thực thi đang theo dõi</h2><code id="demo-run-id"></code></div><span id="demo-run-status" class="badge">Chưa đọc</span></div>
+      <p id="demo-run-note" class="muted"></p><div id="demo-run-counts"></div>
+      <details><summary>Log backend và đối soát SQL</summary><div id="demo-reconciliation"></div><div id="demo-run-logs"></div></details>
+    </section>
+    <div class="row between demo-navigation"><button id="previous-step">Bước trước</button><span id="chapter-label">01 / 07</span><button id="next-step" class="primary">Bước tiếp</button></div>
+    <details class="panel"><summary>Kết luận và câu hỏi bảo vệ thường gặp</summary><p>Raw giữ dữ liệu gốc; DWH tổ chức dữ liệu cho phân tích; OLAP trả lời các câu hỏi tổng hợp; Data Mining phát hiện và đánh giá nhóm hành vi. Một biểu đồ hoặc nhãn cụm tự nó chưa chứng minh dữ liệu đúng.</p><p>Không cộng GBP với VND. Inventory là snapshot bán cộng. Các tỷ lệ mua lại giữa cụm là quan sát, chưa chứng minh tác động marketing. Web BI và file Power BI là hai sản phẩm khác nhau; Desktop report chưa có bằng chứng refresh.</p></details>
+  </main>
+  <div id="portal-footer"></div>
+  <script type="module" src="js/portal-shell.js"></script><script type="module" src="js/demo-guide.js"></script>
+</body></html>

@@ -85,7 +85,7 @@ $controlHealthy = $false
 try { $health = Invoke-RestMethod 'http://127.0.0.1:8010/api/health' -TimeoutSec 5; $controlHealthy = $health.execution -eq 'REAL' } catch {}
 if ($controlHealthy) {
     $expectedBackend = if ($env:LAKE_BACKEND) { $env:LAKE_BACKEND } else { 'local' }
-    if ($health.lake_backend -ne $expectedBackend -or $health.app_id -ne 'retailpulse-control-v2') {
+    if ($health.lake_backend -ne $expectedBackend -or $health.app_id -ne 'retailpulse-control-v4') {
         if ($health.active_run) { throw "Control API is processing $($health.active_run). Wait before changing lake mode." }
         # Only restart the verified RetailPulse uvicorn listener, never an unrelated port owner.
         $listeners = @(Get-NetTCPConnection -LocalPort 8010 -State Listen -ErrorAction SilentlyContinue)

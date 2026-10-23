@@ -1,14 +1,10 @@
+import {controlAPI} from './api-client.js';
 const API = '/api';
 const $ = id => document.getElementById(id);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, x => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
 const fmt = value => typeof value === 'number' ? value.toLocaleString('vi-VN', {maximumFractionDigits: 2}) : String(value ?? '—');
 const badge = status => `<span class="badge ${esc(status)}">${esc(status || 'UNKNOWN')}</span>`;
-async function api(path, options) {
-  const response = await fetch(API + path, options);
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.detail || JSON.stringify(data));
-  return data;
-}
+const api = controlAPI;
 function error(target, exception) {$(target).innerHTML = `<div class="error">${esc(exception.message)}</div>`;}
 function table(target, data, columns) {
   if (!Array.isArray(data) || !data.length) {$(target).innerHTML = '<div class="empty">Chưa có bản ghi cho lựa chọn này.</div>'; return;}
@@ -21,10 +17,6 @@ function table(target, data, columns) {
   });
 }
 function json(target, data) {$(target).innerHTML = `<pre>${esc(JSON.stringify(data,null,2))}</pre>`;}
-async function health() {
-  try {const data = await api('/health'); $('connection').textContent = '● DWH connected · ' + data.warehouse.database + (data.lake_backend === 's3' ? ' · MinIO Raw' : ' · Local Raw');}
-  catch(e) {$('connection').textContent = '● DWH unavailable';}
-}
 async function loadSources(includeRaw=true) {
   try {const data=await api('/sources'); table('sources',data.sources);table('source-status',data.collection_status,['branch_code','status','item_count','snapshot_time','collected_at','error']);table('manifest-status',data.manifests.map(m=>({...m,lake_uri:m.metadata?.lake_uri||'',lake_manifest_key:m.metadata?.lake_manifest_key||''})),['run_id','source_code','provenance','record_count','currency','checksum','raw_path','lake_uri','lake_manifest_key']);$('source-note').textContent=data.note;}
   catch(e) {error('sources',e);}
@@ -85,13 +77,17 @@ async function details() {try{const p=salesParams();p.delete('grain');p.delete('
 async function crossTab(){try{const p=salesParams();p.set('dimension',$('pivot').value==='time'?'product':$('pivot').value);p.delete('pivot');const r=await api('/analytics/pivot?'+p);table('cross-tab',r.rows,r.columns);$('pivot-note').textContent=r.note+(r.truncated?' TRUNCATED: narrow filters.':'');}catch(e){error('cross-tab',e);}}
 async function loadInventory(){try{table('inventory',await api('/analytics/inventory'),['branch_code','stock_code','stock_on_hand','snapshot_time','node_status','data_status','freshness_hours','last_successful_update','inventory_health_status']);}catch(e){error('inventory',e);}}
 async function loadSegments(){try{const params=new URLSearchParams();if($('model-version')?.value.trim())params.set('model_version',$('model-version').value.trim());if($('model-run')?.value.trim())params.set('run_id',$('model-run').value.trim());const data=await api('/analytics/segments?'+params);table('profiles',data.profiles);table('customers',data.customers);$('segment-note').textContent=data.selection;}catch(e){error('profiles',e);}}
-async function loadModels(){try{const data=await api('/models');$('models').innerHTML=data.length?data.map(r=>{
+async function loadModels(){try{const data=await api('/models');$('models').innerHTML=data.length?data.map((r,index)=>{
   const meta=r.metadata?.result||r.metadata||{};
   const files=(meta.artifact_paths||[]).filter(p=>/\.(csv|json|png|txt)$/i.test(p));
-  return `<details class="panel" ${r.status==='SUCCESS'?'open':''}><summary>${esc(r.run_id)} ${badge(r.status)}</summary><div class="row"><div><small>Selected K</small><div class="kpi">${esc(meta.selected_k??'—')}</div></div><div><small>Verified customers</small><div class="kpi">${fmt(meta.persisted_customers??null)}</div></div></div><p class="provenance">${esc(JSON.stringify(meta.dataset||{}))}</p><div class="row">${files.map(p=>`<a class="button" href="/api/artifacts?path=${encodeURIComponent(p)}" target="_blank" rel="noopener">${esc(p.split(/[\\/]/).pop())}</a>`).join('')}</div><pre>${esc(JSON.stringify(meta.evaluation||meta,null,2))}</pre><details><summary>Full reproducibility metadata</summary><pre>${esc(JSON.stringify(meta,null,2))}</pre></details></details>`;
+  return `<details class="panel" ${r.run_id===data.find(x=>x.status==='SUCCESS')?.run_id?'open':''}><summary>${esc(r.run_id)} ${badge(r.status)}</summary><div class="row"><div><small>Selected K</small><div class="kpi">${esc(meta.selected_k??'—')}</div></div><div><small>Verified customers</small><div class="kpi">${fmt(meta.persisted_customers??null)}</div></div></div><p class="provenance">${esc(JSON.stringify(meta.dataset||{}))}</p><div class="row">${files.map(p=>`<a class="button" href="/api/artifacts?path=${encodeURIComponent(p)}" target="_blank" rel="noopener">${esc(p.split(/[\\/]/).pop())}</a>`).join('')}</div><details><summary>Evaluation details</summary><pre>${esc(JSON.stringify(meta.evaluation||meta,null,2))}</pre></details><details><summary>Full reproducibility metadata</summary><pre>${esc(JSON.stringify(meta,null,2))}</pre></details></details>`;
 }).join(''):'<div class="empty">Chưa có thực nghiệm từ run registry. Artifact lịch sử không được tự coi là kết quả đã kiểm chứng.</div>'; }catch(e){error('models',e);}}
 document.addEventListener('DOMContentLoaded',async()=>{
-  await health();const page=document.body.dataset.page;
+  const deepFilters = new URLSearchParams(location.search);
+for (const key of ['source','currency','start','end','product','country','model-run','model-version']) {
+  if ($(key) && deepFilters.has(key)) $(key).value = deepFilters.get(key);
+}
+const page=document.body.dataset.page;
   document.querySelectorAll('[data-refresh]').forEach(b=>b.onclick=()=>location.reload());
   if(page==='etl'){await loadSources();await loadRuns();$('run-etl').onclick=()=>trigger('etl');document.querySelectorAll('[data-records]').forEach(b=>b.onclick=()=>showRecords(b.dataset.records));$('raw-all').onclick=()=>loadRaw();setInterval(loadRuns,3500);}
   if(page==='dashboard'){await loadSales();await loadInventory();await loadSegments();$('apply-filters').onclick=loadSales;$('drill-through').onclick=details;$('pivot-table').onclick=crossTab;$('refresh-inventory').onclick=loadInventory;}

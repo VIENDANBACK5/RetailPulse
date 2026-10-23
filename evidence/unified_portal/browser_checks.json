@@ -1,0 +1,115 @@
+{
+  "execution": "REAL_BROWSER_REAL_API",
+  "checked_at": "2026-10-23T15:16:01.088995+00:00",
+  "checks": [
+    {
+      "page": "index.html",
+      "width": 1440,
+      "status": "PASS",
+      "viewport": 1440,
+      "document": 1440,
+      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
+      "header": "rgb(24, 45, 67)"
+    },
+    {
+      "page": "etl-monitor.html",
+      "width": 1440,
+      "status": "PASS",
+      "viewport": 1440,
+      "document": 1440,
+      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
+      "header": "rgb(24, 45, 67)"
+    },
+    {
+      "page": "dashboard.html",
+      "width": 1440,
+      "status": "PASS",
+      "viewport": 1440,
+      "document": 1440,
+      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
+      "header": "rgb(24, 45, 67)"
+    },
+    {
+      "page": "customer-segments.html",
+      "width": 1440,
+      "status": "PASS",
+      "viewport": 1440,
+      "document": 1440,
+      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
+      "header": "rgb(24, 45, 67)"
+    },
+    {
+      "page": "reports.html",
+      "width": 1440,
+      "status": "PASS",
+      "viewport": 1440,
+      "document": 1440,
+      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
+      "header": "rgb(24, 45, 67)"
+    },
+    {
+      "page": "operations.html",
+      "width": 1440,
+      "status": "PASS",
+      "viewport": 1440,
+      "document": 1440,
+      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
+      "header": "rgb(24, 45, 67)"
+    },
+    {
+      "page": "index.html",
+      "width": 390,
+      "status": "PASS",
+      "viewport": 390,
+      "document": 390,
+      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
+      "header": "rgb(24, 45, 67)"
+    },
+    {
+      "page": "etl-monitor.html",
+      "width": 390,
+      "status": "PASS",
+      "viewport": 390,
+      "document": 390,
+      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
+      "header": "rgb(24, 45, 67)"
+    },
+    {
+      "page": "dashboard.html",
+      "width": 390,
+      "status": "PASS",
+      "viewport": 390,
+      "document": 390,
+      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
+      "header": "rgb(24, 45, 67)"
+    },
+    {
+      "page": "customer-segments.html",
+      "width": 390,
+      "status": "PASS",
+      "viewport": 390,
+      "document": 390,
+      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
+      "header": "rgb(24, 45, 67)"
+    },
+    {
+      "page": "reports.html",
+      "width": 390,
+      "status": "PASS",
+      "viewport": 390,
+      "document": 390,
+      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
+      "header": "rgb(24, 45, 67)"
+    },
+    {
+      "page": "operations.html",
+      "width": 390,
+      "status": "PASS",
+      "viewport": 390,
+      "document": 390,
+      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
+      "header": "rgb(24, 45, 67)"
+    }
+  ],
+  "status": "PASS"
+}

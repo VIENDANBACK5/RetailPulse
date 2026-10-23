@@ -1,3 +1,5 @@
+> Kịch bản trình bày được khuyến nghị hiện tại là [DEMO_THUC_TE_12_PHUT.md](DEMO_THUC_TE_12_PHUT.md), chạy trên trang Demo thực tế trong portal thống nhất. Các hướng dẫn bên dưới giữ làm tài liệu kỹ thuật chi tiết.
+
 # Hướng dẫn demo RetailPulse
 
 ## 1. Chuẩn bị và khởi động

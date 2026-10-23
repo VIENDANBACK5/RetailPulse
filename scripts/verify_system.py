@@ -112,7 +112,13 @@ def main(browser=True):
     step(5, 'Raw bytes match persisted source manifest checksums', raw)
 
     def etl():
-        items = sql('SELECT s.source_code,count(*) AS rows,sum(f.total_amount) AS signed_amount FROM fact_sales f JOIN dim_source s USING(source_key) WHERE f.source_record_id IS NOT NULL GROUP BY s.source_code')
+        # Verify the executed batch's identities, not a frozen global total:
+        # new labelled demo orders legitimately increase the live warehouse.
+        items = sql('''SELECT s.source_code,count(*) AS rows,sum(f.total_amount) AS signed_amount
+            FROM etl_batch_records b JOIN fact_sales f
+              ON f.source_key=b.source_key AND f.source_record_id=b.source_record_id
+            JOIN dim_source s ON s.source_key=b.source_key
+            WHERE b.run_id=:run GROUP BY s.source_code''', {'run': full['full']['run_id']})
         by_source = {r['source_code']: r for r in items}
         assert by_source['UCI_HISTORICAL']['rows'] == 1061164
         assert by_source['APP_OPERATIONAL']['rows'] == 29

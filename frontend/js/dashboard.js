@@ -1,9 +1,10 @@
+import {requestJSON} from './api-client.js';
 import { initClock } from './clock.js';
 import { number as n, money, short, escapeHTML as e, dateLabel as date, monthRange, csvText } from './analytics-utils.mjs';
 
 initClock();
 const $ = id => document.getElementById(id);
-const apiBase = window.RETAIL_API_BASE || (location.port === '8001' || location.port === '' ? '/api/v1/analytics' : `${location.protocol}//${location.hostname}:8001/api/v1/analytics`);
+const apiBase = '/api/reports';
 const colors = ['#a9562b', '#3569aa', '#157456', '#7d899b', '#947052', '#9c6214'];
 const state = { active: 'sales', meta: null, data: {}, requests: {}, pages: { inventory: 1, customers: 1 } };
 const branchName = code => ({ UNKNOWN: 'Không xác định (UCI)', HN: 'Hà Nội', DN: 'Đà Nẵng', SG: 'TP. Hồ Chí Minh' })[code] || code;
@@ -12,13 +13,7 @@ const badge = (text, kind = '') => `<span class="report-badge ${kind}">${e(text)
 
 async function get(path, params = {}, signal) {
   const query = new URLSearchParams(Object.entries(params).filter(([, value]) => value !== '' && value != null));
-  const response = await fetch(`${apiBase}/${path}?${query}`, { signal, headers: { Accept: 'application/json' }, cache: 'no-store' });
-  if (!response.ok) {
-    let body;
-    try { body = await response.json(); } catch { /* An upstream HTML error is not user-facing content. */ }
-    throw new Error(typeof body?.detail === 'string' ? body.detail : `Không tải được dữ liệu (HTTP ${response.status}). Vui lòng thử lại.`);
-  }
-  return response.json();
+  return requestJSON(`${apiBase}/${path}?${query}`, { signal });
 }
 
 function message(text = '', kind = '') {
@@ -63,13 +58,9 @@ async function load(kind = state.active) {
       message();
       $('read-at').textContent = `Đọc lúc ${new Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '2-digit' }).format(new Date())}`;
     }
-    $('connection-label').textContent = 'Dữ liệu từ warehouse';
-    $('connection-label').classList.remove('unavailable');
   } catch (error) {
     if (error.name === 'AbortError') return;
     if (state.active === kind) message(`${error.message} Không hiển thị số liệu cũ hoặc dữ liệu mẫu.`, 'error');
-    $('connection-label').textContent = 'Chưa đọc được dữ liệu';
-    $('connection-label').classList.add('unavailable');
   } finally {
     if (state.requests[kind] === controller) panel.setAttribute('aria-busy', 'false');
   }
@@ -238,8 +229,6 @@ async function initialize() {
   } catch (error) {
     state.meta = null;
     message(`${error.message} Hãy kiểm tra backend tại cổng 8001 và warehouse.`, 'error');
-    $('connection-label').textContent = 'Chưa kết nối';
-    $('connection-label').classList.add('unavailable');
   }
 }
 

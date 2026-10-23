@@ -1,0 +1,1195 @@
+{
+  "execution": "REAL_HTTP_REAL_ETL",
+  "started_at": "2026-10-23T15:27:21.030993+00:00",
+  "checks": [
+    {
+      "name": "PREPARE_SOURCE_ORDERS_IDEMPOTENT",
+      "status": "PASS",
+      "rows": 3,
+      "warehouse_before": {
+        "rows": 3,
+        "gross_purchase_value": 325000.0,
+        "return_value": 0.0,
+        "cancellation_value": 50000.0,
+        "net_sales": 325000.0,
+        "order_count": 1,
+        "quantity_sold": 3,
+        "currency": "VND"
+      },
+      "verification_before": "MATCHED"
+    },
+    {
+      "name": "ACTUAL_SOURCE_RAW_DWH_KPI",
+      "status": "PASS",
+      "actual": {
+        "rows": 3,
+        "gross_purchase_value": 325000.0,
+        "return_value": 0.0,
+        "cancellation_value": 50000.0,
+        "net_sales": 325000.0,
+        "order_count": 1,
+        "quantity_sold": 3,
+        "currency": "VND"
+      }
+    },
+    {
+      "name": "FROZEN_RAW_REPLAY_IDEMPOTENT",
+      "status": "PASS",
+      "counts": {
+        "inserted": 0,
+        "updated": 0,
+        "unchanged": 35,
+        "target_count": 35,
+        "target_amount": 9980000.0,
+        "mismatches": 0,
+        "source_amount": 9980000.0,
+        "reconciliation": "MATCHED"
+      },
+      "session_counts": {
+        "run_id": "etl-20261023T152742-bc742ee066",
+        "batch_id": "BATCH-d89f48474d1b4ee2a0bd70af8ac2873c",
+        "rows": 3,
+        "inserted": 0,
+        "updated": 0,
+        "unchanged": 3
+      }
+    }
+  ],
+  "session_id": "demo-264e2a5ebdd7d23de88b",
+  "expected": {
+    "rows": 3,
+    "currency": "VND",
+    "net_sales": 325000,
+    "order_count": 1,
+    "return_value": 0,
+    "quantity_sold": 3,
+    "cancellation_value": 50000,
+    "gross_purchase_value": 325000
+  },
+  "first_run_id": "etl-20261023T152722-5a47bd93a7",
+  "first_run": {
+    "run_id": "etl-20261023T152722-5a47bd93a7",
+    "batch_id": "etl-20261023T152722-5a47bd93a7",
+    "kind": "etl",
+    "params": {
+      "sources": [
+        "app",
+        "api"
+      ]
+    },
+    "status": "SUCCESS",
+    "created_at": "2026-10-23T15:27:22.248407+00:00",
+    "started_at": "2026-10-23T15:27:22.265040+00:00",
+    "finished_at": "2026-10-23T15:27:29.315212+00:00",
+    "metadata": {
+      "run_id": "etl-20261023T152722-5a47bd93a7",
+      "batch_id": "BATCH-e029a3a308e44755b3ec2b1fe3aaa88d",
+      "status": "SUCCESS",
+      "sources": {
+        "app": {
+          "input_manifest": "raw/source=app/ingest_date=2026-10-23/batch_id=BATCH-e029a3a308e44755b3ec2b1fe3aaa88d/manifest.json",
+          "lake_uri": "s3://retailpulse-raw/raw/source=app/ingest_date=2026-10-23/batch_id=BATCH-e029a3a308e44755b3ec2b1fe3aaa88d/orders.csv",
+          "status": "SUCCESS",
+          "source_status": "AVAILABLE",
+          "raw_count": 35,
+          "valid_count": 35,
+          "rejected_count": 0,
+          "provenance": "DEMO",
+          "currency": "VND",
+          "counts": {
+            "inserted": 0,
+            "updated": 0,
+            "unchanged": 35,
+            "target_count": 35,
+            "target_amount": 9980000.0,
+            "mismatches": 0,
+            "source_amount": 9980000.0,
+            "reconciliation": "MATCHED"
+          },
+          "reconciliation": {
+            "batch_id": "BATCH-e029a3a308e44755b3ec2b1fe3aaa88d",
+            "source_code": "APP_OPERATIONAL",
+            "source_records_count": 35,
+            "dwh_records_inserted": 0,
+            "rejected_records_count": 0,
+            "source_total_amount": 9980000.0,
+            "dwh_total_amount": 9980000.0,
+            "diff_amount": "0.0",
+            "status": "MATCHED",
+            "notes": "Exact source identity set; per-source, per-currency; purchases/returns/cancellations retained separately",
+            "currency": "VND",
+            "updated_count": 0,
+            "unchanged_count": 35,
+            "target_count": 35,
+            "run_id": "etl-20261023T152722-5a47bd93a7"
+          },
+          "raw_path": "data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv"
+        },
+        "api": {
+          "input_manifest": "raw/source=api/ingest_date=2026-10-23/batch_id=BATCH-e029a3a308e44755b3ec2b1fe3aaa88d/manifest.json",
+          "lake_uri": "s3://retailpulse-raw/raw/source=api/ingest_date=2026-10-23/batch_id=BATCH-e029a3a308e44755b3ec2b1fe3aaa88d/inventory.json",
+          "status": "SUCCESS",
+          "branches": [
+            {
+              "branch_code": "HN",
+              "status": "ONLINE",
+              "snapshot_time": 1790085539.175853,
+              "collected_at": "2026-10-23T15:27:26.888915+00:00",
+              "error": null,
+              "http_status": 200
+            },
+            {
+              "branch_code": "DN",
+              "status": "ONLINE",
+              "snapshot_time": 1790085539.175853,
+              "collected_at": "2026-10-23T15:27:26.923822+00:00",
+              "error": null,
+              "http_status": 200
+            },
+            {
+              "branch_code": "SG",
+              "status": "ONLINE",
+              "snapshot_time": 1790085539.175853,
+              "collected_at": "2026-10-23T15:27:26.942851+00:00",
+              "error": null,
+              "http_status": 200
+            }
+          ],
+          "counts": {
+            "inserted": 0
+          },
+          "raw_path": "data_lake\\raw\\api_inventory\\etl-20261023T152722-5a47bd93a7\\response.json",
+          "provenance": "DEMO"
+        }
+      },
+      "counts": {
+        "app": {
+          "raw": 35,
+          "valid": 35,
+          "rejected": 0,
+          "inserted": 0,
+          "updated": 0,
+          "unchanged": 35,
+          "target_count": 35,
+          "target_amount": 9980000.0,
+          "mismatches": 0,
+          "source_amount": 9980000.0,
+          "reconciliation": "MATCHED"
+        },
+        "api": {
+          "inserted": 0
+        }
+      },
+      "artifacts": [
+        "data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv",
+        "data_lake\\raw\\api_inventory\\etl-20261023T152722-5a47bd93a7\\response.json"
+      ],
+      "started_at": "2026-10-23T15:27:22.295000+00:00",
+      "finished_at": "2026-10-23T15:27:29.293026+00:00",
+      "lake_result_uri": "s3://retailpulse-raw/runs/etl-20261023T152722-5a47bd93a7.json",
+      "result": {
+        "run_id": "etl-20261023T152722-5a47bd93a7",
+        "batch_id": "BATCH-e029a3a308e44755b3ec2b1fe3aaa88d",
+        "status": "SUCCESS",
+        "sources": {
+          "app": {
+            "input_manifest": "raw/source=app/ingest_date=2026-10-23/batch_id=BATCH-e029a3a308e44755b3ec2b1fe3aaa88d/manifest.json",
+            "lake_uri": "s3://retailpulse-raw/raw/source=app/ingest_date=2026-10-23/batch_id=BATCH-e029a3a308e44755b3ec2b1fe3aaa88d/orders.csv",
+            "status": "SUCCESS",
+            "source_status": "AVAILABLE",
+            "raw_count": 35,
+            "valid_count": 35,
+            "rejected_count": 0,
+            "provenance": "DEMO",
+            "currency": "VND",
+            "counts": {
+              "inserted": 0,
+              "updated": 0,
+              "unchanged": 35,
+              "target_count": 35,
+              "target_amount": 9980000.0,
+              "mismatches": 0,
+              "source_amount": 9980000.0,
+              "reconciliation": "MATCHED"
+            },
+            "reconciliation": {
+              "batch_id": "BATCH-e029a3a308e44755b3ec2b1fe3aaa88d",
+              "source_code": "APP_OPERATIONAL",
+              "source_records_count": 35,
+              "dwh_records_inserted": 0,
+              "rejected_records_count": 0,
+              "source_total_amount": 9980000.0,
+              "dwh_total_amount": 9980000.0,
+              "diff_amount": "0.0",
+              "status": "MATCHED",
+              "notes": "Exact source identity set; per-source, per-currency; purchases/returns/cancellations retained separately",
+              "currency": "VND",
+              "updated_count": 0,
+              "unchanged_count": 35,
+              "target_count": 35,
+              "run_id": "etl-20261023T152722-5a47bd93a7"
+            },
+            "raw_path": "data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv"
+          },
+          "api": {
+            "input_manifest": "raw/source=api/ingest_date=2026-10-23/batch_id=BATCH-e029a3a308e44755b3ec2b1fe3aaa88d/manifest.json",
+            "lake_uri": "s3://retailpulse-raw/raw/source=api/ingest_date=2026-10-23/batch_id=BATCH-e029a3a308e44755b3ec2b1fe3aaa88d/inventory.json",
+            "status": "SUCCESS",
+            "branches": [
+              {
+                "branch_code": "HN",
+                "status": "ONLINE",
+                "snapshot_time": 1790085539.175853,
+                "collected_at": "2026-10-23T15:27:26.888915+00:00",
+                "error": null,
+                "http_status": 200
+              },
+              {
+                "branch_code": "DN",
+                "status": "ONLINE",
+                "snapshot_time": 1790085539.175853,
+                "collected_at": "2026-10-23T15:27:26.923822+00:00",
+                "error": null,
+                "http_status": 200
+              },
+              {
+                "branch_code": "SG",
+                "status": "ONLINE",
+                "snapshot_time": 1790085539.175853,
+                "collected_at": "2026-10-23T15:27:26.942851+00:00",
+                "error": null,
+                "http_status": 200
+              }
+            ],
+            "counts": {
+              "inserted": 0
+            },
+            "raw_path": "data_lake\\raw\\api_inventory\\etl-20261023T152722-5a47bd93a7\\response.json",
+            "provenance": "DEMO"
+          }
+        },
+        "counts": {
+          "app": {
+            "raw": 35,
+            "valid": 35,
+            "rejected": 0,
+            "inserted": 0,
+            "updated": 0,
+            "unchanged": 35,
+            "target_count": 35,
+            "target_amount": 9980000.0,
+            "mismatches": 0,
+            "source_amount": 9980000.0,
+            "reconciliation": "MATCHED"
+          },
+          "api": {
+            "inserted": 0
+          }
+        },
+        "artifacts": [
+          "data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv",
+          "data_lake\\raw\\api_inventory\\etl-20261023T152722-5a47bd93a7\\response.json"
+        ],
+        "started_at": "2026-10-23T15:27:22.295000+00:00",
+        "finished_at": "2026-10-23T15:27:29.293026+00:00",
+        "lake_result_uri": "s3://retailpulse-raw/runs/etl-20261023T152722-5a47bd93a7.json"
+      }
+    },
+    "events": [
+      {
+        "at": "2026-10-23T15:27:22.280312+00:00",
+        "stage": "control",
+        "message": "Backend worker started"
+      },
+      {
+        "at": "2026-10-23T15:27:24.524171+00:00",
+        "stage": "ingestion",
+        "message": "Reading app",
+        "source": "app"
+      },
+      {
+        "at": "2026-10-23T15:27:26.738783+00:00",
+        "stage": "raw",
+        "message": "Saved app immutable raw",
+        "source": "app",
+        "rows": 35,
+        "raw_path": "data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv",
+        "provenance": "DEMO"
+      },
+      {
+        "at": "2026-10-23T15:27:26.765925+00:00",
+        "stage": "transform",
+        "message": "Validated app",
+        "source": "app",
+        "valid": 35,
+        "rejected": 0
+      },
+      {
+        "at": "2026-10-23T15:27:26.852246+00:00",
+        "stage": "reconciliation",
+        "message": "MATCHED",
+        "source": "app",
+        "inserted": 0,
+        "updated": 0,
+        "unchanged": 35,
+        "target_count": 35,
+        "target_amount": 9980000.0,
+        "mismatches": 0,
+        "source_amount": 9980000.0,
+        "reconciliation": "MATCHED"
+      },
+      {
+        "at": "2026-10-23T15:27:26.859146+00:00",
+        "stage": "ingestion",
+        "message": "Reading api",
+        "source": "api"
+      },
+      {
+        "at": "2026-10-23T15:27:29.284675+00:00",
+        "stage": "inventory",
+        "message": "Persisted source states and valid snapshots",
+        "inserted": 0,
+        "branches": [
+          {
+            "branch_code": "HN",
+            "status": "ONLINE",
+            "snapshot_time": 1790085539.175853,
+            "collected_at": "2026-10-23T15:27:26.888915+00:00",
+            "error": null,
+            "http_status": 200
+          },
+          {
+            "branch_code": "DN",
+            "status": "ONLINE",
+            "snapshot_time": 1790085539.175853,
+            "collected_at": "2026-10-23T15:27:26.923822+00:00",
+            "error": null,
+            "http_status": 200
+          },
+          {
+            "branch_code": "SG",
+            "status": "ONLINE",
+            "snapshot_time": 1790085539.175853,
+            "collected_at": "2026-10-23T15:27:26.942851+00:00",
+            "error": null,
+            "http_status": 200
+          }
+        ]
+      },
+      {
+        "at": "2026-10-23T15:27:29.321872+00:00",
+        "stage": "control",
+        "message": "Worker completed",
+        "status": "SUCCESS"
+      }
+    ],
+    "error": null
+  },
+  "session_verified": {
+    "session_id": "demo-264e2a5ebdd7d23de88b",
+    "idempotency_key": "ui-demo-797efd245fb94ae79cea54af584e7164",
+    "label": "Actual browser teaching-demo verification",
+    "created_at": "2026-10-23T15:24:16.549888+00:00",
+    "source_order_codes": [
+      "RP-DEMO-264e2a5ebdd7d23de88b-BUY",
+      "RP-DEMO-264e2a5ebdd7d23de88b-CANCEL"
+    ],
+    "source_item_ids": [
+      "33",
+      "34",
+      "35"
+    ],
+    "baseline_global": {
+      "rows": 32,
+      "currency": "VND",
+      "net_sales": 9755000.0,
+      "order_count": 16,
+      "return_value": 0.0,
+      "quantity_sold": 60,
+      "cancellation_value": 50000.0,
+      "gross_purchase_value": 9755000.0
+    },
+    "expected": {
+      "rows": 3,
+      "currency": "VND",
+      "net_sales": 325000,
+      "order_count": 1,
+      "return_value": 0,
+      "quantity_sold": 3,
+      "cancellation_value": 50000,
+      "gross_purchase_value": 325000
+    },
+    "source_payload": [
+      {
+        "order_id": 18,
+        "quantity": 2,
+        "subtotal": 250000.0,
+        "order_code": "RP-DEMO-264e2a5ebdd7d23de88b-BUY",
+        "stock_code": "PROD-CERAMIC-MUG",
+        "unit_price": 125000.0,
+        "branch_code": "HN",
+        "customer_id": 1040166053,
+        "invoice_time": "2026-10-23T15:24:16.577318+00:00",
+        "is_cancelled": false,
+        "product_name": "Cốc sứ phong cách Vintage",
+        "customer_name": "[DEMO] Customer demo-264e2a5ebdd7d23de88b",
+        "payment_status": "PAID",
+        "source_record_id": "33"
+      },
+      {
+        "order_id": 18,
+        "quantity": 1,
+        "subtotal": 75000.0,
+        "order_code": "RP-DEMO-264e2a5ebdd7d23de88b-BUY",
+        "stock_code": "PROD-THERMOS-FLASK",
+        "unit_price": 75000.0,
+        "branch_code": "HN",
+        "customer_id": 1040166053,
+        "invoice_time": "2026-10-23T15:24:16.577318+00:00",
+        "is_cancelled": false,
+        "product_name": "Bình giữ nhiệt Inox 500ml",
+        "customer_name": "[DEMO] Customer demo-264e2a5ebdd7d23de88b",
+        "payment_status": "PAID",
+        "source_record_id": "34"
+      },
+      {
+        "order_id": 19,
+        "quantity": 1,
+        "subtotal": 50000.0,
+        "order_code": "RP-DEMO-264e2a5ebdd7d23de88b-CANCEL",
+        "stock_code": "PROD-CERAMIC-MUG",
+        "unit_price": 50000.0,
+        "branch_code": "DN",
+        "customer_id": 1040166053,
+        "invoice_time": "2026-10-23T15:24:16.577318+00:00",
+        "is_cancelled": true,
+        "product_name": "Cốc sứ phong cách Vintage",
+        "customer_name": "[DEMO] Customer demo-264e2a5ebdd7d23de88b",
+        "payment_status": "CANCELLED",
+        "source_record_id": "35"
+      }
+    ],
+    "source_rows": [
+      {
+        "order_id": 18,
+        "order_code": "RP-DEMO-264e2a5ebdd7d23de88b-BUY",
+        "customer_id": 1040166053,
+        "customer_name": "[DEMO] Customer demo-264e2a5ebdd7d23de88b",
+        "branch_code": "HN",
+        "payment_status": "PAID",
+        "is_cancelled": false,
+        "source_record_id": "33",
+        "stock_code": "PROD-CERAMIC-MUG",
+        "product_name": "Cốc sứ phong cách Vintage",
+        "quantity": 2,
+        "unit_price": 125000.0,
+        "subtotal": 250000.0,
+        "invoice_time": "2026-10-23T15:24:16.577318+00:00"
+      },
+      {
+        "order_id": 18,
+        "order_code": "RP-DEMO-264e2a5ebdd7d23de88b-BUY",
+        "customer_id": 1040166053,
+        "customer_name": "[DEMO] Customer demo-264e2a5ebdd7d23de88b",
+        "branch_code": "HN",
+        "payment_status": "PAID",
+        "is_cancelled": false,
+        "source_record_id": "34",
+        "stock_code": "PROD-THERMOS-FLASK",
+        "product_name": "Bình giữ nhiệt Inox 500ml",
+        "quantity": 1,
+        "unit_price": 75000.0,
+        "subtotal": 75000.0,
+        "invoice_time": "2026-10-23T15:24:16.577318+00:00"
+      },
+      {
+        "order_id": 19,
+        "order_code": "RP-DEMO-264e2a5ebdd7d23de88b-CANCEL",
+        "customer_id": 1040166053,
+        "customer_name": "[DEMO] Customer demo-264e2a5ebdd7d23de88b",
+        "branch_code": "DN",
+        "payment_status": "CANCELLED",
+        "is_cancelled": true,
+        "source_record_id": "35",
+        "stock_code": "PROD-CERAMIC-MUG",
+        "product_name": "Cốc sứ phong cách Vintage",
+        "quantity": 1,
+        "unit_price": 50000.0,
+        "subtotal": 50000.0,
+        "invoice_time": "2026-10-23T15:24:16.577318+00:00"
+      }
+    ],
+    "actual": {
+      "rows": 3,
+      "gross_purchase_value": 325000.0,
+      "return_value": 0.0,
+      "cancellation_value": 50000.0,
+      "net_sales": 325000.0,
+      "order_count": 1,
+      "quantity_sold": 3,
+      "currency": "VND"
+    },
+    "verification": {
+      "status": "MATCHED",
+      "checks": {
+        "rows": true,
+        "currency": true,
+        "net_sales": true,
+        "order_count": true,
+        "return_value": true,
+        "quantity_sold": true,
+        "cancellation_value": true,
+        "gross_purchase_value": true,
+        "lineage_present": true,
+        "source_rows_present": true,
+        "source_payload_unchanged": true,
+        "fact_lines_match_source": true
+      }
+    },
+    "current_global": {
+      "rows": 35,
+      "gross_purchase_value": 10080000.0,
+      "return_value": 0.0,
+      "cancellation_value": 100000.0,
+      "net_sales": 10080000.0,
+      "order_count": 17,
+      "quantity_sold": 63,
+      "currency": "VND"
+    },
+    "observed_global_delta": {
+      "rows": 3,
+      "gross_purchase_value": 325000.0,
+      "return_value": 0.0,
+      "cancellation_value": 50000.0,
+      "net_sales": 325000.0,
+      "order_count": 1,
+      "quantity_sold": 3
+    },
+    "warehouse_rows": [
+      {
+        "sales_key": 5336549,
+        "source_record_id": "33",
+        "invoice_no": "RP-DEMO-264e2a5ebdd7d23de88b-BUY",
+        "quantity": 2,
+        "unit_price": 125000.0,
+        "total_amount": 250000.0,
+        "transaction_type": "PURCHASE",
+        "currency": "VND",
+        "provenance": "DEMO",
+        "run_id": "etl-20261023T152722-5a47bd93a7",
+        "raw_path": "data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv",
+        "batch_id": "BATCH-e029a3a308e44755b3ec2b1fe3aaa88d"
+      },
+      {
+        "sales_key": 5336550,
+        "source_record_id": "34",
+        "invoice_no": "RP-DEMO-264e2a5ebdd7d23de88b-BUY",
+        "quantity": 1,
+        "unit_price": 75000.0,
+        "total_amount": 75000.0,
+        "transaction_type": "PURCHASE",
+        "currency": "VND",
+        "provenance": "DEMO",
+        "run_id": "etl-20261023T152722-5a47bd93a7",
+        "raw_path": "data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv",
+        "batch_id": "BATCH-e029a3a308e44755b3ec2b1fe3aaa88d"
+      },
+      {
+        "sales_key": 5336551,
+        "source_record_id": "35",
+        "invoice_no": "RP-DEMO-264e2a5ebdd7d23de88b-CANCEL",
+        "quantity": 1,
+        "unit_price": 50000.0,
+        "total_amount": -50000.0,
+        "transaction_type": "CANCELLATION",
+        "currency": "VND",
+        "provenance": "DEMO",
+        "run_id": "etl-20261023T152722-5a47bd93a7",
+        "raw_path": "data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv",
+        "batch_id": "BATCH-e029a3a308e44755b3ec2b1fe3aaa88d"
+      }
+    ],
+    "observed_runs": [
+      {
+        "run_id": "etl-20261023T152722-5a47bd93a7",
+        "batch_id": "BATCH-e029a3a308e44755b3ec2b1fe3aaa88d",
+        "rows": 3,
+        "inserted": 0,
+        "updated": 0,
+        "unchanged": 3
+      },
+      {
+        "run_id": "etl-20261023T152436-f5661140c8",
+        "batch_id": "BATCH-b146e77d1d7c47c4bbf51e787a56ed3f",
+        "rows": 3,
+        "inserted": 0,
+        "updated": 0,
+        "unchanged": 3
+      },
+      {
+        "run_id": "etl-20261023T152418-9971434598",
+        "batch_id": "BATCH-211d186a76be441088e196d507353f31",
+        "rows": 3,
+        "inserted": 3,
+        "updated": 0,
+        "unchanged": 0
+      }
+    ],
+    "lineage_runs": [
+      "etl-20261023T152722-5a47bd93a7"
+    ],
+    "note": "DEMO orders are actual OLTP rows. Session KPIs are exact; global changes can also include other runs. Preparing these orders does not change the independent inventory API."
+  },
+  "source_traces": [
+    {
+      "fact": {
+        "sales_key": 5336549,
+        "date_key": 20261023,
+        "customer_key": 31055,
+        "product_key": 27,
+        "branch_key": 2,
+        "source_key": 2,
+        "invoice_no": "RP-DEMO-264e2a5ebdd7d23de88b-BUY",
+        "quantity": 2,
+        "unit_price": 125000.0,
+        "total_amount": 250000.0,
+        "is_cancelled": false,
+        "record_hash": "b1de4430c93cd32fda7a614be3313746b8170cd82a489fe911f0b4645ffa4958",
+        "batch_id": "BATCH-e029a3a308e44755b3ec2b1fe3aaa88d",
+        "loaded_at": "2026-10-23T15:24:25.206821+00:00",
+        "source_record_id": "33",
+        "raw_path": "data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv",
+        "provenance": "DEMO",
+        "currency": "VND",
+        "transaction_type": "PURCHASE",
+        "content_hash": "3fe09b2721a00deddd12ca1bd33db56b07d6e6fc43aea3998f20bc1bef63a194",
+        "run_id": "etl-20261023T152722-5a47bd93a7",
+        "updated_at": "2026-10-23T15:27:26.781990+00:00",
+        "source_observed_at": "2026-10-23T15:27:24.560699+00:00",
+        "source_code": "APP_OPERATIONAL",
+        "customer_code": "1040166053",
+        "stock_code": "PROD-CERAMIC-MUG",
+        "full_date": "2026-10-23"
+      },
+      "raw_record": {
+        "source_record_id": "33",
+        "invoice_no": "RP-DEMO-264e2a5ebdd7d23de88b-BUY",
+        "stock_code": "PROD-CERAMIC-MUG",
+        "description": "Cốc sứ phong cách Vintage",
+        "quantity": "2",
+        "order_timestamp": "1792769056.577318",
+        "unit_price": "125000.0",
+        "customer_id": "1040166053.0",
+        "branch_code": "HN",
+        "country": "Vietnam",
+        "is_cancelled": "False",
+        "invoice_date": "2026-10-23 15:24:16.577317953+00:00",
+        "provenance": "DEMO",
+        "currency": "VND"
+      },
+      "transformation": {
+        "transaction_type": "PURCHASE",
+        "signed_amount": 250000.0,
+        "customer_mapping": "1040166053",
+        "product_mapping": "PROD-CERAMIC-MUG",
+        "rule": "Validated types/dates/quantity/price; preserve cancellation; signed RETURN; source-aware dimensional mapping"
+      },
+      "raw_preview": "/api/raw/preview?path=data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv",
+      "source_manifest": [
+        {
+          "manifest_id": 128,
+          "run_id": "etl-20261023T152722-5a47bd93a7",
+          "batch_id": "BATCH-e029a3a308e44755b3ec2b1fe3aaa88d",
+          "source_code": "APP_OPERATIONAL",
+          "status": "SUCCESS",
+          "provenance": "DEMO",
+          "raw_path": "data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv",
+          "checksum": "386487d4e7ba441755167d4d350c236f7678b9d99d30fde4cd23f35485708b7c",
+          "record_count": 35,
+          "currency": "VND",
+          "collected_at": "2026-10-23T15:27:26.731579+00:00",
+          "metadata": {
+            "date_max": "2026-10-23 15:24:16.577317953+00:00",
+            "date_min": "2026-09-22 13:58:59.175760984+00:00",
+            "lake_uri": "s3://retailpulse-raw/raw/source=app/ingest_date=2026-10-23/batch_id=BATCH-e029a3a308e44755b3ec2b1fe3aaa88d/orders.csv",
+            "lake_sha256": "386487d4e7ba441755167d4d350c236f7678b9d99d30fde4cd23f35485708b7c",
+            "original_path": null,
+            "replayed_from": null,
+            "lake_manifest_key": "raw/source=app/ingest_date=2026-10-23/batch_id=BATCH-e029a3a308e44755b3ec2b1fe3aaa88d/manifest.json",
+            "source_collected_at": "2026-10-23T15:27:24.560699+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "fact": {
+        "sales_key": 5336550,
+        "date_key": 20261023,
+        "customer_key": 31055,
+        "product_key": 18,
+        "branch_key": 2,
+        "source_key": 2,
+        "invoice_no": "RP-DEMO-264e2a5ebdd7d23de88b-BUY",
+        "quantity": 1,
+        "unit_price": 75000.0,
+        "total_amount": 75000.0,
+        "is_cancelled": false,
+        "record_hash": "347d5e38193c2ab58fcce3232f2d9f391c6360e774906ec8d6fc5f6888228d54",
+        "batch_id": "BATCH-e029a3a308e44755b3ec2b1fe3aaa88d",
+        "loaded_at": "2026-10-23T15:24:25.206821+00:00",
+        "source_record_id": "34",
+        "raw_path": "data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv",
+        "provenance": "DEMO",
+        "currency": "VND",
+        "transaction_type": "PURCHASE",
+        "content_hash": "126a9d80bb966c6e8790f9125f272440d17bfd12e925a8229185bf580b957669",
+        "run_id": "etl-20261023T152722-5a47bd93a7",
+        "updated_at": "2026-10-23T15:27:26.781990+00:00",
+        "source_observed_at": "2026-10-23T15:27:24.560699+00:00",
+        "source_code": "APP_OPERATIONAL",
+        "customer_code": "1040166053",
+        "stock_code": "PROD-THERMOS-FLASK",
+        "full_date": "2026-10-23"
+      },
+      "raw_record": {
+        "source_record_id": "34",
+        "invoice_no": "RP-DEMO-264e2a5ebdd7d23de88b-BUY",
+        "stock_code": "PROD-THERMOS-FLASK",
+        "description": "Bình giữ nhiệt Inox 500ml",
+        "quantity": "1",
+        "order_timestamp": "1792769056.577318",
+        "unit_price": "75000.0",
+        "customer_id": "1040166053.0",
+        "branch_code": "HN",
+        "country": "Vietnam",
+        "is_cancelled": "False",
+        "invoice_date": "2026-10-23 15:24:16.577317953+00:00",
+        "provenance": "DEMO",
+        "currency": "VND"
+      },
+      "transformation": {
+        "transaction_type": "PURCHASE",
+        "signed_amount": 75000.0,
+        "customer_mapping": "1040166053",
+        "product_mapping": "PROD-THERMOS-FLASK",
+        "rule": "Validated types/dates/quantity/price; preserve cancellation; signed RETURN; source-aware dimensional mapping"
+      },
+      "raw_preview": "/api/raw/preview?path=data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv",
+      "source_manifest": [
+        {
+          "manifest_id": 128,
+          "run_id": "etl-20261023T152722-5a47bd93a7",
+          "batch_id": "BATCH-e029a3a308e44755b3ec2b1fe3aaa88d",
+          "source_code": "APP_OPERATIONAL",
+          "status": "SUCCESS",
+          "provenance": "DEMO",
+          "raw_path": "data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv",
+          "checksum": "386487d4e7ba441755167d4d350c236f7678b9d99d30fde4cd23f35485708b7c",
+          "record_count": 35,
+          "currency": "VND",
+          "collected_at": "2026-10-23T15:27:26.731579+00:00",
+          "metadata": {
+            "date_max": "2026-10-23 15:24:16.577317953+00:00",
+            "date_min": "2026-09-22 13:58:59.175760984+00:00",
+            "lake_uri": "s3://retailpulse-raw/raw/source=app/ingest_date=2026-10-23/batch_id=BATCH-e029a3a308e44755b3ec2b1fe3aaa88d/orders.csv",
+            "lake_sha256": "386487d4e7ba441755167d4d350c236f7678b9d99d30fde4cd23f35485708b7c",
+            "original_path": null,
+            "replayed_from": null,
+            "lake_manifest_key": "raw/source=app/ingest_date=2026-10-23/batch_id=BATCH-e029a3a308e44755b3ec2b1fe3aaa88d/manifest.json",
+            "source_collected_at": "2026-10-23T15:27:24.560699+00:00"
+          }
+        }
+      ]
+    },
+    {
+      "fact": {
+        "sales_key": 5336551,
+        "date_key": 20261023,
+        "customer_key": 31055,
+        "product_key": 27,
+        "branch_key": 3,
+        "source_key": 2,
+        "invoice_no": "RP-DEMO-264e2a5ebdd7d23de88b-CANCEL",
+        "quantity": 1,
+        "unit_price": 50000.0,
+        "total_amount": -50000.0,
+        "is_cancelled": true,
+        "record_hash": "771702944ab185e883a9282a14f21141b01065218f3076a9177f821538b7ba38",
+        "batch_id": "BATCH-e029a3a308e44755b3ec2b1fe3aaa88d",
+        "loaded_at": "2026-10-23T15:24:25.206821+00:00",
+        "source_record_id": "35",
+        "raw_path": "data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv",
+        "provenance": "DEMO",
+        "currency": "VND",
+        "transaction_type": "CANCELLATION",
+        "content_hash": "41c504b0501b60e1cdbafcd127d7e2db1a38229d70d74e150d32b19a188d1d3a",
+        "run_id": "etl-20261023T152722-5a47bd93a7",
+        "updated_at": "2026-10-23T15:27:26.781990+00:00",
+        "source_observed_at": "2026-10-23T15:27:24.560699+00:00",
+        "source_code": "APP_OPERATIONAL",
+        "customer_code": "1040166053",
+        "stock_code": "PROD-CERAMIC-MUG",
+        "full_date": "2026-10-23"
+      },
+      "raw_record": {
+        "source_record_id": "35",
+        "invoice_no": "RP-DEMO-264e2a5ebdd7d23de88b-CANCEL",
+        "stock_code": "PROD-CERAMIC-MUG",
+        "description": "Cốc sứ phong cách Vintage",
+        "quantity": "1",
+        "order_timestamp": "1792769056.577318",
+        "unit_price": "50000.0",
+        "customer_id": "1040166053.0",
+        "branch_code": "DN",
+        "country": "Vietnam",
+        "is_cancelled": "True",
+        "invoice_date": "2026-10-23 15:24:16.577317953+00:00",
+        "provenance": "DEMO",
+        "currency": "VND"
+      },
+      "transformation": {
+        "transaction_type": "CANCELLATION",
+        "signed_amount": -50000.0,
+        "customer_mapping": "1040166053",
+        "product_mapping": "PROD-CERAMIC-MUG",
+        "rule": "Validated types/dates/quantity/price; preserve cancellation; signed RETURN; source-aware dimensional mapping"
+      },
+      "raw_preview": "/api/raw/preview?path=data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv",
+      "source_manifest": [
+        {
+          "manifest_id": 128,
+          "run_id": "etl-20261023T152722-5a47bd93a7",
+          "batch_id": "BATCH-e029a3a308e44755b3ec2b1fe3aaa88d",
+          "source_code": "APP_OPERATIONAL",
+          "status": "SUCCESS",
+          "provenance": "DEMO",
+          "raw_path": "data_lake\\raw\\app_db\\etl-20261023T152722-5a47bd93a7\\extract.csv",
+          "checksum": "386487d4e7ba441755167d4d350c236f7678b9d99d30fde4cd23f35485708b7c",
+          "record_count": 35,
+          "currency": "VND",
+          "collected_at": "2026-10-23T15:27:26.731579+00:00",
+          "metadata": {
+            "date_max": "2026-10-23 15:24:16.577317953+00:00",
+            "date_min": "2026-09-22 13:58:59.175760984+00:00",
+            "lake_uri": "s3://retailpulse-raw/raw/source=app/ingest_date=2026-10-23/batch_id=BATCH-e029a3a308e44755b3ec2b1fe3aaa88d/orders.csv",
+            "lake_sha256": "386487d4e7ba441755167d4d350c236f7678b9d99d30fde4cd23f35485708b7c",
+            "original_path": null,
+            "replayed_from": null,
+            "lake_manifest_key": "raw/source=app/ingest_date=2026-10-23/batch_id=BATCH-e029a3a308e44755b3ec2b1fe3aaa88d/manifest.json",
+            "source_collected_at": "2026-10-23T15:27:24.560699+00:00"
+          }
+        }
+      ]
+    }
+  ],
+  "replay_run_id": "etl-20261023T152742-bc742ee066",
+  "replay_run": {
+    "run_id": "etl-20261023T152742-bc742ee066",
+    "batch_id": "etl-20261023T152742-bc742ee066",
+    "kind": "etl",
+    "params": {
+      "sources": [
+        "api",
+        "app"
+      ],
+      "replay_run_id": "etl-20261023T152722-5a47bd93a7"
+    },
+    "status": "SUCCESS",
+    "created_at": "2026-10-23T15:27:42.695261+00:00",
+    "started_at": "2026-10-23T15:27:42.704957+00:00",
+    "finished_at": "2026-10-23T15:27:47.409789+00:00",
+    "metadata": {
+      "run_id": "etl-20261023T152742-bc742ee066",
+      "batch_id": "BATCH-d89f48474d1b4ee2a0bd70af8ac2873c",
+      "status": "SUCCESS",
+      "sources": {
+        "api": {
+          "status": "SUCCESS",
+          "branches": [
+            {
+              "branch_code": "HN",
+              "status": "ONLINE",
+              "snapshot_time": 1790085539.175853,
+              "collected_at": "2026-10-23T15:27:26.888915+00:00",
+              "error": null,
+              "http_status": 200
+            },
+            {
+              "branch_code": "DN",
+              "status": "ONLINE",
+              "snapshot_time": 1790085539.175853,
+              "collected_at": "2026-10-23T15:27:26.923822+00:00",
+              "error": null,
+              "http_status": 200
+            },
+            {
+              "branch_code": "SG",
+              "status": "ONLINE",
+              "snapshot_time": 1790085539.175853,
+              "collected_at": "2026-10-23T15:27:26.942851+00:00",
+              "error": null,
+              "http_status": 200
+            }
+          ],
+          "counts": {
+            "inserted": 0
+          },
+          "raw_path": "data_lake\\raw\\api_inventory\\etl-20261023T152742-bc742ee066\\response.json",
+          "provenance": "DEMO"
+        },
+        "app": {
+          "status": "SUCCESS",
+          "source_status": "AVAILABLE",
+          "raw_count": 35,
+          "valid_count": 35,
+          "rejected_count": 0,
+          "provenance": "DEMO",
+          "currency": "VND",
+          "counts": {
+            "inserted": 0,
+            "updated": 0,
+            "unchanged": 35,
+            "target_count": 35,
+            "target_amount": 9980000.0,
+            "mismatches": 0,
+            "source_amount": 9980000.0,
+            "reconciliation": "MATCHED"
+          },
+          "reconciliation": {
+            "batch_id": "BATCH-d89f48474d1b4ee2a0bd70af8ac2873c",
+            "source_code": "APP_OPERATIONAL",
+            "source_records_count": 35,
+            "dwh_records_inserted": 0,
+            "rejected_records_count": 0,
+            "source_total_amount": 9980000.0,
+            "dwh_total_amount": 9980000.0,
+            "diff_amount": "0.0",
+            "status": "MATCHED",
+            "notes": "Exact source identity set; per-source, per-currency; purchases/returns/cancellations retained separately",
+            "currency": "VND",
+            "updated_count": 0,
+            "unchanged_count": 35,
+            "target_count": 35,
+            "run_id": "etl-20261023T152742-bc742ee066"
+          },
+          "raw_path": "data_lake\\raw\\app_db\\etl-20261023T152742-bc742ee066\\extract.csv"
+        }
+      },
+      "counts": {
+        "api": {
+          "inserted": 0
+        },
+        "app": {
+          "raw": 35,
+          "valid": 35,
+          "rejected": 0,
+          "inserted": 0,
+          "updated": 0,
+          "unchanged": 35,
+          "target_count": 35,
+          "target_amount": 9980000.0,
+          "mismatches": 0,
+          "source_amount": 9980000.0,
+          "reconciliation": "MATCHED"
+        }
+      },
+      "artifacts": [
+        "data_lake\\raw\\api_inventory\\etl-20261023T152742-bc742ee066\\response.json",
+        "data_lake\\raw\\app_db\\etl-20261023T152742-bc742ee066\\extract.csv"
+      ],
+      "started_at": "2026-10-23T15:27:42.725724+00:00",
+      "replay_of": "etl-20261023T152722-5a47bd93a7",
+      "finished_at": "2026-10-23T15:27:47.383811+00:00",
+      "lake_result_uri": "s3://retailpulse-raw/runs/etl-20261023T152742-bc742ee066.json",
+      "result": {
+        "run_id": "etl-20261023T152742-bc742ee066",
+        "batch_id": "BATCH-d89f48474d1b4ee2a0bd70af8ac2873c",
+        "status": "SUCCESS",
+        "sources": {
+          "api": {
+            "status": "SUCCESS",
+            "branches": [
+              {
+                "branch_code": "HN",
+                "status": "ONLINE",
+                "snapshot_time": 1790085539.175853,
+                "collected_at": "2026-10-23T15:27:26.888915+00:00",
+                "error": null,
+                "http_status": 200
+              },
+              {
+                "branch_code": "DN",
+                "status": "ONLINE",
+                "snapshot_time": 1790085539.175853,
+                "collected_at": "2026-10-23T15:27:26.923822+00:00",
+                "error": null,
+                "http_status": 200
+              },
+              {
+                "branch_code": "SG",
+                "status": "ONLINE",
+                "snapshot_time": 1790085539.175853,
+                "collected_at": "2026-10-23T15:27:26.942851+00:00",
+                "error": null,
+                "http_status": 200
+              }
+            ],
+            "counts": {
+              "inserted": 0
+            },
+            "raw_path": "data_lake\\raw\\api_inventory\\etl-20261023T152742-bc742ee066\\response.json",
+            "provenance": "DEMO"
+          },
+          "app": {
+            "status": "SUCCESS",
+            "source_status": "AVAILABLE",
+            "raw_count": 35,
+            "valid_count": 35,
+            "rejected_count": 0,
+            "provenance": "DEMO",
+            "currency": "VND",
+            "counts": {
+              "inserted": 0,
+              "updated": 0,
+              "unchanged": 35,
+              "target_count": 35,
+              "target_amount": 9980000.0,
+              "mismatches": 0,
+              "source_amount": 9980000.0,
+              "reconciliation": "MATCHED"
+            },
+            "reconciliation": {
+              "batch_id": "BATCH-d89f48474d1b4ee2a0bd70af8ac2873c",
+              "source_code": "APP_OPERATIONAL",
+              "source_records_count": 35,
+              "dwh_records_inserted": 0,
+              "rejected_records_count": 0,
+              "source_total_amount": 9980000.0,
+              "dwh_total_amount": 9980000.0,
+              "diff_amount": "0.0",
+              "status": "MATCHED",
+              "notes": "Exact source identity set; per-source, per-currency; purchases/returns/cancellations retained separately",
+              "currency": "VND",
+              "updated_count": 0,
+              "unchanged_count": 35,
+              "target_count": 35,
+              "run_id": "etl-20261023T152742-bc742ee066"
+            },
+            "raw_path": "data_lake\\raw\\app_db\\etl-20261023T152742-bc742ee066\\extract.csv"
+          }
+        },
+        "counts": {
+          "api": {
+            "inserted": 0
+          },
+          "app": {
+            "raw": 35,
+            "valid": 35,
+            "rejected": 0,
+            "inserted": 0,
+            "updated": 0,
+            "unchanged": 35,
+            "target_count": 35,
+            "target_amount": 9980000.0,
+            "mismatches": 0,
+            "source_amount": 9980000.0,
+            "reconciliation": "MATCHED"
+          }
+        },
+        "artifacts": [
+          "data_lake\\raw\\api_inventory\\etl-20261023T152742-bc742ee066\\response.json",
+          "data_lake\\raw\\app_db\\etl-20261023T152742-bc742ee066\\extract.csv"
+        ],
+        "started_at": "2026-10-23T15:27:42.725724+00:00",
+        "replay_of": "etl-20261023T152722-5a47bd93a7",
+        "finished_at": "2026-10-23T15:27:47.383811+00:00",
+        "lake_result_uri": "s3://retailpulse-raw/runs/etl-20261023T152742-bc742ee066.json"
+      }
+    },
+    "events": [
+      {
+        "at": "2026-10-23T15:27:42.713713+00:00",
+        "stage": "control",
+        "message": "Backend worker started"
+      },
+      {
+        "at": "2026-10-23T15:27:44.907398+00:00",
+        "stage": "ingestion",
+        "message": "Reading api",
+        "source": "api"
+      },
+      {
+        "at": "2026-10-23T15:27:47.207350+00:00",
+        "stage": "inventory",
+        "message": "Persisted source states and valid snapshots",
+        "inserted": 0,
+        "branches": [
+          {
+            "branch_code": "HN",
+            "status": "ONLINE",
+            "snapshot_time": 1790085539.175853,
+            "collected_at": "2026-10-23T15:27:26.888915+00:00",
+            "error": null,
+            "http_status": 200
+          },
+          {
+            "branch_code": "DN",
+            "status": "ONLINE",
+            "snapshot_time": 1790085539.175853,
+            "collected_at": "2026-10-23T15:27:26.923822+00:00",
+            "error": null,
+            "http_status": 200
+          },
+          {
+            "branch_code": "SG",
+            "status": "ONLINE",
+            "snapshot_time": 1790085539.175853,
+            "collected_at": "2026-10-23T15:27:26.942851+00:00",
+            "error": null,
+            "http_status": 200
+          }
+        ]
+      },
+      {
+        "at": "2026-10-23T15:27:47.217943+00:00",
+        "stage": "ingestion",
+        "message": "Reading app",
+        "source": "app"
+      },
+      {
+        "at": "2026-10-23T15:27:47.250245+00:00",
+        "stage": "raw",
+        "message": "Saved app immutable raw",
+        "source": "app",
+        "rows": 35,
+        "raw_path": "data_lake\\raw\\app_db\\etl-20261023T152742-bc742ee066\\extract.csv",
+        "provenance": "DEMO"
+      },
+      {
+        "at": "2026-10-23T15:27:47.277138+00:00",
+        "stage": "transform",
+        "message": "Validated app",
+        "source": "app",
+        "valid": 35,
+        "rejected": 0
+      },
+      {
+        "at": "2026-10-23T15:27:47.377484+00:00",
+        "stage": "reconciliation",
+        "message": "MATCHED",
+        "source": "app",
+        "inserted": 0,
+        "updated": 0,
+        "unchanged": 35,
+        "target_count": 35,
+        "target_amount": 9980000.0,
+        "mismatches": 0,
+        "source_amount": 9980000.0,
+        "reconciliation": "MATCHED"
+      }
+    ],
+    "error": null
+  },
+  "status": "PASS",
+  "finished_at": "2026-10-23T15:27:47.841666+00:00"
+}

@@ -27,6 +27,10 @@ from src.runtime.runs import create_run, update_run, get_run, list_runs, log_eve
 ROOT = Path(__file__).resolve().parents[2]
 RAW = ROOT / "data_lake" / "raw"
 app = FastAPI(title="RetailPulse verified control API", version="1.0")
+from src.web.reports import router as reports_router
+app.include_router(reports_router)
+from src.web.demo import router as demo_router
+app.include_router(demo_router)
 pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="retailpulse")
 job_lock = threading.Lock()
 active_job = None
@@ -88,13 +92,13 @@ def home():
 def health():
     return {"status": "UP", "warehouse": rows("SELECT current_database() AS database, NOW() AS checked_at")[0],
             "execution": "REAL", "lake_backend": os.getenv("LAKE_BACKEND", "local"),
-            "app_id": "retailpulse-control-v2", "workspace": str(ROOT), "active_run": active_job}
+            "app_id": "retailpulse-control-v4", "workspace": str(ROOT), "active_run": active_job}
 
 
 @app.post("/api/runs", status_code=202)
 def trigger(body: RunRequest):
     global active_job
-    allowed = ({"sources", "file_path", "scenario"} if body.kind == "etl" else
+    allowed = ({"sources", "file_path", "scenario", "replay_run_id"} if body.kind == "etl" else
                {"k_clusters", "source_code", "window_months", "window_start", "window_end", "future_months", "seeds", "k_values", "allow_demo"})
     unknown = set(body.params) - allowed
     if unknown:
@@ -111,6 +115,21 @@ def trigger(body: RunRequest):
     scenario = body.params.pop("scenario", "normal")
     if scenario not in {"normal", "dn_outage"}:
         raise HTTPException(422, "scenario must be normal or dn_outage")
+    if body.params.get('replay_run_id'):
+        if scenario != 'normal' or body.params.get('file_path'):
+            raise HTTPException(422, 'Replay uses frozen input; do not combine it with a new file or outage scenario')
+        try:
+            original = get_run(body.params['replay_run_id'])
+        except (KeyError, ValueError, TypeError):
+            raise HTTPException(422, 'Replay requires an existing ETL run')
+        if original.get('kind') != 'etl' or original.get('status') not in ('SUCCESS', 'PARTIAL'):
+            raise HTTPException(422, 'Replay requires a completed ETL run with persisted Raw')
+        original_result = original.get('metadata', {}).get('result', original.get('metadata', {}))
+        available_sources = set(original_result.get('sources', {}))
+        requested_sources = set(body.params.get('sources', available_sources))
+        if not requested_sources or not requested_sources.issubset(available_sources):
+            raise HTTPException(422, 'Replay sources must exist in the selected run')
+        body.params['sources'] = sorted(requested_sources)
     if scenario == "dn_outage":
         cfg_nodes = load_config().get("api_nodes", {}).get("branches", [])
         body.params["branch_nodes"] = [dict(b, url="http://127.0.0.1:1/api/v1/inventory/DN") if b["code"] == "DN" else dict(b) for b in cfg_nodes]
@@ -338,7 +357,7 @@ def segments(model_version: str | None = None, run_id: str | None = None):
 
 @app.get("/api/models")
 def models():
-    return [r for r in list_runs() if r.get("kind") == "mining"]
+    return [r for r in list_runs(limit=1000) if r.get("kind") == "mining"]
 
 
 @app.get("/api/artifacts")

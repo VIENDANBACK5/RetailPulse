@@ -21,10 +21,10 @@ def main():
         page.wait_for_selector('#sales-content:not([hidden])')
         assert page.locator('#sales-month-table tbody tr').count() > 0
         assert page.locator('#sales-kpis').inner_text()
-        result['checks'].append({'name': 'SALES_REAL_CROSS_ORIGIN_AND_REDIRECT', 'status': 'PASS'})
+        result['checks'].append({'name': 'SALES_REAL_SAME_ORIGIN_PORTAL_AND_REDIRECT', 'status': 'PASS'})
         page.screenshot(path=str(OUT / 'reports_sales.png'), full_page=True)
         page.locator('#sales-currency').select_option('VND')
-        with page.expect_response(lambda r: '/analytics/sales?' in r.url and 'currency=VND' in r.url) as response:
+        with page.expect_response(lambda r: '/api/reports/sales?' in r.url and 'currency=VND' in r.url) as response:
             page.locator('#sales-filters button[type=submit]').click()
         payload = response.value.json()
         assert response.value.status == 200

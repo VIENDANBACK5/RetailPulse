@@ -1,0 +1,19 @@
+{
+  "execution": "REAL_BROWSER_READ_ONLY_RESTORE",
+  "checks": [
+    {
+      "name": "RELOAD_RESTORES_BATCH_AND_OWNED_THREE_ROW_REPLAY",
+      "status": "PASS"
+    },
+    {
+      "name": "OFFICIAL_REJECTED_RECORDS_SHOW_REAL_REASONS",
+      "status": "PASS"
+    },
+    {
+      "name": "MOBILE_TABLE_SCROLL_WITHOUT_BODY_OVERFLOW",
+      "status": "PASS"
+    }
+  ],
+  "status": "PASS",
+  "javascript_errors": []
+}

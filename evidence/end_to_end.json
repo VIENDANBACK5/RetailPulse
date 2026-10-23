@@ -1,6 +1,6 @@
 {
   "execution": "REAL_INTEGRATION",
-  "checked_at": "2026-10-21T03:18:15.195868+00:00",
+  "checked_at": "2026-10-23T14:29:36.490378+00:00",
   "steps": [
     {
       "step": 1,
@@ -32,9 +32,13 @@
         "status": "UP",
         "warehouse": {
           "database": "retail_dwh_db",
-          "checked_at": "2026-10-21T03:18:15.699149+00:00"
+          "checked_at": "2026-10-23T14:29:40.986465+00:00"
         },
-        "execution": "REAL"
+        "execution": "REAL",
+        "lake_backend": "local",
+        "app_id": "retailpulse-control-v2",
+        "workspace": "D:\\CODE\\bt\\BTL_DATA_MINING",
+        "active_run": null
       }
     },
     {
@@ -118,9 +122,9 @@
           "currency": "GBP",
           "source_records_count": 1067371,
           "target_count": 1061164,
-          "source_total_amount": 19445179.55,
-          "dwh_total_amount": 19445179.55,
-          "diff_amount": 0.0,
+          "source_total_amount": "19445179.55",
+          "dwh_total_amount": "19445179.55",
+          "diff_amount": "0.00",
           "status": "MATCHED"
         },
         {
@@ -128,9 +132,9 @@
           "currency": "VND",
           "source_records_count": 29,
           "target_count": 29,
-          "source_total_amount": 9430000.0,
-          "dwh_total_amount": 9430000.0,
-          "diff_amount": 0.0,
+          "source_total_amount": "9430000.00",
+          "dwh_total_amount": "9430000.00",
+          "diff_amount": "0.00",
           "status": "MATCHED"
         }
       ]
@@ -206,7 +210,7 @@
         "views": {
           "vw_bi_sales_analytics": 1061193,
           "vw_bi_inventory_status": 60,
-          "vw_bi_customer_segments": 8634
+          "vw_bi_customer_segments": 12951
         },
         "native_power_bi": "BLOCKED: Power BI Desktop unavailable; semantic model and DAX supplied, not executed"
       }
@@ -216,9 +220,9 @@
       "name": "Actual API outage/recovery preserves last known inventory",
       "status": "PASS",
       "evidence": {
-        "outage_run": "etl-20261021T031819-10334e974a",
+        "outage_run": "etl-20261023T142957-25ba7df2f9",
         "outage_status": "PARTIAL",
-        "recovery_run": "etl-20261021T031822-09844255a9",
+        "recovery_run": "etl-20261023T143006-499cb3b5b4",
         "recovery_status": "SUCCESS",
         "unchanged_dn_snapshots": 20,
         "mechanism": "real refused HTTP connection for DN; three endpoints share one demo API server"
@@ -238,48 +242,18 @@
     {
       "step": 15,
       "name": "Actual Chrome interaction and captured screenshots",
-      "status": "PASS",
-      "evidence": {
-        "execution": "REAL_BROWSER",
-        "checks": [
-          {
-            "name": "UI_ETL_REAL_RUN",
-            "status": "PASS",
-            "run_id": "etl-20261021T031825-6e7ed2c596",
-            "batch_id": "BATCH-b86bc98211634e3797b549920b9f8c47"
-          },
-          {
-            "name": "OLAP_GBP_MONTH_CURRENCY_SELECTION",
-            "status": "PASS"
-          },
-          {
-            "name": "OLAP_DAY_SLICE_CURRENCY",
-            "status": "PASS"
-          },
-          {
-            "name": "OLAP_PIVOT_DRILLTHROUGH_LINEAGE",
-            "status": "PASS"
-          }
-        ],
-        "screenshots": [
-          "evidence/screenshots/01_overview.png",
-          "evidence/screenshots/02_etl_real_run.png",
-          "evidence/screenshots/03_olap_real_warehouse.png",
-          "evidence/screenshots/04_mining_registry.png"
-        ],
-        "javascript_errors": [],
-        "status": "PASS"
-      }
+      "status": "FAIL",
+      "error": "Command '['C:\\\\Users\\\\ADMIN\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python310\\\\python.exe', 'D:\\\\CODE\\\\bt\\\\BTL_DATA_MINING\\\\scripts\\\\browser_verify.py']' returned non-zero exit status 1."
     }
   ],
   "summary": {
-    "PASS": 15,
-    "FAIL": 0,
+    "PASS": 14,
+    "FAIL": 1,
     "BLOCKED": 0
   },
   "native_power_bi": {
     "status": "BLOCKED",
     "reason": "Power BI Desktop not installed/available; actual web BI fallback verified in steps 12 and 15. No PBIX execution claimed."
   },
-  "status": "PASS_WITH_NATIVE_POWER_BI_BLOCKED"
+  "status": "FAIL"
 }
