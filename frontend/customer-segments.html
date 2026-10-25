@@ -1,1 +1,95 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Thực nghiệm phân khúc khách hàng · RetailPulse</title><link rel="stylesheet" href="css/portal.css"></head><body data-page="mining"><div id="portal-shell"></div><main id="main"><div class="eyebrow">PTIT · Warehouse / OLAP / Data Mining</div><h1>Thực nghiệm phân khúc khách hàng</h1><p class="subtitle">RFM → tiền xử lý → lựa chọn K → đánh giá độ ổn định → hồ sơ cụm. Chỉ hiển thị kết quả được lưu bởi backend; không nạp metric khởi tạo từ registry minh họa.</p><section class="panel"><div class="row between"><h2>Chạy RFM–K-means thật</h2><button id="run-mining" class="primary">Chạy thực nghiệm</button></div><div class="row filters"><label>Nguồn lịch sử<input id="source-code" value="UCI_HISTORICAL"></label><label>Cửa sổ tháng lịch<input id="months" type="number" min="1" max="36" value="12"></label></div><p class="notice">Backend lựa chọn K theo giao thức thực nghiệm. Không mặc định bốn nhóm rồi tạo metric. Kết quả lịch sử chưa xác minh không được hiển thị như lần chạy mới.</p><div id="mining-error"></div></section><section class="panel"><h2>Lịch sử thực thi</h2><div id="runs"></div></section><section id="run-detail" class="panel hidden"><div class="row between"><h2>Chi tiết lần chạy</h2><div id="selected-status"></div></div><code id="selected-run"></code><p id="stage-summary" class="muted"></p><h3>Sự kiện thực thi backend</h3><div id="run-logs"></div><details><summary>Run registry / metadata / artifact paths</summary><div id="run-json"></div></details><h3>Đối soát nguồn / đích</h3><div id="reconciliation"></div><div class="row"><h3>Bản ghi đầu ra</h3><button data-records="sales">Sales</button><button data-records="rejected">Rejected</button><button data-records="inventory">Inventory</button></div><div id="run-records"></div></section><section class="panel"><h2>Hồ sơ cụm & khách hàng</h2><div class="row filters"><label>Model version<input id="model-version" placeholder="Mới nhất nếu trống"></label><label>Mining run ID<input id="model-run" placeholder="Ưu tiên nếu được chọn"></label><button id="apply-model">Xem kết quả</button></div><p id="segment-note" class="muted"></p><div id="profiles"></div><h3>Khách hàng · tối đa 100 dòng</h3><div id="customers"></div></section><section class="panel"><h2>Thực nghiệm & artifact đã ghi nhận</h2><div id="models"></div></section></main><div id="portal-footer"></div><script type="module" src="js/portal-shell.js"></script><script type="module" src="js/verified.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MLOps Model Registry &amp; Data Activation — RetailPulse</title>
+  <meta name="description" content="Quản trị vòng đời mô hình phân cụm (Model Registry), tinh chỉnh siêu tham số K-Means/Autoencoder, What-if analysis và sinh dynamic API feed cho CRM." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/variables.css?ui=danh-live-20261025">
+  <link rel="stylesheet" href="css/base.css?ui=danh-live-20261025">
+  <link rel="stylesheet" href="css/components.css?ui=danh-live-20261025">
+  <link rel="stylesheet" href="css/pages.css?ui=danh-live-20261025">
+  <style>
+    .param-slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .param-slider-wrap input[type="range"] {
+      flex: 1;
+    }
+    .param-val-badge {
+      font-family: monospace;
+      font-weight: 700;
+      min-width: 3rem;
+      text-align: right;
+    }
+    .code-terminal-box {
+      background: #0d1117;
+      color: #c9d1d9;
+      font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+      font-size: 0.75rem;
+      padding: 1rem;
+      border-radius: var(--radius-card-sm);
+      overflow-x: auto;
+      line-height: 1.45;
+    }
+  </style>
+  <link rel="stylesheet" href="css/refinements.css?ui=danh-live-20261025">
+  <link rel="stylesheet" href="css/workspace.css?ui=danh-live-20261025">
+  <link rel="stylesheet" href="css/workspace-pages.css?ui=danh-live-20261025">
+<link rel="stylesheet" href="css/journey.css?ui=danh-live-20261025"></head>
+<body class="portal-app has-sidebar workspace-page models-workspace">
+  <a href="#main" class="skip-link">Chuyển đến nội dung chính</a>
+
+  <!-- Header -->
+
+  <aside class="workspace-sidebar" id="app-sidebar" aria-label="Thanh điều hướng workspace">
+    <button class="sidebar-close" id="sidebar-close" type="button" aria-label="Đóng điều hướng"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=danh-live-20261025#close"/></svg></button>
+    <a class="workspace-brand" href="index.html?ui=danh-live-20261025" aria-label="RetailPulse - Trang chủ"><span class="workspace-brand-mark"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=danh-live-20261025#brand"/></svg></span>RetailPulse</a>
+    <div class="workspace-identity"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=danh-live-20261025#database"/></svg><div><strong>Retail Analytics</strong><small>Data Warehouse &amp; Mining</small></div></div>
+    <nav aria-label="Điều hướng chính"><div class="sidebar-label">LUỒNG DỮ LIỆU</div><div class="sidebar-nav"><a class="sidebar-link" data-dj-sidebar="source" href="operations.html?ui=danh-live-20261025#source"><span class="project-monogram">01</span><span>Sources</span></a><a class="sidebar-link" data-dj-sidebar="raw" href="etl-monitor.html?ui=danh-live-20261025#raw"><span class="project-monogram">02</span><span>Raw</span></a><a class="sidebar-link" data-dj-sidebar="etl" href="etl-monitor.html?ui=danh-live-20261025#etl"><span class="project-monogram">03</span><span>ETL</span></a><a class="sidebar-link" data-dj-sidebar="dwh" href="etl-monitor.html?ui=danh-live-20261025#dwh"><span class="project-monogram">04</span><span>DWH</span></a><a class="sidebar-link" data-dj-sidebar="olap" href="dashboard.html?ui=danh-live-20261025#olap"><span class="project-monogram">05</span><span>OLAP</span></a><a class="sidebar-link" data-dj-sidebar="mining" href="customer-segments.html?ui=danh-live-20261025#mining"><span class="project-monogram">06</span><span>Mining</span></a><a class="sidebar-link" data-dj-sidebar="bi" href="dashboard.html?ui=danh-live-20261025#bi"><span class="project-monogram">07</span><span>BI</span></a></div></nav>
+    <nav class="sidebar-secondary" aria-label="Truy cập báo cáo"><div class="sidebar-label">BÁO CÁO</div><div class="sidebar-nav">
+      <a class="sidebar-link" href="dashboard.html?ui=danh-live-20261025#revenue-section"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=danh-live-20261025#chart"/></svg><span>Báo cáo bán hàng</span></a>
+      <a class="sidebar-link" href="dashboard.html?ui=danh-live-20261025#branch-section"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=danh-live-20261025#package"/></svg><span>Báo cáo tồn kho</span></a>
+      <a class="sidebar-link" href="customer-segments.html?ui=danh-live-20261025#mining"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#users"/></svg><span>Phân khúc khách hàng</span></a><a class="sidebar-link" href="dashboard.html?ui=danh-live-20261025#system-status"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=danh-live-20261025#activity"/></svg><span>Trạng thái hệ thống</span></a>
+    </div></nav>
+    <div class="sidebar-bottom"><a class="sidebar-link" href="index.html?ui=danh-live-20261025"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=danh-live-20261025#arrow-up-right"/></svg><span>Giới thiệu dự án</span></a><div class="sidebar-project"><span class="project-monogram">RP</span><div><strong>RetailPulse Project</strong><small>Data Warehouse &amp; Data Mining</small></div></div></div>
+  </aside>
+  <button class="sidebar-backdrop" id="sidebar-backdrop" type="button" aria-label="Đóng thanh điều hướng" tabindex="-1" hidden></button>
+  <header class="workspace-topbar">
+    <div class="workspace-breadcrumb"><button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Mở điều hướng" aria-controls="app-sidebar" aria-expanded="false"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=danh-live-20261025#menu"/></svg></button><span>Workspace</span><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=danh-live-20261025#chevron"/></svg><strong>Khai phá &amp; phân khúc</strong></div>
+    <div class="workspace-topbar-meta"><span class="status-pill info" id="dj-health">Đang kiểm tra backend</span><div class="clock-chip"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg?ui=danh-live-20261025#clock"/></svg><span id="live-time-str">--:--</span></div></div>
+  </header>
+
+
+  <!-- Page Banner -->
+  <section class="page-banner">
+    <div class="shell">
+      <div class="page-title-wrap">
+        <div>
+          <div class="eyebrow tone-dark" style="margin-bottom:0.25rem;">
+            <span class="eyebrow-dot" style="background:var(--accent);"></span>
+            <span>DATA MINING / CUSTOMER SEGMENTS</span>
+          </div>
+          <h1 class="page-title">Khai phá & phân khúc khách hàng</h1>
+          <p class="page-subtitle">Đầu vào → Xử lý → Đầu ra → Bằng chứng. Mọi thao tác chính đọc hoặc chạy backend thật.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+
+  <main id="main" class="shell workspace-content" style="padding-bottom: 5rem;"><div id="data-journey"></div></main>
+
+  <footer class="portal-footer"><div class="shell"><span>RetailPulse / Data Warehouse &amp; Data Mining</span><a href="index.html?ui=danh-live-20261025">Về trang giới thiệu &rarr;</a></div></footer>
+
+
+  <script type="module" src="js/sidebar.js?ui=danh-live-20261025"></script>
+<script type="module" src="js/journey.js?ui=danh-live-20261025"></script></body>
+</html>

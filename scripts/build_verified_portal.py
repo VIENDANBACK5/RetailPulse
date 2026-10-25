@@ -1,4 +1,5 @@
-"""Build the compact real-execution portal, preserving original illustrative pages."""
+"""Build real-data detail pages inside Danh's workspace; never replace the main journey."""
+raise SystemExit('DISABLED: frontend is now the exact origin/danh tree. This obsolete generator must not overwrite it.')
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -6,6 +7,8 @@ FRONT = ROOT / 'frontend'
 NAV = [('index.html', 'Tổng quan'), ('etl-monitor.html', 'Luồng dữ liệu'), ('dashboard.html', 'BI / OLAP'), ('customer-segments.html', 'Khai phá'), ('reports.html', 'Báo cáo tổng hợp')]
 
 def page(filename, title, subtitle, body, mode='home'):
+    if filename in ('index.html', 'operations.html'):
+        return  # Hand-authored journey and compatibility redirect are canonical.
     if mode == 'etl':
         body = body.replace('<label>File tùy chọn', '<label>Kịch bản API <select id="scenario"><option value="normal">Bình thường / khôi phục</option><option value="dn_outage">DEMO lỗi kết nối DN</option></select></label><label>File tùy chọn')
         body = body.replace('<h3>Trạng thái thu thập API gần nhất</h3>', '<h3>Source manifest · Xuất xứ thực / demo</h3><div id="manifest-status"></div><h3>Trạng thái thu thập API gần nhất</h3>')
@@ -13,15 +16,6 @@ def page(filename, title, subtitle, body, mode='home'):
         body = body.replace('<button id="drill-through">', '<button id="pivot-table">Pivot hai trục</button><button id="drill-through">')
         body = body.replace('<section class="panel"><h2>Drill-through', '<section class="panel"><h2>Pivot · Chiều phân tích × thời gian</h2><p id="pivot-note" class="muted">Bấm Pivot hai trục để đổi sản phẩm/quốc gia/nguồn thành hàng và thời gian thành cột.</p><div id="cross-tab"></div></section><section class="panel"><h2>Drill-through')
     path = FRONT / filename
-    archived = FRONT / 'demo' / filename
-    if path.exists() and not archived.exists():
-        archived.parent.mkdir(exist_ok=True)
-        original = path.read_text(encoding='utf-8')
-        original = original.replace('<head>', '<head><base href="../">', 1)
-        original = original.replace('<body', '<body', 1)
-        offset = original.find('>', original.find('<body')) + 1
-        original = original[:offset] + '<div style="position:sticky;top:0;z-index:99999;padding:15px;background:#fff3cd;color:#663c00;text-align:center;font-weight:bold">DEMO LƯU TRỮ — giao diện minh họa cũ; dữ liệu và trạng thái có thể mô phỏng. <a href="index.html">Về hệ thống thực</a></div>' + original[offset:]
-        archived.write_text(original, encoding='utf-8')
     path.write_text(f'''<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title} · RetailPulse</title><link rel="stylesheet" href="css/portal.css"></head><body data-page="{mode}"><div id="portal-shell"></div><main id="main"><div class="eyebrow">PTIT · Warehouse / OLAP / Data Mining</div><h1>{title}</h1><p class="subtitle">{subtitle}</p>{body}</main><div id="portal-footer"></div><script type="module" src="js/portal-shell.js"></script><script type="module" src="js/verified.js"></script></body></html>''',encoding='utf-8')
 
 steps = '<div class="steps">'+''.join(f'<div class="step">{i:02d} · {title}<span>{text}</span></div>' for i,(title,text) in enumerate([('Sources','File / DB / REST'),('Raw','Manifest & provenance'),('ETL','Validate & transform'),('DWH','Load & reconcile'),('OLAP','SQL / dimensions'),('Mining','RFM / evaluation'),('BI','Profiles & evidence')],1))+'</div>'
@@ -33,4 +27,4 @@ filters='''<div class="row filters"><label>Cấp thời gian<select id="grain"><
 page('dashboard.html','BI & phân tích đa chiều','Roll-up / drill-down theo cấp thời gian, slice / dice theo bộ lọc, pivot theo chiều và drill-through về giao dịch. Kết quả lấy trực tiếp từ các BI view đã kiểm chứng.', '''<section class="panel"><h2>Sales Analytics</h2>'''+filters+'''<p id="sales-note" class="notice"></p><h3>Gross purchase value</h3><div id="sales-chart"></div><div id="sales-table"></div><details><summary>SQL đối chứng cùng bộ lọc</summary><div id="sql-reference"></div></details></section><section class="panel"><h2>Drill-through · Giao dịch chi tiết</h2><p class="muted">Giữ bộ lọc phía trên. Xem nguồn, định danh dòng và batch để truy ngược Raw.</p><div id="sales-details" class="empty">Bấm Drill-through để mở 50 giao dịch phù hợp.</div></section><section class="panel"><div class="row between"><h2>Inventory Analytics</h2><button id="refresh-inventory">Đọc snapshot mới nhất</button></div><p class="notice">Tồn kho là chỉ tiêu bán cộng: không cộng nhiều thời điểm. Trạng thái nguồn riêng biệt với số tồn; mất kết nối giữ snapshot hợp lệ gần nhất và thời điểm gốc.</p><div id="inventory"></div></section><section class="panel"><h2>Customer Analytics</h2><p id="segment-note" class="muted"></p><div id="profiles"></div><details><summary>Chi tiết khách hàng</summary><div id="customers"></div></details></section>''','dashboard')
 page('customer-segments.html','Thực nghiệm phân khúc khách hàng','RFM → tiền xử lý → lựa chọn K → đánh giá độ ổn định → hồ sơ cụm. Chỉ hiển thị kết quả được lưu bởi backend; không nạp metric khởi tạo từ registry minh họa.', '''<section class="panel"><div class="row between"><h2>Chạy RFM–K-means thật</h2><button id="run-mining" class="primary">Chạy thực nghiệm</button></div><div class="row filters"><label>Nguồn lịch sử<input id="source-code" value="UCI_HISTORICAL"></label><label>Cửa sổ tháng lịch<input id="months" type="number" min="1" max="36" value="12"></label></div><p class="notice">Backend lựa chọn K theo giao thức thực nghiệm. Không mặc định bốn nhóm rồi tạo metric. Kết quả lịch sử chưa xác minh không được hiển thị như lần chạy mới.</p><div id="mining-error"></div></section><section class="panel"><h2>Lịch sử thực thi</h2><div id="runs"></div></section>'''+run_detail+'''<section class="panel"><h2>Hồ sơ cụm & khách hàng</h2><div class="row filters"><label>Model version<input id="model-version" placeholder="Mới nhất nếu trống"></label><label>Mining run ID<input id="model-run" placeholder="Ưu tiên nếu được chọn"></label><button id="apply-model">Xem kết quả</button></div><p id="segment-note" class="muted"></p><div id="profiles"></div><h3>Khách hàng · tối đa 100 dòng</h3><div id="customers"></div></section><section class="panel"><h2>Thực nghiệm & artifact đã ghi nhận</h2><div id="models"></div></section>''','mining')
 page('operations.html','Tác nghiệp ngoài phạm vi demo chính','Portal chính tập trung tích hợp dữ liệu, Warehouse, OLAP và Data Mining.', '''<section class="panel"><h2>Không khả dụng trong demo kiểm chứng</h2><p>Tạo đơn, CRM tự động, broker mô phỏng và điều phối Haversine không nằm trong đường demo chính. Giao diện cũ được giữ riêng với nhãn DEMO.</p><a class="button" href="demo/operations.html">Xem minh họa cũ · DEMO</a><a class="button primary" href="etl-monitor.html">Chạy pipeline thật</a></section>''')
-print('Built verified portal; original pages retained under frontend/demo/.')
+print('Built real-data detail pages using the shared Danh workspace. Main journey preserved.')

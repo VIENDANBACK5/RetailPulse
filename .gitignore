@@ -63,8 +63,10 @@ data_lake/raw/uci/*.csv
 !data_lake/raw/multi_store/*
 
 # Local execution state and protected database backups
+backups/
 data_lake/backups/
 data_lake/runs/
+data_lake/raw/uploads/
 data_lake/raw/secure_staging/
 evidence/browser-profile/
 .build/

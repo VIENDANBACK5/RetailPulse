@@ -1,12 +1,12 @@
 {
   "execution": "REAL_CHROME_REAL_OLTP_ETL_MINING",
-  "started_at": "2026-10-23T15:24:12.906538+00:00",
+  "started_at": "2026-10-25T10:57:55.568236+00:00",
   "idempotency_key": "ui-demo-797efd245fb94ae79cea54af584e7164",
   "checks": [
     {
       "name": "PREPARE_OWNED_THREE_OLTP_ROWS",
       "status": "PASS",
-      "warehouse_before": 0
+      "warehouse_before": 3
     },
     {
       "name": "OFFICIAL_FILE_RAW_PREVIEW",
@@ -31,11 +31,15 @@
       "status": "PASS"
     },
     {
+      "name": "RAW_TO_FACT_TRANSFORM_COMPARISON",
+      "status": "PASS"
+    },
+    {
       "name": "FROZEN_RAW_REPLAY_IDEMPOTENT",
       "status": "PASS",
       "session_observation": {
-        "run_id": "etl-20261023T152436-f5661140c8",
-        "batch_id": "BATCH-b146e77d1d7c47c4bbf51e787a56ed3f",
+        "run_id": "etl-20261025T105826-bf0c5ebe72",
+        "batch_id": "BATCH-eb359cac933b4ee9bc2e336f6b10679e",
         "rows": 3,
         "inserted": 0,
         "updated": 0,
@@ -44,11 +48,11 @@
       "source_counts": {
         "inserted": 0,
         "updated": 0,
-        "unchanged": 35,
-        "target_count": 35,
-        "target_amount": 9980000.0,
+        "unchanged": 38,
+        "target_count": 38,
+        "target_amount": 10255000.0,
         "mismatches": 0,
-        "source_amount": 9980000.0,
+        "source_amount": 10255000.0,
         "reconciliation": "MATCHED"
       }
     },
@@ -64,7 +68,7 @@
     {
       "name": "ACTUAL_FIFTY_FIT_MINING_AND_SNAPSHOT",
       "status": "PASS",
-      "run_id": "mining-20261023T152521-c7d284951f",
+      "run_id": "mining-20261025T105916-277ec882f7",
       "selected_k": 2,
       "persisted_customers": 4317
     },
@@ -85,12 +89,12 @@
     "RP-DEMO-264e2a5ebdd7d23de88b-CANCEL"
   ],
   "runs": {
-    "run-demo-etl": "etl-20261023T152418-9971434598",
-    "replay-demo": "etl-20261023T152436-f5661140c8",
-    "outage-demo": "etl-20261023T152448-b58f629f37",
-    "recover-demo": "etl-20261023T152502-7114a78cc4",
-    "run-demo-mining": "mining-20261023T152521-c7d284951f"
+    "run-demo-etl": "etl-20261025T105801-ef9fe3e965",
+    "replay-demo": "etl-20261025T105826-bf0c5ebe72",
+    "outage-demo": "etl-20261025T105840-fe1007235d",
+    "recover-demo": "etl-20261025T105855-551dd1b697",
+    "run-demo-mining": "mining-20261025T105916-277ec882f7"
   },
   "javascript_errors": [],
-  "finished_at": "2026-10-23T15:25:58.163992+00:00"
+  "finished_at": "2026-10-25T11:00:04.510016+00:00"
 }

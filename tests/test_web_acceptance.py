@@ -12,13 +12,15 @@ from src.web.app import app
 client = TestClient(app)
 
 
-def test_primary_portal_is_real_execution():
+def test_original_danh_frontend_routes_are_served():
     for page in ['index.html', 'etl-monitor.html', 'dashboard.html', 'customer-segments.html']:
         response = client.get('/frontend/' + page)
         assert response.status_code == 200
-        assert 'verified.js' in response.text
-        assert 'dataops-engine.js' not in response.text
-        assert 'Math.random' not in response.text
+        assert 'RetailPulse' in response.text
+        assert 'portal-shell.js' not in response.text
+        assert 'css/portal.css' not in response.text
+        # The original branch contains illustrative controls. Serving it is not
+        # evidence that those controls execute a real ETL/mining worker.
 
 
 def test_unknown_run_is_not_success():

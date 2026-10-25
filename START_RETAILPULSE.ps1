@@ -85,7 +85,7 @@ $controlHealthy = $false
 try { $health = Invoke-RestMethod 'http://127.0.0.1:8010/api/health' -TimeoutSec 5; $controlHealthy = $health.execution -eq 'REAL' } catch {}
 if ($controlHealthy) {
     $expectedBackend = if ($env:LAKE_BACKEND) { $env:LAKE_BACKEND } else { 'local' }
-    if ($health.lake_backend -ne $expectedBackend -or $health.app_id -ne 'retailpulse-control-v4') {
+    if ($health.lake_backend -ne $expectedBackend -or $health.app_id -ne 'retailpulse-control-v6') {
         if ($health.active_run) { throw "Control API is processing $($health.active_run). Wait before changing lake mode." }
         # Only restart the verified RetailPulse uvicorn listener, never an unrelated port owner.
         $listeners = @(Get-NetTCPConnection -LocalPort 8010 -State Listen -ErrorAction SilentlyContinue)
@@ -116,9 +116,9 @@ if ($WithLake -and $health.lake_backend -ne 's3') { throw 'Control API did not e
 Write-Host 'VERIFIED: PostgreSQL OLTP/DWH and real control API are reachable.'
 Write-Host 'Portal: http://127.0.0.1:8010/frontend/index.html'
 Write-Host 'OLAP: http://127.0.0.1:8010/frontend/dashboard.html'
-Write-Host 'Reports: http://127.0.0.1:8010/frontend/reports.html'
+Write-Host 'Danh frontend: http://127.0.0.1:8010/frontend/etl-monitor.html'
 Write-Host 'API docs: http://127.0.0.1:8010/docs'
 if ($WithLake) { Write-Host 'MinIO: http://127.0.0.1:9001 (Raw bucket shared by CLI and Airflow)' }
 if ($WithAirflow) { Write-Host 'Airflow: http://127.0.0.1:18082 (DAGs paused until manually triggered)' }
-Write-Host 'Sources, ETL and mining are executed from the portal or CLI; old runs remain available.'
+Write-Host 'Danh workspace: Sources / Raw / ETL / DWH / OLAP / Mining / BI use the real control API.'
 if (!$NoBrowser) { Start-Process 'http://127.0.0.1:8010/frontend/index.html' -WindowStyle Hidden }

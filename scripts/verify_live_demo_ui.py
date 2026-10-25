@@ -4,6 +4,7 @@ Actions are browser clicks; HTTP is used only to independently read persisted
 run/session results. Re-running resumes the same saved key unless --key is set.
 """
 from pathlib import Path
+raise SystemExit('RETIRED: seven-step frontend removed at user request. Run python scripts/verify_danh_frontend.py for original Danh UI checks; this does not verify ETL/ML controls.')
 from datetime import datetime, timezone
 import argparse
 import json
@@ -46,9 +47,9 @@ def main(key=None):
             page = context.new_page()
             page.set_default_timeout(90000)
             page.on('pageerror', lambda error: errors.append(str(error)))
-            page.goto(BASE + '/frontend/demo-guide.html')
+            page.goto(BASE + '/frontend/index.html')
             page.wait_for_selector('.portal-header')
-            assert page.locator('#portal-navigation [aria-current=page]').get_attribute('href') == 'demo-guide.html'
+            assert page.locator('#portal-navigation [aria-current=step]').get_attribute('href') == 'index.html#step=1'
             page.locator('#session-label').fill('Actual browser teaching-demo verification')
             with page.expect_response(lambda r: r.url.endswith('/api/demo/sessions') and r.request.method == 'POST') as prepared:
                 page.locator('#prepare-session').click()
@@ -109,9 +110,14 @@ def main(key=None):
             assert {str(r['source_record_id']) for r in raw['session_raw_rows']} == set(map(str, session['source_item_ids']))
             result['checks'].append({'name': 'THREE_FACT_LINES_TRACE_TO_RAW', 'status': 'PASS'})
             step(2)
+            page.locator('#inspect-transform').click()
+            page.wait_for_selector('#transform-proof tbody tr')
+            assert page.locator('#transform-proof tbody tr').count() == 3
+            result['checks'].append({'name': 'RAW_TO_FACT_TRANSFORM_COMPARISON', 'status': 'PASS'})
+            step(3)
             assert page.locator('#warehouse-orders tbody tr').count() == 3
             page.screenshot(path=str(SHOTS / '01_session_warehouse.png'), full_page=True)
-            step(3)
+            page.locator('#replay-demo').locator('..').locator('summary').first.click()
             replay = run('replay-demo', 'SUCCESS')
             replay_result = replay['metadata'].get('result', replay['metadata'])
             counts = replay_result['sources']['app']['counts']
@@ -120,7 +126,8 @@ def main(key=None):
             observation = next(r for r in session['observed_runs'] if r['run_id'] == replay['run_id'])
             assert observation['unchanged'] == observation['rows'] == 3
             result['checks'].append({'name': 'FROZEN_RAW_REPLAY_IDEMPOTENT', 'status': 'PASS', 'session_observation': observation, 'source_counts': counts})
-            step(4)
+            step(6)
+            page.locator('#outage-demo').locator('..').locator('summary').first.click()
             before = {r['stock_code']: r['stock_on_hand'] for r in read('/analytics/inventory') if r['branch_code'] == 'DN'}
             assert len(before) == 20
             run('outage-demo', 'PARTIAL')
@@ -133,16 +140,16 @@ def main(key=None):
             assert {r['stock_code']: r['stock_on_hand'] for r in recovered} == before
             assert all(r['node_status'] == 'ONLINE' for r in recovered)
             result['checks'].append({'name': 'DN_OFFLINE_AND_RECOVERY_PRESERVE_STOCK', 'status': 'PASS', 'sku_count': 20})
-            step(5)
+            step(4)
             page.locator('#open-olap').click()
             page.wait_for_selector('#sales-table table')
             assert page.locator('#currency').input_value() == 'VND'
             assert page.locator('#source').input_value() == 'APP_OPERATIONAL'
-            page.locator('#portal-navigation a[href="demo-guide.html"]').click()
+            page.locator('#portal-navigation a[data-flow-step="0"]').click()
             page.wait_for_function("(sid)=>document.querySelector('#session-id').textContent.includes(sid)", arg=sid)
             assert json.loads(page.evaluate(f'localStorage.getItem({json.dumps(STORAGE)})'))['session_id'] == sid
             result['checks'].append({'name': 'OLAP_DEEPLINK_AND_PERSISTED_SESSION_RETURN', 'status': 'PASS'})
-            step(6)
+            step(5)
             mined = run('run-demo-mining', 'SUCCESS')
             model = mined['metadata'].get('result', mined['metadata'])
             assert model['selected_k'] == 2
@@ -156,7 +163,7 @@ def main(key=None):
                 step(number)
                 bounds = page.evaluate('({w:innerWidth,sw:document.documentElement.scrollWidth})')
                 assert bounds['sw'] <= bounds['w'] + 1, (number, bounds)
-            step(2)
+            step(3)
             page.screenshot(path=str(SHOTS / '04_mobile_session.png'), full_page=True)
             assert not errors, errors
             result['checks'].append({'name': 'SEVEN_CHAPTERS_MOBILE_FIT_AND_NO_JS_ERRORS', 'status': 'PASS'})

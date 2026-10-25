@@ -1,4 +1,5 @@
 """Real-browser checks for the shared live portal shell, without synthetic data."""
+raise SystemExit('RETIRED: old portal removed. Run python scripts/verify_danh_frontend.py instead.')
 from pathlib import Path
 import json
 from datetime import datetime, timezone
@@ -22,10 +23,10 @@ def main():
                 page.goto('http://127.0.0.1:8010/frontend/' + filename)
                 page.wait_for_selector('.portal-header')
                 page.wait_for_function("!document.querySelector('#connection').innerText.includes('Đang kiểm tra')")
-                assert page.locator('#portal-navigation a').count() == 6
+                assert page.locator('#portal-navigation [data-flow-step]').count() == 7
                 assert page.locator('link[href="css/portal.css"]').count() == 1
                 assert page.locator('#portal-footer footer').count() == 1
-                if width < 980:
+                if width < 1024:
                     menu = page.locator('.portal-menu')
                     menu.click()
                     assert menu.get_attribute('aria-expanded') == 'true'

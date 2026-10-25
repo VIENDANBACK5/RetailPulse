@@ -1,6 +1,6 @@
 {
   "execution": "REAL_BROWSER_REAL_API",
-  "checked_at": "2026-10-23T15:16:01.088995+00:00",
+  "checked_at": "2026-10-25T11:02:44.131002+00:00",
   "checks": [
     {
       "page": "index.html",
@@ -8,8 +8,8 @@
       "status": "PASS",
       "viewport": 1440,
       "document": 1440,
-      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
-      "header": "rgb(24, 45, 67)"
+      "font": "Onest, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+      "header": "rgba(255, 255, 255, 0.96)"
     },
     {
       "page": "etl-monitor.html",
@@ -17,8 +17,8 @@
       "status": "PASS",
       "viewport": 1440,
       "document": 1440,
-      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
-      "header": "rgb(24, 45, 67)"
+      "font": "Onest, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+      "header": "rgba(255, 255, 255, 0.96)"
     },
     {
       "page": "dashboard.html",
@@ -26,8 +26,8 @@
       "status": "PASS",
       "viewport": 1440,
       "document": 1440,
-      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
-      "header": "rgb(24, 45, 67)"
+      "font": "Onest, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+      "header": "rgba(255, 255, 255, 0.96)"
     },
     {
       "page": "customer-segments.html",
@@ -35,8 +35,8 @@
       "status": "PASS",
       "viewport": 1440,
       "document": 1440,
-      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
-      "header": "rgb(24, 45, 67)"
+      "font": "Onest, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+      "header": "rgba(255, 255, 255, 0.96)"
     },
     {
       "page": "reports.html",
@@ -44,8 +44,8 @@
       "status": "PASS",
       "viewport": 1440,
       "document": 1440,
-      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
-      "header": "rgb(24, 45, 67)"
+      "font": "Onest, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+      "header": "rgba(255, 255, 255, 0.96)"
     },
     {
       "page": "operations.html",
@@ -53,8 +53,8 @@
       "status": "PASS",
       "viewport": 1440,
       "document": 1440,
-      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
-      "header": "rgb(24, 45, 67)"
+      "font": "Onest, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+      "header": "rgba(255, 255, 255, 0.96)"
     },
     {
       "page": "index.html",
@@ -62,8 +62,8 @@
       "status": "PASS",
       "viewport": 390,
       "document": 390,
-      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
-      "header": "rgb(24, 45, 67)"
+      "font": "Onest, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+      "header": "rgba(255, 255, 255, 0.96)"
     },
     {
       "page": "etl-monitor.html",
@@ -71,8 +71,8 @@
       "status": "PASS",
       "viewport": 390,
       "document": 390,
-      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
-      "header": "rgb(24, 45, 67)"
+      "font": "Onest, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+      "header": "rgba(255, 255, 255, 0.96)"
     },
     {
       "page": "dashboard.html",
@@ -80,8 +80,8 @@
       "status": "PASS",
       "viewport": 390,
       "document": 390,
-      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
-      "header": "rgb(24, 45, 67)"
+      "font": "Onest, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+      "header": "rgba(255, 255, 255, 0.96)"
     },
     {
       "page": "customer-segments.html",
@@ -89,8 +89,8 @@
       "status": "PASS",
       "viewport": 390,
       "document": 390,
-      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
-      "header": "rgb(24, 45, 67)"
+      "font": "Onest, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+      "header": "rgba(255, 255, 255, 0.96)"
     },
     {
       "page": "reports.html",
@@ -98,8 +98,8 @@
       "status": "PASS",
       "viewport": 390,
       "document": 390,
-      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
-      "header": "rgb(24, 45, 67)"
+      "font": "Onest, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+      "header": "rgba(255, 255, 255, 0.96)"
     },
     {
       "page": "operations.html",
@@ -107,8 +107,8 @@
       "status": "PASS",
       "viewport": 390,
       "document": 390,
-      "font": "\"Segoe UI\", -apple-system, BlinkMacSystemFont, Arial, sans-serif",
-      "header": "rgb(24, 45, 67)"
+      "font": "Onest, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+      "header": "rgba(255, 255, 255, 0.96)"
     }
   ],
   "status": "PASS"

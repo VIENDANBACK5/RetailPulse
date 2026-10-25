@@ -31,6 +31,16 @@ from src.web.reports import router as reports_router
 app.include_router(reports_router)
 from src.web.demo import router as demo_router
 app.include_router(demo_router)
+from src.web.journey import router as journey_router
+app.include_router(journey_router)
+
+
+@app.middleware('http')
+async def frontend_no_cache(request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith('/frontend/'):
+        response.headers['Cache-Control'] = 'no-store, max-age=0'
+    return response
 pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="retailpulse")
 job_lock = threading.Lock()
 active_job = None
@@ -92,7 +102,7 @@ def home():
 def health():
     return {"status": "UP", "warehouse": rows("SELECT current_database() AS database, NOW() AS checked_at")[0],
             "execution": "REAL", "lake_backend": os.getenv("LAKE_BACKEND", "local"),
-            "app_id": "retailpulse-control-v4", "workspace": str(ROOT), "active_run": active_job}
+            "app_id": "retailpulse-control-v6", "workspace": str(ROOT), "active_run": active_job}
 
 
 @app.post("/api/runs", status_code=202)

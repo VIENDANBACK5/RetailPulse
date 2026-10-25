@@ -1,5 +1,7 @@
 # Một kịch bản demo thực tế, một portal
 
+> Cập nhật giao diện 25/10/2026: trang chính là `frontend/index.html`, dùng workspace/sidebar của Danh. Bảy bước hiện là Nguồn → Raw → ETL → DWH → OLAP → Mining → BI; replay nằm trong DWH và lỗi API nằm trong BI. Bảng thời gian bên dưới ghi thứ tự trình bày trước khi đổi giao diện, nên đối chiếu thao tác mới tại [DANH_WORKSPACE_HANDOFF.md](DANH_WORKSPACE_HANDOFF.md). URL demo-guide cũ tự chuyển về trang chính.
+
 ## Mở đúng một màn hình
 
 ```powershell

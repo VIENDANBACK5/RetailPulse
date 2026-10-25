@@ -1,0 +1,171 @@
+{
+  "checked_at": "2026-10-25T11:10:02.995526+00:00",
+  "ref": "origin/danh",
+  "commit": "a3a924bdae6e0bce51290955a132ad0ac057e531",
+  "scope": "Exact branch bytes, HTTP serving and visual render; NOT ETL/ML execution",
+  "files": [
+    {
+      "path": "frontend/assets/icons.svg",
+      "sha256": "0824cabfe9e2dbd6b154dc2a09bba23c171de7071ef5767bbfae58e6f00706a7",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/css/analytics.css",
+      "sha256": "20b383c62d785a9b6d9a9ce5629e1935a857761e22df5a028fdf23f60e7a1fc6",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/css/base.css",
+      "sha256": "2c790a856ec625310738e16462fcaac5be076857e72bc9e149db546ab93cbe40",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/css/components.css",
+      "sha256": "09a7937d22140cc2e57a04ee68feba72acc59206256e793c8f4cc4f85b09e4e0",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/css/landing.css",
+      "sha256": "856192a9fdcbb316f35fda37382f2d61e77aac6c1cd3a61b411e8e40372ec47c",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/css/pages.css",
+      "sha256": "627a969b61d377e8385c0e420261b693ffeee6b07c6991474cf309ab92f40755",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/css/refinements.css",
+      "sha256": "7ef9adcb4cee57e9ea29c3e030ecd0023f45a1cd2814f52315f50cb97f5534db",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/css/variables.css",
+      "sha256": "a313676b5322be1a8d2a87af27e434f27d2cfa82fd562b45dddb0f291a51039e",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/css/workspace-pages.css",
+      "sha256": "75d31de8322d1a9e4eb6703fa9f7f329aee657b264a71882f0f25508b40d65ed",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/css/workspace.css",
+      "sha256": "3aa24c9a391d9d35545bc574b18283340c0b578385dc3a0b79819372745c0080",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/customer-segments.html",
+      "sha256": "56a2b8e3e6da058a8880e590ff3ad5344117b3896c496a50af517d45855f5d28",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/dashboard.html",
+      "sha256": "870bd5217ca4b25a3cd940417a4ae545680918dc59f5aaa47c38d3e5ef93c4a8",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/data/sample-segments.json",
+      "sha256": "7a141bab8f96989877845c50c541faa280670705cb08caeaa2dd24965fccaa48",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/etl-monitor.html",
+      "sha256": "effa6350520025990b8ba9a1897c8771e77a2646905f3ac03abdf071ab89c71b",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/index.html",
+      "sha256": "8a1099a3b797d6ddeb7cfae488dd88d72ceca722c4b4097c7d790e46a18c6f77",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/js/adaptive-grid.js",
+      "sha256": "8bd80c1023d4c7f5f85fdfe68c492206ef2165a2f45bdd8ac20cad2c91274223",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/js/analytics-utils.mjs",
+      "sha256": "8fc5b3bcbf8e10dee50a55faf13bae5639a63164b553740427649fbbeb23fd79",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/js/app.js",
+      "sha256": "021fe4a8efc50d2d302a55799aaa91fbeb03d2ce791c64b2074d5efb8f1840b9",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/js/clock.js",
+      "sha256": "135575fe4c1229ce9004458d9783755df0f7afb515c53ac18e408e47b9cdb205",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/js/dashboard.js",
+      "sha256": "242d23339a0f16284c9cfd922a7dfdb9528cf13b29cdfcb12655c6301811260f",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/js/dataops-engine.js",
+      "sha256": "856562015d9e291b878e5ba07e94e0a8eb1dec96b3a0f262f51305cf878e2b6b",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/js/lenis-smooth.js",
+      "sha256": "751786411b275be50eef9942175d5ff4f56aedc7c842f5469920d38b8aede3f5",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/js/liquid-reveal.js",
+      "sha256": "2b4780d67c1d41020a745f5cb303d46a276ca5535633b934e15f8e0c113ad7c1",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/js/rfm-engine.js",
+      "sha256": "aaae5377f4a6fee94282abe027c361de4c66118e797c66e96c098b975f0fdfbf",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/js/sidebar.js",
+      "sha256": "2051bb5af35e20512e88944b8e6f6945b259f3371ca5a087df3755f00208465d",
+      "status": "PASS"
+    },
+    {
+      "path": "frontend/operations.html",
+      "sha256": "13974decd55b317005405d8d9b07d99a127bcc27d95ac3ca2bfba5cd249c6907",
+      "status": "PASS"
+    }
+  ],
+  "pages": [
+    {
+      "path": "index",
+      "title": "RetailPulse — Enterprise Retail DWH & Customer Mining Platform",
+      "javascript_errors": [],
+      "status": "PASS"
+    },
+    {
+      "path": "dashboard",
+      "title": "Báo cáo kinh doanh — RetailPulse",
+      "javascript_errors": [],
+      "status": "PASS"
+    },
+    {
+      "path": "etl-monitor",
+      "title": "DataOps Pipeline & Kafka Control — RetailPulse",
+      "javascript_errors": [],
+      "status": "PASS"
+    },
+    {
+      "path": "customer-segments",
+      "title": "MLOps Model Registry & Data Activation — RetailPulse",
+      "javascript_errors": [],
+      "status": "PASS"
+    },
+    {
+      "path": "operations",
+      "title": "Data Ingestion & Node Security — RetailPulse DataOps",
+      "javascript_errors": [],
+      "status": "PASS"
+    }
+  ],
+  "status": "PASS"
+}

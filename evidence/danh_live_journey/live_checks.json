@@ -1,0 +1,143 @@
+{
+  "started_at": "2026-10-25T11:34:34.866159+00:00",
+  "execution": "REAL_BROWSER_HTTP_SQL_MINIO_ML",
+  "source_fixture": {
+    "name": "demo_journey_upload.csv",
+    "sha256": "352fc7695e352b27beb8e681aa8b3a60e7d7bda937feb9244b2779899cb290b2",
+    "provenance": "UNVERIFIED",
+    "currency": "GBP",
+    "rows": 3,
+    "expected_valid": 2,
+    "expected_rejected": 1
+  },
+  "checks": [
+    {
+      "name": "CUSTOMER_LINK_SAME_ORIGIN_DANH_SHELL",
+      "status": "PASS",
+      "url": "http://127.0.0.1:8010/frontend/customer-segments.html?ui=danh-live-20261025"
+    },
+    {
+      "name": "SQL_AND_HTTP_SOURCE_PREVIEWS_AND_EXISTING_DEMO_SESSION",
+      "status": "PASS"
+    },
+    {
+      "name": "CSV_UPLOAD_PREVIEW_CHECKSUM_AND_UNVERIFIED_LABEL",
+      "status": "PASS",
+      "file_path": "data_lake/raw/uploads/8ac9f2399d4a481db249e5878ae9b5f6/source.csv"
+    },
+    {
+      "name": "THREE_SOURCE_REAL_ETL_WITH_VALID_AND_REJECTED",
+      "status": "PASS",
+      "counts": {
+        "uci": {
+          "raw": 3,
+          "valid": 2,
+          "rejected": 1,
+          "inserted": 0,
+          "updated": 0,
+          "unchanged": 2,
+          "target_count": 2,
+          "target_amount": 8.0,
+          "mismatches": 0,
+          "source_amount": 8.0,
+          "reconciliation": "MATCHED"
+        },
+        "app": {
+          "raw": 38,
+          "valid": 38,
+          "rejected": 0,
+          "inserted": 0,
+          "updated": 0,
+          "unchanged": 38,
+          "target_count": 38,
+          "target_amount": 10255000.0,
+          "mismatches": 0,
+          "source_amount": 10255000.0,
+          "reconciliation": "MATCHED"
+        },
+        "api": {
+          "inserted": 0
+        }
+      }
+    },
+    {
+      "name": "THREE_RAW_FILES_DOWNLOAD_SHA256_AND_MINIO_MANIFEST",
+      "status": "PASS"
+    },
+    {
+      "name": "SELECT_RECORD_RAW_TO_FACT_AND_REAL_REJECTION",
+      "status": "PASS"
+    },
+    {
+      "name": "WAREHOUSE_DIMENSIONS_SQL_RECONCILIATION_AND_FROZEN_REPLAY",
+      "status": "PASS",
+      "counts": {
+        "api": {
+          "inserted": 0
+        },
+        "app": {
+          "raw": 38,
+          "valid": 38,
+          "rejected": 0,
+          "inserted": 0,
+          "updated": 0,
+          "unchanged": 38,
+          "target_count": 38,
+          "target_amount": 10255000.0,
+          "mismatches": 0,
+          "source_amount": 10255000.0,
+          "reconciliation": "MATCHED"
+        },
+        "uci": {
+          "raw": 3,
+          "valid": 2,
+          "rejected": 1,
+          "inserted": 0,
+          "updated": 0,
+          "unchanged": 2,
+          "target_count": 2,
+          "target_amount": 8.0,
+          "mismatches": 0,
+          "source_amount": 8.0,
+          "reconciliation": "MATCHED"
+        }
+      }
+    },
+    {
+      "name": "CUSTOMER_TRANSACTIONS_RFM_STANDARDIZATION_AND_PERSISTED_CLUSTER",
+      "status": "PASS"
+    },
+    {
+      "name": "REAL_MINING_SELECTION_EVALUATION_AND_READBACK",
+      "status": "PASS",
+      "selected_k": 2,
+      "customers": 4317
+    },
+    {
+      "name": "OLAP_FILTER_GRAIN_PIVOT_DRILLTHROUGH_AND_RAW",
+      "status": "PASS"
+    },
+    {
+      "name": "BI_REAL_DATA_SOURCE_OUTAGE_AND_RECOVERY_PRESERVES_STOCK",
+      "status": "PASS"
+    },
+    {
+      "name": "ALL_SEVEN_NODES_MOBILE_DANH_NAVIGATION_NO_OVERFLOW",
+      "status": "PASS"
+    },
+    {
+      "name": "NO_BROWSER_JAVASCRIPT_ERRORS_AND_NO_CACHE_HEADER",
+      "status": "PASS",
+      "header": "no-store, max-age=0"
+    }
+  ],
+  "runs": {
+    "collect": "etl-20261025T113453-c098d4af93",
+    "replay": "etl-20261025T113528-b5ec013688",
+    "mining-run": "mining-20261025T113547-6f280dbad1",
+    "outage": "etl-20261025T113704-35f6806288",
+    "recover": "etl-20261025T113725-172a48edcc"
+  },
+  "status": "PASS",
+  "finished_at": "2026-10-25T11:38:00.738818+00:00"
+}
