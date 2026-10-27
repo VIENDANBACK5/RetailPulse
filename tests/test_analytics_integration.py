@@ -89,3 +89,38 @@ def test_readonly_login_all_endpoints_and_version_selection():
             assert db.execute(text("SELECT has_table_privilege(current_user,'fact_sales','INSERT')")).scalar_one() is False
     finally:
         engine.dispose()
+
+
+def test_fresh_branch_cannot_hide_a_stale_branch(engine):
+    from contextlib import contextmanager
+    from datetime import datetime, timedelta, timezone
+    tag='FRESH_AUDIT_'+uuid.uuid4().hex[:12]
+    now=datetime.now(timezone.utc)
+    with engine.connect() as db:
+        tx=db.begin()
+        class ActualTransaction(module.Analytics):
+            @contextmanager
+            def snapshot(self):
+                yield db
+        service=ActualTransaction(None)
+        try:
+            baseline=service.inventory()['summary']['stale_branches']
+            source=db.execute(text("INSERT INTO dim_source(source_code,source_name,currency) VALUES(:s,'Audit only','VND') RETURNING source_key"),{'s':tag}).scalar_one()
+            product=db.execute(text("INSERT INTO dim_product(source_key,stock_code,description) VALUES(:s,'AUDIT-SKU','Audit only') RETURNING product_key"),{'s':source}).scalar_one()
+            for suffix,age in [('fresh',1),('old',72)]:
+                code=tag+'_'+suffix
+                branch=db.execute(text("INSERT INTO dim_branch(branch_code,branch_name) VALUES(:b,'Audit only') RETURNING branch_key"),{'b':code}).scalar_one()
+                snapshot=now-timedelta(hours=age)
+                db.execute(text("""INSERT INTO fact_inventory_snapshot(date_key,branch_key,product_key,source_key,
+                    stock_on_hand,snapshot_time,node_status,batch_id,snapshot_identity,run_id,raw_path)
+                    VALUES(:date,:b,:p,:s,15,:snapshot,'ONLINE',:id,:identity,:id,'tests/audit')"""),
+                    {'date':int(snapshot.strftime('%Y%m%d')),'b':branch,'p':product,'s':source,'snapshot':snapshot,'id':code,'identity':snapshot.isoformat()})
+                db.execute(text("""INSERT INTO inventory_source_status(run_id,batch_id,source_code,branch_code,status,item_count)
+                    VALUES(:id,:id,:s,:b,'ONLINE',1)"""),{'id':code,'s':tag,'b':code})
+            actual=service.inventory()['summary']
+            assert actual['stale_branches'] == baseline+1
+            assert datetime.fromisoformat(actual['snapshot_time']) > now-timedelta(hours=2)
+            assert service.inventory(branch=tag+'_old')['summary']['stale_locations'] == 1
+            assert service.inventory(branch=tag+'_fresh')['summary']['stale_locations'] == 0
+        finally:
+            tx.rollback()

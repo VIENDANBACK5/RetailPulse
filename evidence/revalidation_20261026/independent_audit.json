@@ -1,0 +1,151 @@
+{
+  "scope": "Independent read-only SQL, original MinIO objects and saved model inference",
+  "checked_at": "2026-10-26T09:14:18.886350+00:00",
+  "status": "PASS",
+  "steps": [
+    {
+      "step": 1,
+      "name": "Source identities and provenance populations",
+      "status": "PASS",
+      "population": [
+        {
+          "source_code": "APP_OPERATIONAL",
+          "provenance": "DEMO",
+          "currency": "VND",
+          "rows": 41,
+          "signed_amount": "10530000.0000"
+        },
+        {
+          "source_code": "UCI_HISTORICAL",
+          "provenance": "OFFICIAL_UCI",
+          "currency": "GBP",
+          "rows": 1061164,
+          "signed_amount": "19445179.5500"
+        },
+        {
+          "source_code": "UCI_HISTORICAL",
+          "provenance": "UNVERIFIED",
+          "currency": "GBP",
+          "rows": 29851,
+          "signed_amount": "1322618.2500"
+        }
+      ]
+    },
+    {
+      "step": 2,
+      "name": "Local Raw and actual MinIO object bytes both match their own manifests",
+      "status": "PASS",
+      "objects": [
+        {
+          "source": "UCI_HISTORICAL",
+          "bytes": 343,
+          "local_checksum": "352fc7695e352b27beb8e681aa8b3a60e7d7bda937feb9244b2779899cb290b2",
+          "object_checksum": "352fc7695e352b27beb8e681aa8b3a60e7d7bda937feb9244b2779899cb290b2",
+          "uri": "s3://retailpulse-raw/raw/source=uci/ingest_date=2026-10-26/batch_id=BATCH-1fa5b85b67bc46dca189fba4753429c4/source.csv"
+        },
+        {
+          "source": "APP_OPERATIONAL",
+          "bytes": 7610,
+          "local_checksum": "b365400f00a6ed0dfd6d933e65bd70fce86f6158fe163cba1595af50019733e8",
+          "object_checksum": "b365400f00a6ed0dfd6d933e65bd70fce86f6158fe163cba1595af50019733e8",
+          "uri": "s3://retailpulse-raw/raw/source=app/ingest_date=2026-10-26/batch_id=BATCH-1fa5b85b67bc46dca189fba4753429c4/orders.csv"
+        },
+        {
+          "source": "INVENTORY_API",
+          "bytes": 36524,
+          "local_checksum": "225dbce32b28fb43c497ad935544a0b50c9a5640df6d08a865ad03215c45786e",
+          "object_checksum": "74cfae700104b155be4871f681a1407e78049dbe64af8e4de8dde181afffbb28",
+          "uri": "s3://retailpulse-raw/raw/source=api/ingest_date=2026-10-26/batch_id=BATCH-1fa5b85b67bc46dca189fba4753429c4/inventory.json"
+        }
+      ]
+    },
+    {
+      "step": 3,
+      "name": "Labelled CSV fixture has two valid and one actually rejected row",
+      "status": "PASS",
+      "rejected": [
+        {
+          "source_code": "UCI_HISTORICAL",
+          "rejection_reason": "Invalid quantity",
+          "raw_data": "{\"invoice_no\": \"DJ-UPLOAD-BAD\", \"stock_code\": \"DJ-UPLOAD-SKU\", \"description\": \"DEMO invalid fixture\", \"quantity\": \"bad\", \"invoice_date\": \"2011-01-03\", \"unit_price\": \"5\", \"customer_id\": \"DJ-UPLOAD-CUSTOMER\", \"country\": \"DEMO\", \"source_sheet\": \"CSV\", \"source_row\": 4, \"source_record_id\": \"352fc7695e352b27beb8e681aa8b3a60e7d7bda937feb9244b2779899cb290b2:CSV:4\", \"provenance\": \"UNVERIFIED\", \"currency\": \"GBP\", \"raw_path\": \"data_lake\\\\raw\\\\uci\\\\etl-20261026T090832-88a97e1dc4\\\\source.csv\", \"source_observed_at\": \"2026-10-26T09:08:38.174272+00:00\", \"rejection_reason\": \"Invalid quantity\"}"
+        }
+      ]
+    },
+    {
+      "step": 4,
+      "name": "SQL reconciliation and replay disposition readback",
+      "status": "PASS",
+      "reconciliation": [
+        {
+          "source_code": "UCI_HISTORICAL",
+          "currency": "GBP",
+          "status": "MATCHED",
+          "diff_amount": "0.00"
+        },
+        {
+          "source_code": "APP_OPERATIONAL",
+          "currency": "VND",
+          "status": "MATCHED",
+          "diff_amount": "0.00"
+        }
+      ]
+    },
+    {
+      "step": 5,
+      "name": "BI and OLAP equal an independent fact-level SQL reference for official provenance",
+      "status": "PASS",
+      "reference": {
+        "gross": "20972594.5500",
+        "returns": "1527415.0000",
+        "net": "19445179.5500",
+        "orders": 40077
+      }
+    },
+    {
+      "step": 6,
+      "name": "Saved scaler/model inference reproduces every label; independent customer RFM SQL agrees",
+      "status": "PASS",
+      "customers": 4317,
+      "selected_k": 2,
+      "rfm_examples": 3
+    },
+    {
+      "step": 7,
+      "name": "BI equation and freshness reflect selected populations, not mock metrics",
+      "status": "PASS",
+      "official_bi": {
+        "year_month": null,
+        "branch_code": null,
+        "branch_name": null,
+        "gross": 20972594.55,
+        "refunds": 1527415.0,
+        "net": 19445179.55,
+        "cancelled": 0.0,
+        "provenances": "OFFICIAL_UCI",
+        "orders": 40077,
+        "row_count": 1061164,
+        "min_date": "2009-12-01",
+        "max_date": "2011-12-09",
+        "last_loaded": "2026-10-20T16:56:00.955151+00:00",
+        "aov": 523.31
+      },
+      "inventory": {
+        "stock": 7164,
+        "low_locations": 0,
+        "zero_locations": 0,
+        "offline_branches": 0,
+        "branch_count": 3,
+        "sku_locations": 60,
+        "stale_locations": 60,
+        "stale_branches": 3,
+        "current_stock": null,
+        "oldest_snapshot_time": "2026-10-20T16:55:21.634418+00:00",
+        "last_collection_at": "2026-10-26T09:11:05.998499+00:00",
+        "snapshot_time": "2026-10-20T16:55:21.687505+00:00",
+        "last_loaded": "2026-10-20T16:55:21.852305+00:00"
+      }
+    }
+  ],
+  "etl_run": "etl-20261026T090832-88a97e1dc4",
+  "mining_run": "mining-20261026T090936-486abdfcd4"
+}

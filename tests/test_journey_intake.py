@@ -77,3 +77,12 @@ def test_raw_download_cannot_escape_root(client):
     (root/'secret.env').write_text('private',encoding='utf-8')
     assert http.get('/api/journey/download?path=secret.env').status_code == 404
     assert http.get('/api/journey/download?path=../secret.env').status_code == 404
+
+
+def test_legacy_xls_is_really_parsed(client):
+    http, root = client
+    payload=(Path(__file__).parent/'fixtures/journey_valid.xls').read_bytes()
+    response=http.post('/api/journey/files?filename=labelled_demo.xls',content=payload)
+    assert response.status_code == 201
+    assert response.json()['preview']['rows'][0]['Invoice'] == 'DJ-XLS'
+    assert int(response.json()['preview']['rows'][0]['Quantity']) == 2

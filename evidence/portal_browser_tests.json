@@ -58,13 +58,13 @@
   },
   "suites": [
     {
-      "title": "dashboard.spec.cjs",
-      "file": "dashboard.spec.cjs",
+      "title": "bi-reading.spec.cjs",
+      "file": "bi-reading.spec.cjs",
       "column": 0,
       "line": 0,
       "specs": [
         {
-          "title": "Danh warehouse dashboard reads actual analytics data",
+          "title": "default BI isolates official provenance and explains net/return/cancel with actual values",
           "ok": true,
           "tags": [],
           "tests": [
@@ -79,12 +79,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 11157,
+                  "duration": 23982,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-25T11:40:57.875Z",
+                  "startTime": "2026-10-26T01:57:18.890Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -92,111 +92,9 @@
               "status": "expected"
             }
           ],
-          "id": "98c9c7983ccfaa711b4b-572525c389b2f4e3c248",
-          "file": "dashboard.spec.cjs",
-          "line": 4,
-          "column": 1
-        },
-        {
-          "title": "Danh pages retain their original shells while extending the data journey",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 90000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 13175,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-25T11:41:09.543Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "98c9c7983ccfaa711b4b-de1d15b681253e2fad5a",
-          "file": "dashboard.spec.cjs",
-          "line": 13,
-          "column": 1
-        },
-        {
-          "title": "secondary customer segmentation link stays on Danh Mining with four evidence blocks and no cache",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 90000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 2757,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-25T11:41:22.750Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "98c9c7983ccfaa711b4b-cbf2cc933209689bafd6",
-          "file": "dashboard.spec.cjs",
-          "line": 27,
-          "column": 1
-        },
-        {
-          "title": "Danh mobile sidebar opens and closes with Escape",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 90000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5952,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-10-25T11:41:25.531Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "98c9c7983ccfaa711b4b-710736c855583eaa8aff",
-          "file": "dashboard.spec.cjs",
-          "line": 39,
+          "id": "61d928f1a597faf32640-25095f4107b01a605ee0",
+          "file": "bi-reading.spec.cjs",
+          "line": 8,
           "column": 1
         }
       ]
@@ -204,9 +102,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-10-25T11:40:56.839Z",
-    "duration": 35150.126000000004,
-    "expected": 4,
+    "startTime": "2026-10-26T01:57:17.998Z",
+    "duration": 25545.869000000002,
+    "expected": 1,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

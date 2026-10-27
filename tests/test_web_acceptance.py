@@ -54,6 +54,21 @@ def test_artifact_download_does_not_disclose_config():
     assert client.get('/api/artifacts',params={'path':'config/config.yaml'}).status_code == 404
 
 
+def test_model_artifacts_download_as_bytes_without_execution(tmp_path, monkeypatch):
+    import importlib
+    web = importlib.import_module('src.web.app')
+    monkeypatch.setattr(web, 'ROOT', tmp_path)
+    models = tmp_path / 'models' / 'runs' / 'test-model'
+    models.mkdir(parents=True)
+    content = b'not an executable pickle; download must never deserialize'
+    (models / 'kmeans.pkl').write_bytes(content)
+    response = client.get('/api/artifacts', params={'path': str(models / 'kmeans.pkl')})
+    assert response.status_code == 200 and response.content == content
+    outside = tmp_path / 'secret.pkl'
+    outside.write_bytes(content)
+    assert client.get('/api/artifacts', params={'path': str(outside)}).status_code == 404
+
+
 def test_no_arbitrary_sql_identifier():
     assert client.get('/api/analytics/sales',params={'grain':"day'); DROP TABLE fact_sales;--"}).status_code == 422
 

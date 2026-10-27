@@ -1,0 +1,14 @@
+{
+  "source": "Playwright CLI execution this session; --reporter=list,json",
+  "started_at": "2026-10-26T09:02:05.374Z",
+  "duration_ms": 267583.481,
+  "passed": 13,
+  "failed": 0,
+  "flaky": 0,
+  "skipped": 0,
+  "scope": [
+    "6 BI semantics/error-state cases (2 explicitly mocked UI contracts)",
+    "4 Danh navigation/mobile cases",
+    "3 real BI controls: refresh, drill, reset, pagination, search, model choice, CSV"
+  ]
+}

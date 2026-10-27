@@ -29,7 +29,7 @@ if (!(Test-DockerEngine)) {
     } while (!$dockerReady -and (Get-Date) -lt $deadline)
     if (!$dockerReady) { throw 'Docker engine startup timed out.' }
 }
-python -c "import pandas, numpy, sklearn, sqlalchemy, psycopg2, fastapi, uvicorn, httpx, boto3"
+python -c "import pandas, numpy, sklearn, sqlalchemy, psycopg2, fastapi, uvicorn, httpx, boto3, openpyxl, xlrd"
 if ($LASTEXITCODE -ne 0) {
     python -m pip install -r requirements.txt
     Check-Exit 'Python dependencies'
@@ -67,6 +67,16 @@ if ($WithLake) {
     }
     $env:LAKE_BACKEND = 's3'
     $env:LAKE_ENDPOINT_URL = 'http://127.0.0.1:9000'
+    if (!$env:LAKE_ACCESS_KEY -or !$env:LAKE_SECRET_KEY) {
+        # Reuse credentials of this project's running MinIO, without logging them.
+        $minioId = docker compose -f docker-compose.yml -f compose.lake.yml ps -q minio
+        $minioConfig = (docker inspect $minioId | ConvertFrom-Json)[0].Config
+        if ($minioConfig.Labels.'com.docker.compose.service' -ne 'minio') { throw 'Cannot verify project MinIO service.' }
+        $minioEnvironment = @{}
+        foreach ($entry in $minioConfig.Env) { $pair = $entry.Split('=',2); $minioEnvironment[$pair[0]] = $pair[1] }
+        $env:LAKE_ACCESS_KEY = $minioEnvironment['MINIO_ROOT_USER']
+        $env:LAKE_SECRET_KEY = $minioEnvironment['MINIO_ROOT_PASSWORD']
+    }
     if (!$env:LAKE_ACCESS_KEY) { $env:LAKE_ACCESS_KEY = 'retailpulse' }
     if (!$env:LAKE_SECRET_KEY) { $env:LAKE_SECRET_KEY = 'retailpulse-local-only' }
     if (!$env:LAKE_BUCKET) { $env:LAKE_BUCKET = 'retailpulse-raw' }
@@ -85,7 +95,7 @@ $controlHealthy = $false
 try { $health = Invoke-RestMethod 'http://127.0.0.1:8010/api/health' -TimeoutSec 5; $controlHealthy = $health.execution -eq 'REAL' } catch {}
 if ($controlHealthy) {
     $expectedBackend = if ($env:LAKE_BACKEND) { $env:LAKE_BACKEND } else { 'local' }
-    if ($health.lake_backend -ne $expectedBackend -or $health.app_id -ne 'retailpulse-control-v6') {
+    if ($health.lake_backend -ne $expectedBackend -or $health.app_id -ne 'retailpulse-control-v8') {
         if ($health.active_run) { throw "Control API is processing $($health.active_run). Wait before changing lake mode." }
         # Only restart the verified RetailPulse uvicorn listener, never an unrelated port owner.
         $listeners = @(Get-NetTCPConnection -LocalPort 8010 -State Listen -ErrorAction SilentlyContinue)

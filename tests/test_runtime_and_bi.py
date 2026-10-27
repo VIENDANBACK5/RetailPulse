@@ -76,6 +76,29 @@ def test_actual_sql_purchase_return_cancellation(sql_fixture):
     assert result["orders"] == 1
 
 
+def test_report_api_contract_separates_cancel_and_provenance(sql_fixture):
+    from contextlib import contextmanager
+    import importlib.util
+    from pathlib import Path
+    spec=importlib.util.spec_from_file_location('bi_semantics_service',Path(__file__).resolve().parents[1]/'fastapi-base/app/services/analytics.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    conn, source, tag=sql_fixture
+    class InTransaction(module.Analytics):
+        @contextmanager
+        def snapshot(self):
+            yield conn  # Real SQL on this rollback fixture; no mocked response.
+    service=InTransaction(None)
+    actual=service.sales('GBP',source=tag,provenance='DEMO')
+    assert actual['summary']['gross'] == 100
+    assert actual['summary']['refunds'] == 20
+    assert actual['summary']['cancelled'] == 50
+    assert actual['summary']['net'] == 80
+    assert actual['summary']['aov'] == 100
+    assert actual['summary']['provenances'] == 'DEMO'
+    assert service.sales('GBP',source=tag,provenance='OFFICIAL_UCI')['summary']['row_count'] == 0
+    assert service.sales('GBP',source=tag,provenance='OFFICIAL_UCI')['summary']['aov'] is None
+
+
 def test_actual_sql_rollup_equals_detail(sql_fixture):
     conn, source, _ = sql_fixture
     daily = conn.execute(text("SELECT sum(net_sales_amount) FROM vw_bi_sales_analytics WHERE source_key=:source GROUP BY full_date"), {"source": source}).scalars().all()

@@ -71,7 +71,7 @@ const templates = {
     `<div id="dj-reconciliation"></div><div id="dj-dispositions"></div><p>Đối soát signed amount theo batch khác công thức Net Sales. Phiên mua 325.000, hủy 50.000 có Net Sales 325.000 VND; signed sum của ba dòng là 275.000.</p>`,
   ],
   olap: [
-    `<div class="dj-controls">${input('dj-currency','Tiền tệ',select('dj-currency',[['GBP','GBP'],['VND','VND']]))}${input('dj-source','Nguồn',select('dj-source',[['UCI_HISTORICAL','UCI lịch sử'],['APP_OPERATIONAL','App DEMO']]))}${input('dj-grain','Cấp thời gian',select('dj-grain',[['year','Năm'],['quarter','Quý'],['month','Tháng'],['day','Ngày']]))}${input('dj-start','Từ ngày','<input id="dj-start" type="date">')}${input('dj-end','Đến ngày','<input id="dj-end" type="date">')}${input('dj-product','SKU','<input id="dj-product" placeholder="Tất cả sản phẩm">')}</div>`,
+    `<div class="dj-controls">${input('dj-currency','Tiền tệ',select('dj-currency',[['GBP','GBP'],['VND','VND']]))}${input('dj-source','Nguồn',select('dj-source',[['UCI_HISTORICAL','File lịch sử / upload'],['APP_OPERATIONAL','App DEMO']]))}${input('dj-provenance','Xuất xứ',select('dj-provenance',[['OFFICIAL_UCI','UCI chính thức'],['DEMO','DEMO'],['UNVERIFIED','File chưa xác minh'],['','Tất cả xuất xứ']]))}${input('dj-grain','Cấp thời gian',select('dj-grain',[['year','Năm'],['quarter','Quý'],['month','Tháng'],['day','Ngày']]))}${input('dj-start','Từ ngày','<input id="dj-start" type="date">')}${input('dj-end','Đến ngày','<input id="dj-end" type="date">')}${input('dj-product','SKU','<input id="dj-product" placeholder="Tất cả sản phẩm">')}</div>`,
     `${btn('olap','Phân tích / Roll-up / Drill-down',true)} ${btn('pivot','Pivot sản phẩm × thời gian')} ${btn('details','Drill-through')}<p>Đổi cấp thời gian và giữ bộ lọc. Source/currency luôn đi cùng ngữ cảnh; pivot có giới hạn số ô được công bố.</p>`,
     `<div id="dj-olap-output"></div><div id="dj-detail-links"></div><div id="dj-lineage"></div>`,
     `<details><summary>SQL đã thực thi và parameters cùng bộ lọc</summary><div id="dj-sql"></div></details>`,
@@ -91,24 +91,32 @@ const templates = {
 };
 
 const root = $('data-journey');
-root.innerHTML = `<nav class="dj-stepbar" aria-label="Luồng dữ liệu 7 bước">${nodes.map(([id,title,page,note],i)=>`<a data-dj-step="${id}" href="${page}?ui=danh-live-20261025#${id}"><span>0${i+1} · ${title}</span><small>${note}</small></a>`).join('')}</nav><div id="dj-message" class="report-message" role="status">Đang đọc backend thật…</div><div class="dj-context" id="dj-context"></div>${localNodes.map(([id,title],i)=>`<article class="card-box workspace-panel dj-node" id="dj-${id}" data-dj-node="${id}" hidden><div class="eyebrow">DATA JOURNEY / ${title}</div><h2 class="section-title">${title}: đầu vào, xử lý và bằng chứng</h2><div class="dj-four">${templates[id].map((html,j)=>panel(['input','process','output','evidence'][j],['Đầu vào','Xử lý','Đầu ra','Bằng chứng'][j],html)).join('')}</div></article>`).join('')}<section class="card-box workspace-panel dj-audit"><div class="dj-controls"><span id="dj-run-status">Chưa theo dõi tác vụ</span>${btn('refresh','Đọc lại dữ liệu')}</div><details><summary>Log kỹ thuật và registry</summary><div id="dj-logs"></div></details></section>`;
+function stageMarkup(id,title) {
+  const blocks=templates[id].map((html,j)=>panel(['input','process','output','evidence'][j],['Đầu vào','Xử lý','Đầu ra','Bằng chứng'][j],html)).join('');
+  return `<article class="card-box workspace-panel dj-node" id="dj-${id}" data-dj-node="${id}" hidden>${id==='bi'?'<details id="dj-bi-evidence"><summary>07 · BI — mở nguồn dữ liệu và bằng chứng khi cần</summary>':`<div class="eyebrow">DATA JOURNEY / ${title}</div><h2 class="section-title">${title}: đầu vào, xử lý và bằng chứng</h2>`}<div class="dj-four">${blocks}</div>${id==='bi'?'</details>':''}</article>`;
+}
+root.innerHTML = `<nav class="dj-stepbar" aria-label="Luồng dữ liệu 7 bước">${nodes.map(([id,title,page,note],i)=>`<a data-dj-step="${id}" href="${page}?ui=danh-live-20261026#${id}"><span>0${i+1} · ${title}</span><small>${note}</small></a>`).join('')}</nav><div id="dj-message" class="report-message" role="status">Đang tải dữ liệu hệ thống…</div><div class="dj-context" id="dj-context"></div>${localNodes.map(([id,title])=>stageMarkup(id,title)).join('')}<section class="card-box workspace-panel dj-audit"><div class="dj-controls"><span id="dj-run-status">Chưa theo dõi tác vụ</span>${btn('refresh','Đọc lại dữ liệu')}</div><details><summary>Log kỹ thuật và registry</summary><div id="dj-logs"></div></details></section>`;
+if($('dj-upload-note'))$('dj-upload-note').insertAdjacentHTML('beforebegin',btn('configured-file','Dùng File theo cấu hình'));
+if($('dj-model-k'))$('dj-model-k').insertAdjacentHTML('beforebegin','<p>Silhouette đo mức tách cụm, không phải độ chính xác. ARI gần 1 cho thấy các seed chia cụm tương tự trên cùng tập khách. Inertia chỉ so khi cùng dữ liệu và tiền xử lý; không chọn K chỉ vì Inertia nhỏ nhất.</p>');
 
 function activate() {
   const requested = location.hash.slice(1);
-  const id = localNodes.some(n=>n[0]===requested) ? requested : file==='dashboard.html' && ['branch-section','customer-report','revenue-section'].includes(requested) ? 'bi' : localNodes[0][0];
+  const id = localNodes.some(n=>n[0]===requested) ? requested : file==='dashboard.html' ? 'bi' : localNodes[0][0];
+  root.dataset.current=id;
+  if($('bi-workspace'))$('bi-workspace').hidden=id!=='bi';
   document.querySelectorAll('[data-dj-node]').forEach(el=>el.hidden=el.dataset.djNode!==id);
   document.querySelectorAll('[data-dj-step]').forEach(el=>el.classList.toggle('active',el.dataset.djStep===id));
   document.querySelectorAll('[data-dj-sidebar]').forEach(el=>{ const active=el.dataset.djSidebar===id; el.classList.toggle('active',active); if(active)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current'); });
   if (!busy) loadNode(id).catch(e=>notify(e.message,true));
 }
 function busyUI(value) { busy=value; root.querySelectorAll('[data-dj-action]').forEach(b=>b.disabled=value); }
-function scope() { $('dj-context').textContent = `ETL: ${state.etlRun || 'chưa chọn'} · Mining: ${state.modelRun || 'chưa chọn'} · Phiên: ${state.sessionId || 'chưa chọn'}`; }
+function scope() { root.dataset.hasActive=String(!!state.active); $('dj-context').textContent = `ETL: ${state.etlRun || 'chưa chọn'} · Mining: ${state.modelRun || 'chưa chọn'} · Phiên: ${state.sessionId || 'chưa chọn'}`; }
 async function refresh() {
   [runs,models,context] = await Promise.all([api('/runs'),api('/models'),api('/demo/context')]);
-  state.etlRun ||= runs.find(r=>r.kind==='etl'&&done.has(r.status))?.run_id;
+  state.etlRun ||= (runs.find(r=>r.kind==='etl'&&r.status==='SUCCESS'&&(result(r).sources?.app||result(r).sources?.uci)) || runs.find(r=>r.kind==='etl'&&done.has(r.status)))?.run_id;
   state.modelRun ||= models.find(r=>r.status==='SUCCESS')?.run_id;
   if(state.sessionId)session=await api('/demo/session/'+encodeURIComponent(state.sessionId));
-  document.querySelectorAll('[data-dj-etl-select]').forEach(s=>{s.innerHTML=runs.filter(r=>r.kind==='etl').map(r=>`<option value="${esc(r.run_id)}">${esc(r.run_id)} · ${esc(r.status)}</option>`).join('');s.value=state.etlRun || '';});
+  document.querySelectorAll('[data-dj-etl-select]').forEach(s=>{s.innerHTML=runs.filter(r=>r.kind==='etl').map(r=>`<option value="${esc(r.run_id)}">${esc(r.run_id)} · ${esc(r.status)} · ${esc(Object.keys(result(r).sources||{}).join('+'))}</option>`).join('');s.value=state.etlRun || '';});
   if($('dj-model')) { $('dj-model').innerHTML=models.filter(r=>r.status==='SUCCESS').map(r=>`<option value="${esc(r.run_id)}">${esc(r.run_id)}</option>`).join('');$('dj-model').value=state.modelRun||''; }
   if($('dj-source-output')&&session) { $('dj-session-label').textContent=`${session.session_id} · DEMO / VND · DWH ${session.verification.status}`;table('dj-source-output',session.source_rows); }
   save();scope();
@@ -136,7 +144,7 @@ async function transform() {
   const own=session ? facts.filter(f=>session.source_item_ids.map(String).includes(String(f.source_record_id))&&f.currency==='VND') : [];
   const sample=selected?facts.filter(f=>String(f.sales_key)===selected):(own.length?own:facts).slice(0,5);
   const traces=await Promise.all(sample.map(f=>api('/lineage/'+f.sales_key)));
-  table('dj-transform',traces.map(t=>({source_record_id:t.fact.source_record_id,raw_quantity:t.raw_record?.quantity,raw_price:t.raw_record?.unit_price,raw_cancelled:t.raw_record?.is_cancelled,transaction_type:t.fact.transaction_type,total_amount:t.fact.total_amount,currency:t.fact.currency,sales_key:t.fact.sales_key,date_key:t.fact.date_key,product_key:t.fact.product_key,customer_key:t.fact.customer_key})));
+  table('dj-transform',traces.map(t=>({source_record_id:t.fact.source_record_id,raw_quantity:t.raw_record?.quantity ?? t.raw_record?.Quantity,raw_price:t.raw_record?.unit_price ?? t.raw_record?.UnitPrice ?? t.raw_record?.Price,raw_cancelled:t.raw_record?.is_cancelled,transaction_type:t.fact.transaction_type,total_amount:t.fact.total_amount,currency:t.fact.currency,sales_key:t.fact.sales_key,date_key:t.fact.date_key,product_key:t.fact.product_key,customer_key:t.fact.customer_key})));
   table('dj-rejected',rejected,[['source_code','Nguồn'],['rejection_reason','Lý do'],['raw_data','Dòng gốc']]);
   table('dj-etl-counts',Object.entries(result(run).sources||{}).map(([source,r])=>({source,raw:r.raw_count,valid:r.valid_count,rejected:r.rejected_count,status:r.status})));
 }
@@ -148,7 +156,7 @@ async function warehouse() {
   table('dj-dispositions',facts.map(f=>({source_record_id:f.source_record_id,observed_batch_id:f.observed_batch_id,disposition:f.disposition,run_id:f.run_id,raw_path:f.raw_path})));
 }
 function filterQuery() {
-  const p=new URLSearchParams();for(const [id,name]of[['dj-currency','currency'],['dj-source','source'],['dj-start','start'],['dj-end','end'],['dj-product','product']])if($(id)?.value)p.set(name,$(id).value);return p;
+  const p=new URLSearchParams();for(const [id,name]of[['dj-currency','currency'],['dj-source','source'],['dj-provenance','provenance'],['dj-start','start'],['dj-end','end'],['dj-product','product']])if($(id)?.value)p.set(name,$(id).value);return p;
 }
 async function olap(action) {
   const p=filterQuery(); if(action!=='details')p.set('grain',$('dj-grain').value);
@@ -180,18 +188,23 @@ async function watch(id, kind) {
       $('dj-run-status').textContent=`${id} · ${run.status}`;
       json('dj-logs',{events:run.events,metadata:run.metadata,error:run.error});
       if(done.has(run.status)) {
+        if(kind==='mining' && run.status==='SUCCESS')state.modelRun=id;
         delete state.active;save();await refresh();
         if(kind==='mining'&&$('dj-model-meta'))await mining();
         if(kind==='etl'&&result(run).sources?.api&&$('dj-outage'))table('dj-outage',result(run).sources.api.branches||[]);
-        activate();notify(`Backend hoàn tất ${id}: ${run.status}. Xem đầu ra và bằng chứng; không suy từ tiến độ giả.`,run.status==='FAILED');break;
+        const retained=kind==='mining'&&run.status!=='SUCCESS'?` Đang giữ mô hình SUCCESS ${state.modelRun || 'chưa có'}; đó không phải kết quả của run lỗi.`:'';
+        activate();notify(`Backend hoàn tất ${id}: ${run.status}. Xem đầu ra và bằng chứng; không suy từ tiến độ giả.${retained}`,run.status==='FAILED');break;
       }
       await new Promise(resolve=>setTimeout(resolve,1300));
     }
   } catch(e) {notify('Chưa đọc được run: '+e.message+'. Tác vụ có thể vẫn chạy; bấm Đọc lại dữ liệu.',true);}
   finally {watching=false;busyUI(false);activate();}
 }
-async function start(kind,params) {
-  const run=await post('/runs',{kind,params});state[kind==='etl'?'etlRun':'modelRun']=run.run_id;state.active={id:run.run_id,kind};save();scope();await watch(run.run_id,kind);
+async function start(kind,params,{select=true}={}) {
+  const run=await post('/runs',{kind,params});
+  if(kind==='etl' && select)state.etlRun=run.run_id;
+  // A pending/failed training job must never replace the selected successful model.
+  state.active={id:run.run_id,kind};save();scope();await watch(run.run_id,kind);
 }
 const actions={
   'preview-db':async()=>{const d=await api('/journey/sources/app');table('dj-db-preview',d.rows);notify(`Đã SELECT/JOIN ${d.record_count} dòng nguồn. Đây chưa phải Raw đã lưu.`);},
@@ -206,7 +219,7 @@ const actions={
   'mining-read':mining,
   'mining-run':()=>start('mining',{source_code:'UCI_HISTORICAL',window_months:Number($('dj-months').value),...($('dj-k').value?{k_clusters:Number($('dj-k').value)}:{})}),
   customer:async()=>{const d=await api('/journey/mining/'+encodeURIComponent(state.modelRun)+'/customer?customer_key='+encodeURIComponent($('dj-customer').value));$('dj-customer-trace').innerHTML='<h4>Giao dịch mua trong cửa sổ (tối đa 20 dòng)</h4><div id="dj-cust-transactions"></div><h4>RFM gốc → chuẩn hóa → nhãn lưu trong DWH</h4><div id="dj-cust-features"></div>';table('dj-cust-transactions',d.transactions);table('dj-cust-features',[{...d.rfm,scaled_R:d.standardized.recency,scaled_F:d.standardized.frequency,scaled_M:d.standardized.monetary,cluster:d.segment?.cluster_name,model_version:d.segment?.model_version}]);},
-  bi,outage:()=>start('etl',{sources:['api'],scenario:'dn_outage'}),recover:()=>start('etl',{sources:['api']}),
+  bi,outage:()=>start('etl',{sources:['api'],scenario:'dn_outage'},{select:false}),recover:()=>start('etl',{sources:['api']},{select:false}),
   refresh:async()=>{await refresh();if(state.active)await watch(state.active.id,state.active.kind);else activate();},
 };
 root.addEventListener('click',async e=>{
@@ -222,11 +235,12 @@ root.addEventListener('click',async e=>{
 root.addEventListener('change',e=>{
   if(e.target.matches('[data-dj-etl-select]')){state.etlRun=e.target.value;save();scope();activate();}
   if(e.target.id==='dj-model'){state.modelRun=e.target.value;save();scope();mining().catch(err=>notify(err.message,true));}
-  if(e.target.id==='dj-source')$('dj-currency').value=e.target.value==='APP_OPERATIONAL'?'VND':'GBP';
+  if(e.target.id==='dj-source'){$('dj-currency').value=e.target.value==='APP_OPERATIONAL'?'VND':'GBP';$('dj-provenance').value=e.target.value==='APP_OPERATIONAL'?'DEMO':'OFFICIAL_UCI';}
 });
 addEventListener('hashchange',activate);
 async function initialize() {
   busyUI(true);
+  activate();
   try {const h=await api('/health');if($('dj-health'))$('dj-health').textContent=`${h.status} · ${h.lake_backend==='s3'?'MinIO Raw':'Local Raw'}`;await refresh();busyUI(false);notify('Dữ liệu và trạng thái được đọc từ backend. Chọn một bước để kiểm chứng.');activate();if(state.active)await watch(state.active.id,state.active.kind);}
   catch(e){busyUI(false);if($('dj-health'))$('dj-health').textContent='Chưa kết nối backend';notify(e.message,true);activate();}
 }

@@ -52,34 +52,38 @@ class Analytics:
 
     def meta(self):
         with self.snapshot() as db:
-            sources = self.rows(db, """SELECT source_code, source_name, currency,
+            sources = self.rows(db, """SELECT source_code, source_name, currency,array_agg(DISTINCT provenance ORDER BY provenance) AS provenances,
                 MIN(full_date) AS min_date, MAX(full_date) AS max_date, COUNT(*) AS row_count
                 FROM vw_bi_sales_analytics GROUP BY source_code, source_name, currency ORDER BY source_code""")
             branches = self.rows(db, "SELECT branch_code,branch_name FROM vw_dashboard_branches ORDER BY branch_code")
         return {"sources": sources, "branches": branches, "generated_at": datetime.now(timezone.utc).isoformat()}
 
-    def sales(self, currency, source=None, branch=None, start=None, end=None):
-        params = {"currency": currency, "source": source, "branch": branch, "start": start, "end": end}
+    def sales(self, currency, source=None, branch=None, start=None, end=None, provenance=None):
+        params = {"currency": currency, "source": source, "branch": branch, "start": start, "end": end, "provenance": provenance}
         where = """currency=:currency AND (:source IS NULL OR source_code=:source)
             AND (:branch IS NULL OR branch_code=:branch)
             AND (CAST(:start AS date) IS NULL OR full_date>=CAST(:start AS date))
-            AND (CAST(:end AS date) IS NULL OR full_date<=CAST(:end AS date))"""
+            AND (CAST(:end AS date) IS NULL OR full_date<=CAST(:end AS date))
+            AND (:provenance IS NULL OR provenance=:provenance)"""
         # Aggregate invoice lines once, then compute total/month/branch in one
         # grouping-sets query. Distinct order identities sort tens of thousands
         # of invoices rather than a million line items. No persistent cache.
         aggregate = f"""WITH invoices AS (
-                SELECT to_char(full_date,'YYYY-MM') AS year_month,branch_code,branch_name,source_code,invoice_no,
+                SELECT to_char(full_date,'YYYY-MM') AS year_month,branch_code,branch_name,source_code,provenance,invoice_no,
                     SUM(gross_sales_amount) AS gross,SUM(refund_amount) AS refunds,
-                    SUM(net_sales_amount) AS net,BOOL_OR(transaction_type='PURCHASE') AS purchased,
+                    SUM(net_sales_amount) AS net,SUM(cancellation_amount) AS cancelled,
+                    BOOL_OR(transaction_type='PURCHASE') AS purchased,
                     COUNT(*) AS line_count,MIN(full_date) AS first_date,
                     MAX(full_date) AS last_date,MAX(loaded_at) AS loaded
                 FROM vw_bi_sales_analytics WHERE {where}
-                GROUP BY to_char(full_date,'YYYY-MM'),branch_code,branch_name,source_code,invoice_no)
+                GROUP BY to_char(full_date,'YYYY-MM'),branch_code,branch_name,source_code,provenance,invoice_no)
                 SELECT year_month,branch_code,branch_name,
                     GROUPING(year_month) AS month_group,GROUPING(branch_code) AS branch_group,
                     ROUND(COALESCE(SUM(gross),0)::numeric,2) AS gross,
                     ROUND(COALESCE(SUM(refunds),0)::numeric,2) AS refunds,
                     ROUND(COALESCE(SUM(net),0)::numeric,2) AS net,
+                    ROUND(COALESCE(SUM(cancelled),0)::numeric,2) AS cancelled,
+                    string_agg(DISTINCT provenance,', ' ORDER BY provenance) AS provenances,
                     COUNT(DISTINCT (source_code,invoice_no)) FILTER (WHERE purchased) AS orders,
                     COALESCE(SUM(line_count),0)::bigint AS row_count,MIN(first_date) AS min_date,
                     MAX(last_date) AS max_date,MAX(loaded) AS last_loaded
@@ -97,7 +101,9 @@ class Analytics:
                 ROUND(SUM(gross_sales_amount)::numeric,2) AS gross
                 FROM vw_bi_sales_analytics WHERE {where} GROUP BY stock_code,product_name
                 HAVING SUM(gross_sales_amount)>0 ORDER BY gross DESC,stock_code LIMIT 10""", params)
-        return {"currency": currency, "summary": summary, "monthly": monthly, "branches": branches, "products": products}
+        return {"currency": currency, "summary": summary, "monthly": monthly, "branches": branches, "products": products,
+                "scope": params, "definitions": {"net": "gross minus RETURN only; CANCELLATION is separate",
+                "aov": "gross / distinct purchase orders; null if no orders"}}
 
     def inventory(self, branch=None, health=None, search="", page=1, page_size=20):
         params = {"branch": branch, "health": health, "search": "%" + search.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%",
@@ -117,6 +123,11 @@ class Analytics:
                 COUNT(DISTINCT branch_code) FILTER (WHERE node_status='OFFLINE') AS offline_branches,
                 COUNT(DISTINCT branch_code) AS branch_count,
                 COUNT(*) FILTER (WHERE node_status='ONLINE') AS sku_locations,
+                COUNT(*) FILTER (WHERE node_status='ONLINE' AND data_status='STALE') AS stale_locations,
+                COUNT(DISTINCT branch_code) FILTER (WHERE node_status='ONLINE' AND data_status='STALE') AS stale_branches,
+                SUM(stock_on_hand) FILTER (WHERE node_status='ONLINE' AND data_status='CURRENT') AS current_stock,
+                MIN(snapshot_time) FILTER (WHERE node_status='ONLINE') AS oldest_snapshot_time,
+                MAX(last_collection_at) AS last_collection_at,
                 MAX(snapshot_time) FILTER (WHERE node_status='ONLINE') AS snapshot_time,
                 MAX(loaded_at) AS last_loaded FROM vw_bi_inventory_status WHERE {where}""", params)
             branch_where = """(:branch IS NULL OR branch_code=:branch) AND
@@ -124,7 +135,14 @@ class Analytics:
                  OR (:health='unknown' AND node_status IN ('UNKNOWN','INVALID','EMPTY'))
                  OR (:health='low' AND node_status='ONLINE' AND low_locations>0)
                  OR (:health='healthy' AND node_status='ONLINE' AND stock>10))"""
-            branches = self.rows(db, f"SELECT * FROM vw_dashboard_inventory_branches WHERE {branch_where} ORDER BY source_code,branch_code", params)
+            branches = self.rows(db, f"""SELECT b.*,z.stale_locations,z.oldest_snapshot_time
+                FROM vw_dashboard_inventory_branches b LEFT JOIN (
+                    SELECT source_code,branch_code,
+                        COUNT(*) FILTER (WHERE node_status='ONLINE' AND data_status='STALE') AS stale_locations,
+                        MIN(snapshot_time) AS oldest_snapshot_time
+                    FROM vw_bi_inventory_status GROUP BY source_code,branch_code
+                ) z USING(source_code,branch_code)
+                WHERE {branch_where} ORDER BY source_code,branch_code""", params)
             summary['offline_branches'] = len({row['branch_code'] for row in branches if row['node_status'] == 'OFFLINE'})
             summary['branch_count'] = len({row['branch_code'] for row in branches})
             total = self.one(db, f"SELECT COUNT(*) AS count FROM vw_bi_inventory_status WHERE {detail_where}", params)["count"]

@@ -102,7 +102,7 @@ def home():
 def health():
     return {"status": "UP", "warehouse": rows("SELECT current_database() AS database, NOW() AS checked_at")[0],
             "execution": "REAL", "lake_backend": os.getenv("LAKE_BACKEND", "local"),
-            "app_id": "retailpulse-control-v6", "workspace": str(ROOT), "active_run": active_job}
+            "app_id": "retailpulse-control-v8", "workspace": str(ROOT), "active_run": active_job}
 
 
 @app.post("/api/runs", status_code=202)
@@ -270,11 +270,14 @@ def preview(path: str, limit: int = Query(20, ge=1, le=100)):
     raise HTTPException(415, "Unsupported preview format")
 
 
-def sales_filter(source, currency, start, end, product, country):
+def sales_filter(source, currency, start, end, product, country, provenance=None):
+    if start and end and start > end:
+        raise HTTPException(422, 'Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.')
     clauses, params = [], {}
     for column, value, key, op in [("source_code", source, "source", "="), ("currency", currency, "currency", "="),
                                    ("full_date", start, "start", ">="), ("full_date", end, "end", "<="),
-                                   ("stock_code", product, "product", "="), ("customer_country", country, "country", "=")]:
+                                   ("stock_code", product, "product", "="), ("customer_country", country, "country", "="),
+                                   ("provenance", provenance, "provenance", "=")]:
         if value:
             clauses.append(f"{column} {op} :{key}")
             params[key] = value
@@ -284,8 +287,9 @@ def sales_filter(source, currency, start, end, product, country):
 @app.get("/api/analytics/sales")
 def sales(grain: Literal["year", "quarter", "month", "day"] = "month", source: str | None = None, currency: str | None = None,
           start: date | None = None, end: date | None = None, product: str | None = None, country: str | None = None,
-          pivot: Literal["time", "product", "country", "source"] = "time"):
-    where, params = sales_filter(source, currency, start, end, product, country)
+          pivot: Literal["time", "product", "country", "source"] = "time",
+          provenance: Literal['OFFICIAL_UCI','DEMO','UNVERIFIED'] | None = None):
+    where, params = sales_filter(source, currency, start, end, product, country, provenance)
     group = {"time": f"date_trunc('{grain}', full_date)::date::text", "product": "stock_code", "country": "customer_country", "source": "source_code"}[pivot]
     query = f"""SELECT {group} AS category, currency,
         SUM(gross_sales_amount) AS gross_purchase_value, SUM(refund_amount) AS return_value,
@@ -302,8 +306,9 @@ def sales(grain: Literal["year", "quarter", "month", "day"] = "month", source: s
 
 @app.get("/api/analytics/sales/details")
 def sales_details(source: str | None = None, currency: str | None = None, start: date | None = None, end: date | None = None,
-                  product: str | None = None, country: str | None = None, limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0)):
-    where, params = sales_filter(source, currency, start, end, product, country)
+                  product: str | None = None, country: str | None = None, limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0),
+                  provenance: Literal['OFFICIAL_UCI','DEMO','UNVERIFIED'] | None = None):
+    where, params = sales_filter(source, currency, start, end, product, country, provenance)
     params.update(limit=limit, offset=offset)
     return rows(f"SELECT * FROM vw_bi_sales_analytics WHERE {where} ORDER BY full_date DESC,sales_key LIMIT :limit OFFSET :offset", params)
 
@@ -313,8 +318,9 @@ def pivot_sales(grain: Literal["year", "quarter", "month", "day"] = "month",
                 dimension: Literal["product", "country", "source"] = "product",
                 source: str | None = None, currency: str | None = None,
                 start: date | None = None, end: date | None = None,
-                product: str | None = None, country: str | None = None):
-    where, params = sales_filter(source, currency, start, end, product, country)
+                product: str | None = None, country: str | None = None,
+                provenance: Literal['OFFICIAL_UCI','DEMO','UNVERIFIED'] | None = None):
+    where, params = sales_filter(source, currency, start, end, product, country, provenance)
     field = {"product": "stock_code", "country": "customer_country", "source": "source_code"}[dimension]
     query = f"""SELECT {field} AS category,currency,date_trunc('{grain}',full_date)::date::text AS period,
         SUM(gross_sales_amount) AS value FROM vw_bi_sales_analytics WHERE {where}
@@ -379,7 +385,7 @@ def artifact(path: str):
         path = normalized[len('/workspace/'):]
     p = (ROOT / path).resolve()
     allowed = [ROOT / "models", ROOT / "artifacts"]
-    if not any(p.is_relative_to(folder.resolve()) for folder in allowed) or not p.is_file() or p.suffix.lower() not in {".csv", ".json", ".png", ".txt"}:
+    if not any(p.is_relative_to(folder.resolve()) for folder in allowed) or not p.is_file() or p.suffix.lower() not in {".csv", ".json", ".png", ".txt", ".pkl"}:
         raise HTTPException(404, "Artifact not found")
     return FileResponse(p)
 

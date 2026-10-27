@@ -34,10 +34,11 @@ def meta():
 def sales(currency: Literal["GBP", "VND", "USD", "EUR"] = "GBP",
           source: Optional[str] = Query(None, max_length=50),
           branch: Optional[str] = Query(None, max_length=30),
-          start: Optional[date] = None, end: Optional[date] = None):
+          start: Optional[date] = None, end: Optional[date] = None,
+          provenance: Optional[Literal['OFFICIAL_UCI', 'DEMO', 'UNVERIFIED']] = None):
     if start and end and start > end:
         raise HTTPException(422, "Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.")
-    return analytics.sales(currency, source, branch, start, end)
+    return analytics.sales(currency, source, branch, start, end, provenance)
 
 
 @router.get("/inventory")

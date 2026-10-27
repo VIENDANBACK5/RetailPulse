@@ -1,5 +1,7 @@
 # Demo 7 bước ngay trong giao diện Danh
 
+> Đã kiểm tra lại và cải tiến BI ngày 26/10/2026: [Báo cáo nghiệm thu 7 bước](REVALIDATION_7_BUOC_20261026.md) và [Sổ tay đọc chỉ số](BI_GIAI_NGHIA_VA_TRA_LOI_THAY.md). Bản BI mới mặc định tách UCI chính thức khỏi File chưa xác minh; mỗi KPI có phần giải thích tại chỗ.
+
 Cập nhật và chạy kiểm chứng ngày 25/10/2026.
 
 ## Giao diện nào đang dùng?
@@ -61,7 +63,7 @@ Các link mới có phiên bản `danh-live-20261025`; server trả `Cache-Contr
 ## Hợp đồng File và giới hạn
 
 - Browser intake tối đa 25 MiB, kiểm tra schema UCI; không tự nhận mọi bảng Excel tùy ý.
-- CSV/XLSX đã có kiểm chứng thực tế. Mã reader có nhánh XLS nhưng môi trường hiện chưa có `xlrd`; nên chuyển XLS cũ sang XLSX/CSV trước khi dùng.
+- CSV/XLSX/XLS đã có kiểm chứng; XLS dùng `xlrd`, được kiểm tra trong bước khởi động. Bộ kiểm thử có tệp XLS nhị phân để xác nhận reader thực sự đọc được định dạng này.
 - File upload có nhãn UNVERIFIED và hợp đồng GBP hiện tại. Không tự gắn OFFICIAL_UCI, đổi sang VND hoặc trộn tiền tệ.
 - Nguồn UCI chính thức có provenance/checksum riêng; Mining chỉ chọn OFFICIAL_UCI theo pipeline hiện có.
 - Không upload lại hai bản xuất lịch sử chồng lấn rồi giả định hệ thống tự nhận diện mọi sự kiện trùng giữa hai checksum khác nhau.

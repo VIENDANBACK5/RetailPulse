@@ -1,0 +1,43 @@
+{
+  "checked_at": "2026-10-25T18:55:31.390416+00:00",
+  "scope": "Real API, no data interception",
+  "checks": [
+    {
+      "width": 1440,
+      "tab": "sales",
+      "status": "PASS",
+      "javascript_errors": []
+    },
+    {
+      "width": 1440,
+      "tab": "inventory",
+      "status": "PASS",
+      "javascript_errors": []
+    },
+    {
+      "width": 1440,
+      "tab": "customers",
+      "status": "PASS",
+      "javascript_errors": []
+    },
+    {
+      "width": 390,
+      "tab": "sales",
+      "status": "PASS",
+      "javascript_errors": []
+    },
+    {
+      "width": 390,
+      "tab": "inventory",
+      "status": "PASS",
+      "javascript_errors": []
+    },
+    {
+      "width": 390,
+      "tab": "customers",
+      "status": "PASS",
+      "javascript_errors": []
+    }
+  ],
+  "status": "PASS"
+}

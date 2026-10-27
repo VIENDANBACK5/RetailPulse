@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-25T11:34:34.866159+00:00",
+  "started_at": "2026-10-26T09:08:01.007277+00:00",
   "execution": "REAL_BROWSER_HTTP_SQL_MINIO_ML",
   "source_fixture": {
     "name": "demo_journey_upload.csv",
@@ -14,7 +14,11 @@
     {
       "name": "CUSTOMER_LINK_SAME_ORIGIN_DANH_SHELL",
       "status": "PASS",
-      "url": "http://127.0.0.1:8010/frontend/customer-segments.html?ui=danh-live-20261025"
+      "url": "http://127.0.0.1:8010/frontend/customer-segments.html?ui=danh-live-20261026"
+    },
+    {
+      "name": "INPUT_GUARDS_NO_FILE_AND_NO_SELECTED_SOURCE",
+      "status": "PASS"
     },
     {
       "name": "SQL_AND_HTTP_SOURCE_PREVIEWS_AND_EXISTING_DEMO_SESSION",
@@ -23,7 +27,7 @@
     {
       "name": "CSV_UPLOAD_PREVIEW_CHECKSUM_AND_UNVERIFIED_LABEL",
       "status": "PASS",
-      "file_path": "data_lake/raw/uploads/8ac9f2399d4a481db249e5878ae9b5f6/source.csv"
+      "file_path": "data_lake/raw/uploads/52e8f1269e7c4cc9b68e9557b2267e94/source.csv"
     },
     {
       "name": "THREE_SOURCE_REAL_ETL_WITH_VALID_AND_REJECTED",
@@ -43,16 +47,16 @@
           "reconciliation": "MATCHED"
         },
         "app": {
-          "raw": 38,
-          "valid": 38,
+          "raw": 41,
+          "valid": 41,
           "rejected": 0,
           "inserted": 0,
           "updated": 0,
-          "unchanged": 38,
-          "target_count": 38,
-          "target_amount": 10255000.0,
+          "unchanged": 41,
+          "target_count": 41,
+          "target_amount": 10530000.0,
           "mismatches": 0,
-          "source_amount": 10255000.0,
+          "source_amount": 10530000.0,
           "reconciliation": "MATCHED"
         },
         "api": {
@@ -76,16 +80,16 @@
           "inserted": 0
         },
         "app": {
-          "raw": 38,
-          "valid": 38,
+          "raw": 41,
+          "valid": 41,
           "rejected": 0,
           "inserted": 0,
           "updated": 0,
-          "unchanged": 38,
-          "target_count": 38,
-          "target_amount": 10255000.0,
+          "unchanged": 41,
+          "target_count": 41,
+          "target_amount": 10530000.0,
           "mismatches": 0,
-          "source_amount": 10255000.0,
+          "source_amount": 10530000.0,
           "reconciliation": "MATCHED"
         },
         "uci": {
@@ -114,6 +118,21 @@
       "customers": 4317
     },
     {
+      "name": "ALL_MODEL_ARTIFACT_DOWNLOADS_MATCH_LOCAL_BYTES",
+      "status": "PASS",
+      "artifacts": 19
+    },
+    {
+      "name": "ALL_FOUR_TIME_GRAINS_PRESERVE_NET_SALES",
+      "status": "PASS",
+      "totals": [
+        10730000.0,
+        10730000.0,
+        10730000.0,
+        10730000.0
+      ]
+    },
+    {
       "name": "OLAP_FILTER_GRAIN_PIVOT_DRILLTHROUGH_AND_RAW",
       "status": "PASS"
     },
@@ -132,12 +151,71 @@
     }
   ],
   "runs": {
-    "collect": "etl-20261025T113453-c098d4af93",
-    "replay": "etl-20261025T113528-b5ec013688",
-    "mining-run": "mining-20261025T113547-6f280dbad1",
-    "outage": "etl-20261025T113704-35f6806288",
-    "recover": "etl-20261025T113725-172a48edcc"
+    "collect": "etl-20261026T090832-88a97e1dc4",
+    "replay": "etl-20261026T090913-cc69a2beab",
+    "mining-run": "mining-20261026T090936-486abdfcd4",
+    "outage": "etl-20261026T091052-602444d1a9",
+    "recover": "etl-20261026T091103-f73170129e"
   },
   "status": "PASS",
-  "finished_at": "2026-10-25T11:38:00.738818+00:00"
+  "clicked_actions": [
+    "official",
+    "configured-file",
+    "upload",
+    "collect",
+    "preview-db",
+    "preview-api",
+    "prepare",
+    "upload",
+    "collect",
+    "raw",
+    "transform",
+    "warehouse",
+    "replay",
+    "mining-read",
+    "customer",
+    "mining-run",
+    "olap",
+    "olap",
+    "olap",
+    "olap",
+    "olap",
+    "pivot",
+    "details",
+    "bi",
+    "outage",
+    "recover",
+    "refresh"
+  ],
+  "javascript_errors": [],
+  "finished_at": "2026-10-26T09:14:14.570927+00:00",
+  "resumed_at": "2026-10-26T09:13:41.065335+00:00",
+  "resume_reason": "Test tried a technical control hidden in BI; open Mining before refreshing",
+  "action_coverage": {
+    "exercised": 21,
+    "total": 21,
+    "actions": [
+      "bi",
+      "collect",
+      "configured-file",
+      "customer",
+      "details",
+      "mining-read",
+      "mining-run",
+      "official",
+      "olap",
+      "outage",
+      "pivot",
+      "prepare",
+      "preview-api",
+      "preview-db",
+      "raw",
+      "recover",
+      "refresh",
+      "replay",
+      "transform",
+      "upload",
+      "warehouse"
+    ]
+  }
 }
